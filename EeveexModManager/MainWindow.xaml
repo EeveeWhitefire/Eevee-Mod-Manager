@@ -1,12 +1,25 @@
-﻿<Window x:Class="EeveexModManager.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EeveexModManager"
+        xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="EeveexModManager.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="549.187" Width="919.817">
     <Grid>
-        
+        <TreeView HorizontalAlignment="Left" Height="283" Margin="36,44,0,0" VerticalAlignment="Top" Width="405">
+            <TreeViewItem Header="Models and Textures" Name="ModelsAndTexturesItem">
+            </TreeViewItem>
+            <TreeViewItem Header="Weapons">
+            </TreeViewItem>
+            <TreeViewItem Header="Armour">
+            </TreeViewItem>
+        </TreeView>
+        <Button Content="Launch Game" HorizontalAlignment="Left" Margin="710,438,0,0" VerticalAlignment="Top" Width="192" Height="70" Click="Button_Click"/>
+        <ComboBox x:Name="ComboBoxTest" HorizontalAlignment="Left" Margin="529,387,0,0" VerticalAlignment="Top" Width="120">
+            <ComboBoxItem Content="test"/>
+        </ComboBox>
+
     </Grid>
 </Window>

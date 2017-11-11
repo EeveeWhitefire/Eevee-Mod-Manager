@@ -98,5 +98,8 @@
   <ItemGroup>
     <Resource Include="Images\test.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mods\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

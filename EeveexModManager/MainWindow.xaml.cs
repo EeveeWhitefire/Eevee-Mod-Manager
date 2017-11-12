@@ -34,7 +34,8 @@ namespace EeveexModManager
         enum SymbolicLink
         {
             File = 0,
-            Directory = 1
+            Directory = 1,
+            Test = 2
         }
 
         DatabaseContext db;
@@ -49,7 +50,7 @@ namespace EeveexModManager
 
             db.ModList?.ToList().ForEach(mod =>
             {
-                AddModToCategory(mod);
+                AddModToCategory(mod, db.ModList.ToList().IndexOf(mod));
             });
 
         }
@@ -68,7 +69,7 @@ namespace EeveexModManager
             Process process = new Process();
             if (GamePicker.SelectedIndex == 0)
             {
-                var mods = db.ModList.ToList();
+                var mods = db.ModList.Where( x => x.Active && x.Installed).ToList();
                 mods.ForEach(mod =>
                 {
                     var fileName = mod.SourceArchive.Split('\\').Last();
@@ -78,8 +79,10 @@ namespace EeveexModManager
                         string symbolicLink = $@"E:\Steam-Main\steamapps\common\Skyrim Special Edition\Data\{file}";
                         string filePath = $@"D:\OneDrive\EeveexModManager\EeveexModManager\bin\x64\Debug\Mods\{fileName}\{file}";
 
+                        //CreateSymbolicLink(symbolicLink, filePath, SymbolicLink.Test); //creating symlinks
+                        File.Copy(filePath, symbolicLink); //manual copy of mod's files
+
                         linksToDelete.Add(symbolicLink);
-                        CreateSymbolicLink(symbolicLink, filePath, SymbolicLink.File); //creating symlinks
 
                         //TODO: skyrim needs to be able to access these files (it detects the files but says that the required files are not present)
                     });
@@ -97,26 +100,69 @@ namespace EeveexModManager
             }
         }
 
-        void AddModToCategory(ModDatabase mod)
+        void OnItemMouseDoubleClick(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("test");
+        }
+        void AddModToCategory(ModDatabase mod, int modIndex)
         {
             var x = new StackPanel
             {
                 Orientation = Orientation.Horizontal
             };
-            var z = new BitmapImage(new Uri("pack://application:,,,/Images/test.png"));
-
-            x.Children.Add(new Image()
+            //var z = new BitmapImage(new Uri("pack://application:,,,/Images/test.png"));
+            Button newButton = new Button()
             {
-                Source = z,
-                Width = 20
+                Background = mod.Active ? Brushes.Green : Brushes.Red,
+                Content = modIndex,
+                Foreground = Brushes.White,
+                Width = 15
+            };
+            newButton.Click += new RoutedEventHandler(ActivateModButton_Click);
+
+            x.Children.Add(newButton);
+            x.Children.Add(new TextBlock()
+            {
+                Text = mod.Name,
+                VerticalAlignment = VerticalAlignment.Center
             });
             x.Children.Add(new TextBlock()
             {
-                Text = $"{mod.Name}        Active:  {mod.Active}     Id:  {mod.Id}     Version:  {mod.Version}",
+                Text = mod.Active.ToString(),
+                VerticalAlignment = VerticalAlignment.Center
+            });
+            x.Children.Add(new TextBlock()
+            {
+                Text = mod.Id.ToString(),
+                VerticalAlignment = VerticalAlignment.Center
+            });
+            x.Children.Add(new TextBlock()
+            {
+                Text = mod.Version,
                 VerticalAlignment = VerticalAlignment.Center
             });
 
             ModelsAndTexturesItem.Items.Add(x);
+        }
+
+        private void ActivateModButton_Click(object sender, RoutedEventArgs e)
+        {
+            var button = (Button)sender;
+
+            if (button.Background == Brushes.Green)
+            {
+                button.Background = Brushes.Red;
+            }
+            else
+            {
+                button.Background = Brushes.Green;
+            }
+
+            var mod = db.ModList.ToList()[Convert.ToInt32(button.Content)];
+            mod.Active = !mod.Active;
+            db.ModList.Update(mod);
+
+            db.SaveChanges();
         }
 
         private void GameDirButton_Click(object sender, RoutedEventArgs e)
@@ -161,7 +207,7 @@ namespace EeveexModManager
                 Version = props.Last()
             };
 
-            AddModToCategory(newMod);
+            AddModToCategory(newMod, db.ModList.Count());
 
             db.ModList.Add(newMod);
             db.SaveChanges();

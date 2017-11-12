@@ -17,7 +17,7 @@
             </TreeViewItem>
         </TreeView>
         <Button Name="GameLaunchButton" Content="Launch Game" HorizontalAlignment="Left" Margin="710,438,0,0" VerticalAlignment="Top" Width="192" Height="70" Click="GameLaunchButton_Click"/>
-        <ComboBox x:Name="GamePicker" HorizontalAlignment="Left" Margin="585,438,0,0" VerticalAlignment="Top" Width="120" Height="70">
+        <ComboBox x:Name="GamePicker" HorizontalAlignment="Left" Margin="570,481,0,0" VerticalAlignment="Top" Width="135" Height="27">
             <StackPanel Orientation="Horizontal">
                 <Image Source="Images\test.png" Width="20"/>
                 <TextBlock Text="SSE" VerticalAlignment="Center"/>
@@ -28,8 +28,7 @@
             </StackPanel>
         </ComboBox>
         <Button Name="GameDirButton" Content="..." HorizontalAlignment="Left" Margin="827,10,0,0" VerticalAlignment="Top" Width="75" Click="GameDirButton_Click"/>
-        <Button Content="Install Mod" HorizontalAlignment="Left" Margin="658,164,0,0" VerticalAlignment="Top" Width="244" Height="61" Click="InstallModButton_Click"/>
+        <Button Content="Install Mod" HorizontalAlignment="Left" Margin="710,372,0,0" VerticalAlignment="Top" Width="192" Height="61" Click="InstallModButton_Click"/>
         <Label Content="Mod List:" HorizontalAlignment="Left" Margin="36,13,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.769"/>
-
     </Grid>
 </Window>

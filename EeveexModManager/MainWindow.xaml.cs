@@ -19,6 +19,7 @@ using System.IO;
 using SevenZip;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace EeveexModManager
 {
@@ -72,7 +73,7 @@ namespace EeveexModManager
                 {
                     var fileName = mod.SourceArchive.Split('\\').Last();
                     var files = Directory.GetFiles($@"Mods\{fileName}");
-                    files.ToList().Select( x => x.Split('\\').Last()).ToList().ForEach(file =>
+                    files.Select( x => x.Split('\\').Last()).ToList().ForEach(file =>
                     {
                         string symbolicLink = $@"E:\Steam-Main\steamapps\common\Skyrim Special Edition\Data\{file}";
                         string filePath = $@"D:\OneDrive\EeveexModManager\EeveexModManager\bin\x64\Debug\Mods\{fileName}\{file}";

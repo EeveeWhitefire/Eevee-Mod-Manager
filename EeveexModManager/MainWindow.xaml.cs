@@ -64,6 +64,7 @@ namespace EeveexModManager
 
         private void GameLaunchButton_Click(object sender, RoutedEventArgs e)
         {
+            Process process = new Process();
             if (GamePicker.SelectedIndex == 0)
             {
                 var mods = db.ModList.ToList();
@@ -78,19 +79,20 @@ namespace EeveexModManager
 
                         linksToDelete.Add(symbolicLink);
                         CreateSymbolicLink(symbolicLink, filePath, SymbolicLink.File); //creating symlinks
+
+                        //TODO: skyrim needs to be able to access these files (it detects the files but says that the required files are not present)
                     });
                 });
 
-                Process skyrimProcess = new Process();
                 ProcessStartInfo startInfo = new ProcessStartInfo()
                 {
                     FileName = skyrimDir,
                     UseShellExecute = true
                 };
-                skyrimProcess.StartInfo = startInfo;
-                skyrimProcess.Start();
+                process.StartInfo = startInfo;
+                process.Start();
 
-                skyrimProcess.WaitForExit();
+                process.WaitForExit();
             }
         }
 

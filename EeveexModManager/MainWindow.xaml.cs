@@ -18,6 +18,7 @@ using System.IO.Compression;
 using System.IO;
 using SevenZip;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.InteropServices;
 
 namespace EeveexModManager
 {
@@ -26,13 +27,24 @@ namespace EeveexModManager
     /// </summary>
     public partial class MainWindow : Window
     {
+        [DllImport("kernel32.dll")]
+        static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, SymbolicLink dwFlags);
+
+        enum SymbolicLink
+        {
+            File = 0,
+            Directory = 1
+        }
+
         DatabaseContext db;
-        string skyrimDir = @"E:\Steam-Main\steamapps\common\Skyrim Special Edition\SkyrimSELauncher.exe";
+        string skyrimDir = @"E:\Steam-Main\steamapps\common\Skyrim Special Edition\SkyrimSE.exe";
+        List<string> linksToDelete;
         public MainWindow()
         {
             InitializeComponent();
             db = new DatabaseContext();
             db.Database.Migrate();
+            linksToDelete = new List<string>();
 
             db.ModList?.ToList().ForEach(mod =>
             {
@@ -41,20 +53,44 @@ namespace EeveexModManager
 
         }
 
+        ~MainWindow() //removing the symlinks
+        {
+            linksToDelete.ForEach(link =>
+            {
+                if(File.Exists(link))
+                    File.Delete(link);
+            });
+        }
+
         private void GameLaunchButton_Click(object sender, RoutedEventArgs e)
         {
             if (GamePicker.SelectedIndex == 0)
             {
+                var mods = db.ModList.ToList();
+                mods.ForEach(mod =>
+                {
+                    var fileName = mod.SourceArchive.Split('\\').Last();
+                    var files = Directory.GetFiles($@"Mods\{fileName}");
+                    files.ToList().Select( x => x.Split('\\').Last()).ToList().ForEach(file =>
+                    {
+                        string symbolicLink = $@"E:\Steam-Main\steamapps\common\Skyrim Special Edition\Data\{file}";
+                        string filePath = $@"D:\OneDrive\EeveexModManager\EeveexModManager\bin\x64\Debug\Mods\{fileName}\{file}";
+
+                        linksToDelete.Add(symbolicLink);
+                        CreateSymbolicLink(symbolicLink, filePath, SymbolicLink.File); //creating symlinks
+                    });
+                });
+
                 Process skyrimProcess = new Process();
                 ProcessStartInfo startInfo = new ProcessStartInfo()
                 {
                     FileName = skyrimDir,
-                    UseShellExecute = false
+                    UseShellExecute = true
                 };
                 skyrimProcess.StartInfo = startInfo;
                 skyrimProcess.Start();
+
                 skyrimProcess.WaitForExit();
-                MessageBox.Show("exited");
             }
         }
 
@@ -66,8 +102,16 @@ namespace EeveexModManager
             };
             var z = new BitmapImage(new Uri("pack://application:,,,/Images/test.png"));
 
-            x.Children.Add(new Image() { Source = z, Width = 20 });
-            x.Children.Add(new TextBlock() { Text = $"{mod.Name}        Active:{mod.Active}     Id:{mod.Id}     Version:{mod.Version}" });
+            x.Children.Add(new Image()
+            {
+                Source = z,
+                Width = 20
+            });
+            x.Children.Add(new TextBlock()
+            {
+                Text = $"{mod.Name}        Active:  {mod.Active}     Id:  {mod.Id}     Version:  {mod.Version}",
+                VerticalAlignment = VerticalAlignment.Center
+            });
 
             ModelsAndTexturesItem.Items.Add(x);
         }
@@ -94,17 +138,17 @@ namespace EeveexModManager
             
             var modProperties = archive.FileName.Split('-');
 
-            if (!Directory.Exists($@"Mods\{archive.FileName}"))
+            if (!Directory.Exists($@"Mods\{archive.FileName}{archive.Extension}"))
             {
                 archive.Extract();
 
-                CreateMod(archive, modProperties).GetAwaiter();
+                CreateMod(archive, modProperties);
             }
         }
 
-        async Task CreateMod(ArchiveFile archive, string[] props)
+        void CreateMod(ArchiveFile archive, string[] props)
         {
-            ModDatabase newMod = new ModDatabase()
+            ModDatabase newMod = new ModDatabase
             {
                 SourceArchive = archive.GetFullArchivePath(),
                 Active = false,
@@ -116,8 +160,8 @@ namespace EeveexModManager
 
             AddModToCategory(newMod);
 
-            await db.ModList.AddAsync(newMod);
-            await db.SaveChangesAsync();
+            db.ModList.Add(newMod);
+            db.SaveChanges();
         }
 
         public class ArchiveFile
@@ -198,6 +242,5 @@ namespace EeveexModManager
         public class Mod : ModDatabase , IMod
         {
         }
-
     }
 }

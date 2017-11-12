@@ -17,6 +17,7 @@ using Microsoft.Win32;
 using System.IO.Compression;
 using System.IO;
 using SevenZip;
+using Microsoft.EntityFrameworkCore;
 
 namespace EeveexModManager
 {
@@ -25,11 +26,19 @@ namespace EeveexModManager
     /// </summary>
     public partial class MainWindow : Window
     {
+        DatabaseContext db;
         string skyrimDir = @"E:\Steam-Main\steamapps\common\Skyrim Special Edition\SkyrimSELauncher.exe";
         public MainWindow()
         {
             InitializeComponent();
-            
+            db = new DatabaseContext();
+            db.Database.Migrate();
+
+            db.ModList?.ToList().ForEach(mod =>
+            {
+                AddModToCategory(mod);
+            });
+
         }
 
         private void GameLaunchButton_Click(object sender, RoutedEventArgs e)
@@ -49,7 +58,7 @@ namespace EeveexModManager
             }
         }
 
-        void AddModToCategory(int index, Mod mod)
+        void AddModToCategory(ModDatabase mod)
         {
             var x = new StackPanel
             {
@@ -89,18 +98,26 @@ namespace EeveexModManager
             {
                 archive.Extract();
 
-                Mod newMod = new Mod()
-                {
-                    SourceArchive = archive,
-                    Active = false,
-                    Id = Convert.ToUInt64(modProperties[1]),
-                    Name = modProperties.First(),
-                    Installed = true,
-                    Version = modProperties.Last()
-                };
-
-                AddModToCategory(0, newMod);
+                CreateMod(archive, modProperties).GetAwaiter();
             }
+        }
+
+        async Task CreateMod(ArchiveFile archive, string[] props)
+        {
+            ModDatabase newMod = new ModDatabase()
+            {
+                SourceArchive = archive.GetFullArchivePath(),
+                Active = false,
+                Id = Convert.ToUInt64(props[1]),
+                Name = props.First(),
+                Installed = true,
+                Version = props.Last()
+            };
+
+            AddModToCategory(newMod);
+
+            await db.ModList.AddAsync(newMod);
+            await db.SaveChangesAsync();
         }
 
         public class ArchiveFile
@@ -137,6 +154,11 @@ namespace EeveexModManager
                 }
             }
 
+            public string GetFullArchivePath()
+            {
+                return $"{Path}\\{FileName}{Extension}";
+            }
+
             public void Extract()
             {
                 string extractFrom = $@"{Path}\{FileName}{Extension}";
@@ -168,16 +190,13 @@ namespace EeveexModManager
 
         }
 
-
-        public class Mod
+        public interface IMod
         {
-            public ulong Id { get; set; }
-            public string Version { get; set; }
-            public string Name { get; set; }
-            public bool Active { get; set; }
-            public bool Installed { get; set; }
 
-            public ArchiveFile SourceArchive { get; set; }
+        }
+
+        public class Mod : ModDatabase , IMod
+        {
         }
 
     }

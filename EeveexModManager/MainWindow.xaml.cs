@@ -12,11 +12,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using EeveexModManager.Classes;
 using System.Diagnostics;
 using Microsoft.Win32;
 using System.IO.Compression;
 using System.IO;
+using SevenZip;
 
 namespace EeveexModManager
 {
@@ -74,19 +74,24 @@ namespace EeveexModManager
         private void InstallModButton_Click(object sender, RoutedEventArgs e)
         {
 
-            OpenFileDialog dialog = new OpenFileDialog();
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = "Archive Files|*.rar;*.zip;*.7z;"
+            };
+
             dialog.ShowDialog();
 
-            var filePath = dialog.FileName;
-            var fileName = filePath.Split('\\').Last();
-            var modProperties = fileName.Replace(".zip", "").Split('-');
+            ArchiveFile archive = new ArchiveFile(dialog.FileName);
+            
+            var modProperties = archive.FileName.Split('-');
 
-            if (!Directory.Exists($@"Mods\{fileName}"))
+            if (!Directory.Exists($@"Mods\{archive.FileName}"))
             {
-                ZipFile.ExtractToDirectory(filePath, $@"Mods\{fileName}");
+                archive.Extract();
 
                 Mod newMod = new Mod()
                 {
+                    SourceArchive = archive,
                     Active = false,
                     Id = Convert.ToUInt64(modProperties[1]),
                     Name = modProperties.First(),
@@ -97,5 +102,83 @@ namespace EeveexModManager
                 AddModToCategory(0, newMod);
             }
         }
+
+        public class ArchiveFile
+        {
+            public string Extension { get; set; }
+
+            ArchiveType FileType;
+
+            public string FileName { get; set; }
+            public string Path { get; set; }
+
+            public ArchiveFile(string fullPath)
+            {
+                var parts = fullPath.Split('\\');
+                var name = parts.Last().Split('.');
+
+                Path = string.Join("\\", parts.Take(parts.Length - 1));
+                FileName = name[0];
+                Extension = $".{name[1].ToLower()}";
+
+                switch (Extension)
+                {
+                    case ".rar":
+                        FileType = ArchiveType.Rar;
+                        break;
+                    case ".zip":
+                        FileType = ArchiveType.Zip;
+                        break;
+                    case ".7z":
+                        FileType = ArchiveType.SevenZip;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            public void Extract()
+            {
+                string extractFrom = $@"{Path}\{FileName}{Extension}";
+                string extractTo = $@"Mods\{FileName}";
+
+                switch (FileType)
+                {
+                    case ArchiveType.Rar:
+                        break;
+                    case ArchiveType.SevenZip:
+                        SevenZipBase.SetLibraryPath(@"D:\OneDrive\EeveexModManager\EeveexModManager\7z.dll");
+                        SevenZipExtractor extractor = new SevenZipExtractor(extractFrom);
+                        extractor.ExtractArchive(extractTo);
+                        break;
+                    case ArchiveType.Zip:
+                        ZipFile.ExtractToDirectory(extractFrom, extractTo);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            enum ArchiveType
+            {
+                Rar,
+                SevenZip,
+                Zip
+            }
+
+        }
+
+
+        public class Mod
+        {
+            public ulong Id { get; set; }
+            public string Version { get; set; }
+            public string Name { get; set; }
+            public bool Active { get; set; }
+            public bool Installed { get; set; }
+
+            public ArchiveFile SourceArchive { get; set; }
+        }
+
     }
 }

@@ -55,7 +55,7 @@ namespace EeveexModManager
 
         }
 
-        ~MainWindow() //removing the symlinks
+        ~MainWindow() //removing the symlinks / mod files
         {
             linksToDelete.ForEach(link =>
             {
@@ -104,6 +104,7 @@ namespace EeveexModManager
         {
             MessageBox.Show("test");
         }
+
         void AddModToCategory(ModDatabase mod, int modIndex)
         {
             var x = new StackPanel

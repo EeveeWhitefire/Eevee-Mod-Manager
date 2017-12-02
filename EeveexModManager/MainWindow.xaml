@@ -30,5 +30,8 @@
         <Button Name="GameDirButton" Content="..." HorizontalAlignment="Left" Margin="827,10,0,0" VerticalAlignment="Top" Width="75" Click="GameDirButton_Click"/>
         <Button Content="Install Mod" HorizontalAlignment="Left" Margin="710,372,0,0" VerticalAlignment="Top" Width="192" Height="61" Click="InstallModButton_Click"/>
         <Label Content="Mod List:" HorizontalAlignment="Left" Margin="36,13,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.769"/>
+        <Button Content="Associate" HorizontalAlignment="Left" Margin="827,186,0,0" VerticalAlignment="Top" Width="75" Click="Association_Button_Click"/>
+        <CheckBox x:Name="AssociationWithNXM_CheckBox" HorizontalAlignment="Left" Margin="806,189,0,0" VerticalAlignment="Top"/>
+        <Button Content="Test Download" HorizontalAlignment="Left" Margin="783,237,0,0" VerticalAlignment="Top" Width="119" Click="Test_Download_Click"/>
     </Grid>
 </Window>

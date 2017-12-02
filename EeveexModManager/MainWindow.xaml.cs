@@ -16,10 +16,15 @@ using System.Diagnostics;
 using Microsoft.Win32;
 using System.IO.Compression;
 using System.IO;
+using System.Net.Http;
 using SevenZip;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;
 using System.Threading;
+using EeveexModManager.Services;
+using EeveexModManager.JsonClasses;
+using System.Net;
+using EeveexModManager.Nexus;
 
 namespace EeveexModManager
 {
@@ -41,27 +46,67 @@ namespace EeveexModManager
         DatabaseContext db;
         string skyrimDir = @"E:\Steam-Main\steamapps\common\Skyrim Special Edition\SkyrimSE.exe";
         List<string> linksToDelete;
-        public MainWindow()
+        Service_JsonParser jsonParser;
+        public static Json_Config config;
+
+        Mutex m;
+
+        Thickness modListMargin;
+
+        public MainWindow(ref Mutex mutex, bool IgnoreLink = false, NexusUrl nexusUrl = null)
         {
-            InitializeComponent();
-            db = new DatabaseContext();
-            db.Database.Migrate();
-            linksToDelete = new List<string>();
-
-            db.ModList?.ToList().ForEach(mod =>
+            m = mutex;
+            if (nexusUrl == null || IgnoreLink)
             {
-                AddModToCategory(mod, db.ModList.ToList().IndexOf(mod));
-            });
+                InitializeComponent();
 
+                modListMargin = new Thickness(10, 2, 10, 2);
+                jsonParser = new Service_JsonParser();
+
+                db = new DatabaseContext();
+                db.Database.Migrate();
+
+                config = jsonParser.GetJsonFields<Json_Config>();
+
+                AssociationWithNXM_CheckBox.IsChecked = config.Nxm_Handled;
+
+                linksToDelete = new List<string>();
+
+                db.ModList?.ToList().ForEach(mod =>
+                {
+                    AddModToCategory(mod, db.ModList.ToList().IndexOf(mod));
+                });
+
+                if (nexusUrl != null)
+                {
+                    MessageBox.Show("Installing new mod!");
+                    CreateMod(nexusUrl);
+                }
+            }
         }
+        
 
         ~MainWindow() //removing the symlinks / mod files
         {
+            m.Close();
+
             linksToDelete.ForEach(link =>
             {
                 if(File.Exists(link))
                     File.Delete(link);
             });
+
+            try
+            {
+                if (config.Nxm_Handled != (bool)AssociationWithNXM_CheckBox.IsChecked)
+                {
+                    AssociationManagement(config.Nxm_Handled);
+                }
+            }
+            catch (Exception)
+            {
+            }
+
         }
 
         private void GameLaunchButton_Click(object sender, RoutedEventArgs e)
@@ -105,8 +150,17 @@ namespace EeveexModManager
             MessageBox.Show("test");
         }
 
+        #region Json_Handling
+
+        #endregion
+
+        #region Mod_Management
+
+
         void AddModToCategory(ModDatabase mod, int modIndex)
         {
+            int ModNameWidth = 200;
+
             var x = new StackPanel
             {
                 Orientation = Orientation.Horizontal
@@ -116,6 +170,7 @@ namespace EeveexModManager
             {
                 Background = mod.Active ? Brushes.Green : Brushes.Red,
                 Content = modIndex,
+                Margin = modListMargin,
                 Foreground = Brushes.White,
                 Width = 15
             };
@@ -125,22 +180,23 @@ namespace EeveexModManager
             x.Children.Add(new TextBlock()
             {
                 Text = mod.Name,
-                VerticalAlignment = VerticalAlignment.Center
-            });
-            x.Children.Add(new TextBlock()
-            {
-                Text = mod.Active.ToString(),
-                VerticalAlignment = VerticalAlignment.Center
+                Margin = modListMargin,
+                VerticalAlignment = VerticalAlignment.Center,
+                Width = ModNameWidth
             });
             x.Children.Add(new TextBlock()
             {
                 Text = mod.Id.ToString(),
-                VerticalAlignment = VerticalAlignment.Center
+                Margin = modListMargin,
+                VerticalAlignment = VerticalAlignment.Center,
+                Width = 50
             });
             x.Children.Add(new TextBlock()
             {
                 Text = mod.Version,
-                VerticalAlignment = VerticalAlignment.Center
+                Margin = modListMargin,
+                VerticalAlignment = VerticalAlignment.Center,
+                Width = 30
             });
 
             ModelsAndTexturesItem.Items.Add(x);
@@ -182,27 +238,28 @@ namespace EeveexModManager
                 Filter = "Archive Files|*.rar;*.zip;*.7z;"
             };
 
-            dialog.ShowDialog();
-
-            ArchiveFile archive = new ArchiveFile(dialog.FileName);
-            
-            var modProperties = archive.FileName.Split('-');
-
-            if (!Directory.Exists($@"Mods\{archive.FileName}{archive.Extension}"))
+            if (dialog.ShowDialog() == true)
             {
-                archive.Extract();
+                ArchiveFile archive = new ArchiveFile(dialog.FileName);
 
-                CreateMod(archive, modProperties);
+                var modProperties = archive.FileName.Split('-');
+
+                if (!Directory.Exists($@"Mods\{archive.FileName}{archive.Extension}"))
+                {
+                    archive.Extract();
+
+                    CreateMod(archive, modProperties);
+                }
             }
         }
 
-        void CreateMod(ArchiveFile archive, string[] props)
+        public void CreateMod(ArchiveFile archive, string[] props)
         {
             ModDatabase newMod = new ModDatabase
             {
                 SourceArchive = archive.GetFullArchivePath(),
                 Active = false,
-                Id = Convert.ToUInt64(props[1]),
+                Id = props[1],
                 Name = props.First(),
                 Installed = true,
                 Version = props.Last()
@@ -212,6 +269,30 @@ namespace EeveexModManager
 
             db.ModList.Add(newMod);
             db.SaveChanges();
+        }
+
+        public void CreateMod(NexusUrl nexusUrl)
+        {
+            if (!db.ModList.Select(x => x.FileId).Contains(nexusUrl.FileId))
+            {
+                ModDatabase newMod = new ModDatabase
+                {
+                    SourceArchive = $@"Downloads\{nexusUrl.ModId}-{nexusUrl.FileId}.zip",
+                    Active = false,
+                    Id = nexusUrl.ModId,
+                    FileId = nexusUrl.FileId,
+                    Name = "def",
+                    Installed = true,
+                    FullSourceUrl = nexusUrl.SourceUrl.ToString(),
+                    Version = "1.1.1",
+                    GameName = nexusUrl.GameName
+                };
+
+                AddModToCategory(newMod, db.ModList.Count());
+
+                db.ModList.Add(newMod);
+                db.SaveChanges();
+            }
         }
 
         public class ArchiveFile
@@ -291,6 +372,89 @@ namespace EeveexModManager
 
         public class Mod : ModDatabase , IMod
         {
+        }
+
+        #endregion
+
+        #region NXM_Association
+        public static void AssociateNxmFile(string Extension, string KeyName, string OpenWith, string FileDescription)
+        {
+            string strFileId = Extension + "_File_Type";
+
+            try
+            {
+                Registry.SetValue(@"HKEY_CLASSES_ROOT\" + "." + Extension, null, strFileId);
+                Registry.SetValue(@"HKEY_CLASSES_ROOT\" + strFileId, null, FileDescription, RegistryValueKind.String);
+                Registry.SetValue(@"HKEY_CLASSES_ROOT\" + strFileId + @"\DefaultIcon", null, OpenWith + ",0", RegistryValueKind.String);
+                Registry.SetValue(@"HKEY_CLASSES_ROOT\" + strFileId + @"\shell\open\command", null, "\"" + OpenWith + "\" \"%1\"", RegistryValueKind.String);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw new InvalidOperationException("Something (usually your antivirus) is preventing the program from interacting with the registry and changing the file associations.");
+            }
+        }
+
+        protected void UnassociateNxmFile(string name)
+        {
+            string strFileId =  name + "_File_Type";
+            string[] strKeys = Registry.ClassesRoot.GetSubKeyNames();
+            if (Array.IndexOf<string>(strKeys, strFileId) != -1)
+            {
+                Registry.ClassesRoot.DeleteSubKeyTree(strFileId);
+                Registry.ClassesRoot.DeleteSubKeyTree("." + name);
+            }
+        }
+
+        public void AssociateNxmUrl(string name, string desc, string exePath)
+        {
+
+            string strUrlId = "URL:" + desc;
+            Registry.SetValue(@"HKEY_CLASSES_ROOT\" + name, null, strUrlId, RegistryValueKind.String);
+            Registry.SetValue(@"HKEY_CLASSES_ROOT\" + name, "URL Protocol", "", RegistryValueKind.String);
+            Registry.SetValue(@"HKEY_CLASSES_ROOT\" + name + @"\DefaultIcon", null, exePath + ",0", RegistryValueKind.String);
+            Registry.SetValue(@"HKEY_CLASSES_ROOT\" + name + @"\shell\open\command", null, "\"" + exePath + "\" \"%1\"", RegistryValueKind.String);
+        }
+        protected void UnassociateNxmUrl(string name)
+        {
+            string[] strKeys = Registry.ClassesRoot.GetSubKeyNames();
+            if (Array.IndexOf(strKeys, name) != -1)
+                Registry.ClassesRoot.DeleteSubKeyTree(name);
+        }
+
+        [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
+
+        void AssociationManagement(bool isAssociated)
+        {
+            bool newState = !isAssociated;
+            if (!isAssociated)
+            {
+                //AssociateNxmFile(".nxm", "NXM_File_Handler", Directory.GetCurrentDirectory() + @"\" + "EeveexModManager.exe", "NXM File");
+                AssociateNxmUrl("nxm", "Nexus Url", Directory.GetCurrentDirectory() + @"\" + "EeveexModManager.exe");
+                AssociationWithNXM_CheckBox.IsChecked = newState;
+            }
+            else
+            {
+                //UnassociateNxmFile("nxm");
+                UnassociateNxmUrl("nxm");
+                AssociationWithNXM_CheckBox.IsChecked = newState;
+
+            }
+            config.Nxm_Handled = newState;
+            jsonParser.UpdateJson(config);
+        }
+
+        private void Association_Button_Click(object sender, RoutedEventArgs e)
+        {
+            AssociationManagement((bool)AssociationWithNXM_CheckBox.IsChecked);
+        }
+        #endregion
+
+        private void Test_Download_Click(object sender, RoutedEventArgs e)
+        {
+            Uri test = new Uri(@"http://filedelivery.nexusmods.com/130/Realistic%20Movement%201.0-64202-.zip?fid=1000044713&ttl=1512245346&ri=8192&rs=8192&setec=65ec2654c8a833a8a2ec32ce12db994e");
+            WebClient webClient = new WebClient();
+            webClient.DownloadFile(test, @"Downloads\test.zip");
         }
     }
 }

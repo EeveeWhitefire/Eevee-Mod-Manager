@@ -164,6 +164,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\AddModDescriptor.cs" />
     <Compile Include="Classes\CookieEndpointBehaviour.cs" />
     <Compile Include="Classes\CookieMessageInspector.cs" />
     <Compile Include="Classes\FileServerInfo.cs" />
@@ -175,7 +176,9 @@
     <Compile Include="Classes\NexusModFileInfo.cs" />
     <Compile Include="Classes\NexusModInfo.cs" />
     <Compile Include="Classes\NexusModRepository.cs" />
+    <Compile Include="Classes\PerGameModeSettings.cs" />
     <Compile Include="Classes\RepositoryUnavailableException.cs" />
+    <Compile Include="Intefaces\IEnvironmentInfo.cs" />
     <Compile Include="Intefaces\IModFileInfo.cs" />
     <Compile Include="Intefaces\IModInfo.cs" />
     <Compile Include="Intefaces\IModRepository.cs" />

@@ -48,6 +48,9 @@ namespace EeveexModManager
         List<string> linksToDelete;
         Service_JsonParser jsonParser;
         public static Json_Config config;
+        IModRepository modRepository;
+        IEnvironmentInfo environmentInfo;
+        private List<string> m_strFileserverCaptions = new List<string>();
 
         Mutex m;
 
@@ -271,22 +274,49 @@ namespace EeveexModManager
             db.SaveChanges();
         }
 
-        public void CreateMod(NexusUrl nexusUrl)
+        public AddModDescriptor CreateMod(NexusUrl nexusUrl)
         {
+            AddModDescriptor amdDescriptor;
+
             if (!db.ModList.Select(x => x.FileId).Contains(nexusUrl.FileId))
             {
-                ModDatabase newMod = new ModDatabase
+                IModFileInfo mfiFile = null;
+                List<FileServerInfo> lstFileServerInfo = new List<FileServerInfo>();
+                List<Uri> uriFilesToDownload = new List<Uri>();
+                try
                 {
-                    SourceArchive = $@"Downloads\{nexusUrl.ModId}-{nexusUrl.FileId}.zip",
-                    Active = false,
-                    Id = nexusUrl.ModId,
-                    FileId = nexusUrl.FileId,
-                    Name = "def",
-                    Installed = true,
-                    FullSourceUrl = nexusUrl.SourceUrl.ToString(),
-                    Version = "1.1.1",
-                    GameName = nexusUrl.GameName
-                };
+                    if (String.IsNullOrEmpty(nexusUrl.FileId))
+                        mfiFile = modRepository.GetDefaultFileInfo(nexusUrl.ModId);
+                    else
+                        mfiFile = modRepository.GetFileInfo(nexusUrl.ModId, nexusUrl.FileId);
+                    if (mfiFile == null)
+                    {
+                        Trace.TraceInformation(String.Format("[{0}] Can't get the file: no file.", nexusUrl.SourceUrl));
+                        return null;
+                    }
+                    string strRepositoryMessage;
+                    lstFileServerInfo = modRepository.GetFilePartInfo(nexusUrl.ModId, mfiFile.Id.ToString(), config.Installation_Path, out strRepositoryMessage);
+                    if (lstFileServerInfo.Count > 0)
+                    {
+                        foreach (FileServerInfo fsiFileServer in lstFileServerInfo)
+                            if (!String.IsNullOrEmpty(fsiFileServer.DownloadLink))
+                            {
+                                uriFilesToDownload.Add(new Uri(fsiFileServer.DownloadLink));
+                                m_strFileserverCaptions.Add(fsiFileServer.Name);
+                            }
+                        if (!String.IsNullOrEmpty(strRepositoryMessage))
+                            m_strRepositoryMessage = strRepositoryMessage;
+                    }
+                }
+                catch (RepositoryUnavailableException e)
+                {
+                    return null;
+                }
+
+                if ((uriFilesToDownload == null) || (uriFilesToDownload.Count <= 0))
+                    return null;
+                string strSourcePath = Path.Combine(@"Downloads\", mfiFile.Filename);
+                amdDescriptor = new AddModDescriptor(nexusUrl.SourceUrl, strSourcePath, uriFilesToDownload, TaskStatus.Running, m_strFileserverCaptions);
 
                 AddModToCategory(newMod, db.ModList.Count());
 

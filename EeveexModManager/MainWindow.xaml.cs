@@ -165,7 +165,7 @@ namespace EeveexModManager
             {
                 Orientation = Orientation.Horizontal
             };
-            //var z = new BitmapImage(new Uri("pack://application:,,,/Images/test.png"));
+
             Button newButton = new Button()
             {
                 Background = mod.Active ? Brushes.Green : Brushes.Red,
@@ -407,7 +407,6 @@ namespace EeveexModManager
 
         public void AssociateNxmUrl(string name, string desc, string exePath)
         {
-
             string strUrlId = "URL:" + desc;
             Registry.SetValue(@"HKEY_CLASSES_ROOT\" + name, null, strUrlId, RegistryValueKind.String);
             Registry.SetValue(@"HKEY_CLASSES_ROOT\" + name, "URL Protocol", "", RegistryValueKind.String);

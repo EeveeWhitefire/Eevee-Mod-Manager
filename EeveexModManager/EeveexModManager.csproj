@@ -143,6 +143,9 @@
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.4.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -161,7 +164,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="JsonClasses\Json_Config.cs" />
+    <Compile Include="Classes\CookieEndpointBehaviour.cs" />
+    <Compile Include="Classes\CookieMessageInspector.cs" />
+    <Compile Include="Classes\FileServerInfo.cs" />
+    <Compile Include="Classes\FileServerZone.cs" />
+    <Compile Include="Classes\HttpUserAgentEndpointBehaviour.cs" />
+    <Compile Include="Classes\HttpUserAgentMessageInspector.cs" />
+    <Compile Include="Classes\JsonClasses\Json_Config.cs" />
+    <Compile Include="Classes\ModInfo.cs" />
+    <Compile Include="Classes\NexusModFileInfo.cs" />
+    <Compile Include="Classes\NexusModInfo.cs" />
+    <Compile Include="Classes\NexusModRepository.cs" />
+    <Compile Include="Classes\RepositoryUnavailableException.cs" />
+    <Compile Include="Intefaces\IModFileInfo.cs" />
+    <Compile Include="Intefaces\IModInfo.cs" />
+    <Compile Include="Intefaces\IModRepository.cs" />
+    <Compile Include="Intefaces\INexusModRepositoryApi.cs" />
     <Compile Include="Nexus\NexusUrl.cs" />
     <Compile Include="Services\Service_JsonParser.cs" />
     <Page Include="MainWindow.xaml">
@@ -172,7 +190,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DatabaseContext.cs" />
+    <Compile Include="Classes\DatabaseContext.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

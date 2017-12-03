@@ -167,22 +167,27 @@
     <Compile Include="Classes\AddModDescriptor.cs" />
     <Compile Include="Classes\CookieEndpointBehaviour.cs" />
     <Compile Include="Classes\CookieMessageInspector.cs" />
+    <Compile Include="Classes\EnvironmentInfo.cs" />
     <Compile Include="Classes\FileServerInfo.cs" />
     <Compile Include="Classes\FileServerZone.cs" />
     <Compile Include="Classes\HttpUserAgentEndpointBehaviour.cs" />
     <Compile Include="Classes\HttpUserAgentMessageInspector.cs" />
     <Compile Include="Classes\JsonClasses\Json_Config.cs" />
+    <Compile Include="Classes\KeyedSettings.cs" />
     <Compile Include="Classes\ModInfo.cs" />
     <Compile Include="Classes\NexusModFileInfo.cs" />
     <Compile Include="Classes\NexusModInfo.cs" />
     <Compile Include="Classes\NexusModRepository.cs" />
     <Compile Include="Classes\PerGameModeSettings.cs" />
     <Compile Include="Classes\RepositoryUnavailableException.cs" />
+    <Compile Include="Classes\Settings.cs" />
+    <Compile Include="Classes\SettingsList.cs" />
     <Compile Include="Intefaces\IEnvironmentInfo.cs" />
     <Compile Include="Intefaces\IModFileInfo.cs" />
     <Compile Include="Intefaces\IModInfo.cs" />
     <Compile Include="Intefaces\IModRepository.cs" />
     <Compile Include="Intefaces\INexusModRepositoryApi.cs" />
+    <Compile Include="Intefaces\ISettings.cs" />
     <Compile Include="Nexus\NexusUrl.cs" />
     <Compile Include="Services\Service_JsonParser.cs" />
     <Page Include="MainWindow.xaml">
@@ -226,9 +231,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\test.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Downloads\" />

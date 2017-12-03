@@ -48,17 +48,22 @@ namespace EeveexModManager
         List<string> linksToDelete;
         Service_JsonParser jsonParser;
         public static Json_Config config;
-        IModRepository modRepository;
+        NexusModRepository modRepository;
         IEnvironmentInfo environmentInfo;
         private List<string> m_strFileserverCaptions = new List<string>();
 
         Mutex m;
 
         Thickness modListMargin;
+        private Dictionary<string, string> tokens;
 
         public MainWindow(ref Mutex mutex, bool IgnoreLink = false, NexusUrl nexusUrl = null)
         {
             m = mutex;
+            modRepository = new NexusModRepository("FalloutNV");
+            modRepository.IsOffline = modRepository.Login("kaipowers01", "2001nov06", out tokens);
+            modRepository.m_dicAuthenticationTokens = tokens;
+            //environmentInfo = new EnvironmentInfo((ISettings)(Properties.Settings.Default));
             if (nexusUrl == null || IgnoreLink)
             {
                 InitializeComponent();
@@ -70,7 +75,8 @@ namespace EeveexModManager
                 db.Database.Migrate();
 
                 config = jsonParser.GetJsonFields<Json_Config>();
-
+                if(IsUrlAssociated("nxm") != config.Nxm_Handled)
+                    AssociationManagement(IsUrlAssociated("nxm"));
                 AssociationWithNXM_CheckBox.IsChecked = config.Nxm_Handled;
 
                 linksToDelete = new List<string>();
@@ -276,7 +282,7 @@ namespace EeveexModManager
 
         public AddModDescriptor CreateMod(NexusUrl nexusUrl)
         {
-            AddModDescriptor amdDescriptor;
+            AddModDescriptor amdDescriptor = null;
 
             if (!db.ModList.Select(x => x.FileId).Contains(nexusUrl.FileId))
             {
@@ -291,11 +297,10 @@ namespace EeveexModManager
                         mfiFile = modRepository.GetFileInfo(nexusUrl.ModId, nexusUrl.FileId);
                     if (mfiFile == null)
                     {
-                        Trace.TraceInformation(String.Format("[{0}] Can't get the file: no file.", nexusUrl.SourceUrl));
+                        MessageBox.Show(String.Format("[{0}] Can't get the file: no file.", nexusUrl.SourceUrl));
                         return null;
                     }
-                    string strRepositoryMessage;
-                    lstFileServerInfo = modRepository.GetFilePartInfo(nexusUrl.ModId, mfiFile.Id.ToString(), config.Installation_Path, out strRepositoryMessage);
+                    lstFileServerInfo = modRepository.GetFilePartInfo(nexusUrl.ModId, mfiFile.Id.ToString(), config.Installation_Path, out string strRepositoryMessage);
                     if (lstFileServerInfo.Count > 0)
                     {
                         foreach (FileServerInfo fsiFileServer in lstFileServerInfo)
@@ -304,8 +309,6 @@ namespace EeveexModManager
                                 uriFilesToDownload.Add(new Uri(fsiFileServer.DownloadLink));
                                 m_strFileserverCaptions.Add(fsiFileServer.Name);
                             }
-                        if (!String.IsNullOrEmpty(strRepositoryMessage))
-                            m_strRepositoryMessage = strRepositoryMessage;
                     }
                 }
                 catch (RepositoryUnavailableException e)
@@ -315,13 +318,28 @@ namespace EeveexModManager
 
                 if ((uriFilesToDownload == null) || (uriFilesToDownload.Count <= 0))
                     return null;
-                string strSourcePath = Path.Combine(@"Downloads\", mfiFile.Filename);
+                string strSourcePath = System.IO.Path.Combine(@"Downloads\", mfiFile.Filename);
                 amdDescriptor = new AddModDescriptor(nexusUrl.SourceUrl, strSourcePath, uriFilesToDownload, TaskStatus.Running, m_strFileserverCaptions);
 
-                AddModToCategory(newMod, db.ModList.Count());
+                /*AddModToCategory(newMod, db.ModList.Count());
 
                 db.ModList.Add(newMod);
-                db.SaveChanges();
+                db.SaveChanges(); */
+
+                DownloadMod(amdDescriptor.DownloadFiles);
+            }
+
+            return amdDescriptor;
+        }
+
+        void DownloadMod(List<Uri> toDownload)
+        {
+            WebClient webClient = new WebClient();
+            int i = 0;
+            foreach (var item in toDownload)
+            {
+                webClient.DownloadFile(item, $@"Downloads\test-{i}.zip");
+                i++;
             }
         }
 
@@ -433,6 +451,19 @@ namespace EeveexModManager
                 Registry.ClassesRoot.DeleteSubKeyTree(strFileId);
                 Registry.ClassesRoot.DeleteSubKeyTree("." + name);
             }
+        }
+
+        /// <summary>
+        /// Determines if the specified URL protocol is associated with the client.
+        /// </summary>
+        /// <param name="p_strUrlProtocol">The protocol of the URL for which it is to be determined
+        /// whether it is associated with the client.</param>
+        /// <returns><c>true</c> if the URL protocol is associated with the client;
+        /// <c>false</c> otherwise.</returns>
+        protected bool IsUrlAssociated(string p_strUrlProtocol)
+        {
+            string key = Registry.GetValue(@"HKEY_CLASSES_ROOT\" + p_strUrlProtocol, null, null) as string;
+            return !String.IsNullOrEmpty(key);
         }
 
         public void AssociateNxmUrl(string name, string desc, string exePath)

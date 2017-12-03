@@ -32,7 +32,7 @@ namespace EeveexModManager
         private int m_intRemoteGameId = 0;
         private int m_intMaxConcurrentDownloads = 5;
         private string[] m_strUserStatus = null;
-        private Dictionary<string, string> m_dicAuthenticationTokens = null;
+        public Dictionary<string, string> m_dicAuthenticationTokens = null;
 
         #region Custom Events
 
@@ -109,6 +109,10 @@ namespace EeveexModManager
             get
             {
                 return ((m_strUserStatus == null) || (m_strUserStatus.Length <= 0));
+            }
+            set
+            {
+
             }
         }
 

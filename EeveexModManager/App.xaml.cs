@@ -38,17 +38,27 @@ namespace EeveexModManager
             mutex.Close();
         }
 
+        void Init()
+        {
+            string[] neededDirs = new string[] { "Mods", "Downloads", "Profiles" };
+            foreach (var dir in neededDirs)
+            {
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+            }
+        }
 
 
-    [STAThread]
+        [STAThread]
         void App_Startup(object sender, StartupEventArgs e)
         {
+            Init();
             NexusUrl modArg = null;
 
             mutex = new Mutex(false, "Global\\" + appGuid);
             _namedPipeManager = new NamedPipeManager("EeveexModManager");
 
-             _db = new DatabaseContext();// Strong Type Class
+            _db = new DatabaseContext();// Strong Type Class
 
             _jsonParser = new Service_JsonParser();
             _config = _jsonParser.GetJsonFields<Json_Config>();

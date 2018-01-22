@@ -33,7 +33,6 @@ namespace EeveexModManager.Classes
         {
             Name = n;
             SearchTextBox = control.ProgressBar;
-            RegistryName = Game.GetRegistryName(n);
             control.Dispatcher.Invoke(() => StartSearch(control), DispatcherPriority.Background);
         }
 
@@ -56,16 +55,21 @@ namespace EeveexModManager.Classes
         public bool GameIsInstalled()
         {
             RegistryKey parentKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
-            
-            foreach (var regKey in parentKey.GetSubKeyNames().Select(x => parentKey.OpenSubKey(x))
-                .Where(x => x.GetValue("DisplayName")?.ToString() == Game.GetRegistryName(Name)))
+            foreach (var item in Game.GetRegistryName(Name))
             {
-                try
+
+                foreach (var regKey in parentKey.GetSubKeyNames().Select(x => parentKey.OpenSubKey(x))
+                    .Where(x => x.GetValue("DisplayName")?.ToString().ToLower().Replace(" ", string.Empty) == 
+                    item.ToLower().Replace(" ", string.Empty)))
                 {
-                    InstallationPath = regKey.GetValue("InstallLocation").ToString();
-                    return true;
+                    try
+                    {
+                        InstallationPath = regKey.GetValue("InstallLocation").ToString();
+                        RegistryName = item;
+                        return true;
+                    }
+                    catch { }
                 }
-                catch { }
             }
             return false;
         }

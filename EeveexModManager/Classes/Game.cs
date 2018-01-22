@@ -47,21 +47,21 @@ namespace EeveexModManager.Classes
             }
         }
 
-        public static string GetRegistryName(string n)
+        public static string[] GetRegistryName(string n)
         {
             switch (n)
             {
                 case "TESV : Skyrim Special Edition":
-                    return "skyrimse";
+                    return new string[] { "skyrimse" };
                 case "TESV : Skyrim":
-                    return "Skyrim";
+                    return new string[] { "TSEV Skyrim LE" };
                 case "Fallout : New Vegas":
                     //return "falloutnv";
                     return null;
                 case "Fallout 4":
-                    return "Fallout4";
+                    return new string[] { "Fallout 4" };
                 case "Fallout 3":
-                    return "Fallout3";
+                    return new string[] {"Fallout3"};
                 default:
                     return null;
             }

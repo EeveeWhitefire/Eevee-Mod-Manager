@@ -6,9 +6,26 @@
         xmlns:local="clr-namespace:EeveexModManager.Windows"
         xmlns:controls="clr-namespace:EeveexModManager.Controls"
         mc:Ignorable="d"
-        Title="Please choose the games you'd like to mod:" Height="500" Width="760">
+        Title="Please choose the games you'd like to mod:" Height="500" Width="1000">
     <Window.Resources>
-        <ResourceDictionary>
+        <ControlTemplate x:Name="Template_CircularButton" x:Key="circularbutton_template" TargetType = "Button">
+            <Grid>
+                <Ellipse Stroke="Black"  
+                       StrokeThickness="0">
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <RadialGradientBrush.Transform>
+                                <TransformGroup>
+                                    <ScaleTransform ScaleY = "0.65" />
+                                </TransformGroup >
+                            </RadialGradientBrush.Transform>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </ControlTemplate>
+        <ResourceDictionary x:Key="resource_dict">
             <BitmapImage x:Key="icon_skyrim" UriSource="/EeveexModManager;component/Resources/Icon - TESV Skyrim.png" />
             <BitmapImage x:Key="icon_skyrimSe" UriSource="/EeveexModManager;component/Resources/Icon - TESV Skyrim Special Edition.png" />
             <BitmapImage x:Key="icon_falloutNV" UriSource="/EeveexModManager;component/Resources/Icon - Fallout New Vegas.png" />
@@ -26,7 +43,7 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10" VerticalAlignment="Bottom">
-            <Button Content="Restart Scans" HorizontalAlignment="Right" Margin="0" VerticalAlignment="Bottom" Width="100" Height="50" Click="RestartScansButton_Click" FontSize="16"/>
+            <Button Content="Restart Scans" HorizontalAlignment="Right" Margin="0" VerticalAlignment="Bottom" Width="100" Height="50" Click="RestartScansButton_Click" FontSize="16" Name="test"/>
             <Button Content="Ignore All" HorizontalAlignment="Right" Margin="10,0,0,0" VerticalAlignment="Bottom" Width="100" Height="50" Click="IgnoreAllModsButton_Click" FontSize="16"/>
             <Button Content="Confirm All" HorizontalAlignment="Right" Margin="10,0,0,0" VerticalAlignment="Bottom" Width="100" Height="50" Click="ConfirmGamesButton_Click" FontSize="16"/>
         </StackPanel>

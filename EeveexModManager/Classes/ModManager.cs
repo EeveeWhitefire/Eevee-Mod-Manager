@@ -157,7 +157,7 @@ namespace EeveexModManager.Classes
                 httpClient.BaseAddress = new Uri("http://localhost:9000/");
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
-                httpClient.DefaultRequestHeaders.Add("Cookie", "sid = zCHCHwtHzAttvuHwyDwGDEtGwGDAzxGuBDDHHAxw");
+                //httpClient.DefaultRequestHeaders.Add("Cookie", "sid = zCHCHwtHzAttvuHwyDwGDEtGwGDAzxGuBDDHHAxw");
                 httpClient.DefaultRequestHeaders.Add("User-Agent", "Nexus Client v0.55.8");
                 /*
                 httpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate");

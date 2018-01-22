@@ -35,7 +35,7 @@ namespace EeveexModManager.Windows
 
         void StartSearches()
         {
-            int counter = 0;
+           int counter = 0;
             string[] gameNames = new string[]
                 {"TESV : Skyrim Special Edition", "TESV : Skyrim", "Fallout : New Vegas", "Fallout 4", "Fallout 3"};
 
@@ -76,11 +76,6 @@ namespace EeveexModManager.Windows
         public IList<Game> GetAvailableGames()
         {
             return games;
-        }
-
-        private void IgnoreModButton_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void RestartScansButton_Click(object sender, RoutedEventArgs e)

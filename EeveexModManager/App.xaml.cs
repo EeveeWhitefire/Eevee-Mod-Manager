@@ -6,8 +6,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.IO;
-using EeveexModManager.Nexus;
 using System.Threading;
+using System.IO.Pipes;
+
+using EeveexModManager.Nexus;
+using EeveexModManager.Classes;
+using EeveexModManager.Services;
+using EeveexModManager.Classes.JsonClasses;
+using EeveexModManager.Windows;
+
+using Microsoft.EntityFrameworkCore;
+using System.Text;
+using LiteDB;
 
 namespace EeveexModManager
 {
@@ -16,52 +26,76 @@ namespace EeveexModManager
     /// </summary>
     public partial class App : Application
     {
-        private static string appGuid = "c0a76b5a-12ab-45c5-b9d9-d693faa6e7b9";
+        string appGuid = "c0a76b5a-12ab-45c5-b9d9-d693faa6e7b9";
+        private Service_JsonParser _jsonParser;
+        private Json_Config _config;
+        private DatabaseContext _db;
+        private NamedPipeManager _namedPipeManager;
 
-        [STAThread]
+        Mutex mutex;
+        ~App()
+        {
+            mutex.Close();
+        }
+
+
+
+    [STAThread]
         void App_Startup(object sender, StartupEventArgs e)
         {
-            Mutex mutex = new Mutex(false, "Global\\" + appGuid);
             NexusUrl modArg = null;
 
-            // Application is running
-            // Process command line args
-            bool startMinimized = false;
-            for (int i = 0; i != e.Args.Length; ++i)
+            mutex = new Mutex(false, "Global\\" + appGuid);
+            _namedPipeManager = new NamedPipeManager("EeveexModManager");
+
+             _db = new DatabaseContext();// Strong Type Class
+
+            _jsonParser = new Service_JsonParser();
+            _config = _jsonParser.GetJsonFields<Json_Config>();
+
+            if (_config.First_Time)
             {
-                if (e.Args[i] == "/StartMinimized")
-                {
-                    startMinimized = true;
-                }
-                else
-                {
-                    MessageBox.Show(e.Args[i]);
-                    modArg = new NexusUrl(new Uri(e.Args[i]));
-                }
+                AvailableGamesWindow window = new AvailableGamesWindow();
+                window.Show();
             }
 
-            if (!mutex.WaitOne( 0, false ))
+            if (!_config.First_Time)
             {
-                MessageBox.Show("Instance already running");
+                // Application is running
+                // Process command line args
+                bool startMinimized = false;
+                for (int i = 0; i != e.Args.Length; ++i)
+                {
+                    if (e.Args[i] == "/StartMinimized")
+                    {
+                        startMinimized = true;
+                    }
+                    else
+                    {
+                        MessageBox.Show(e.Args[i]);
+                        modArg = new NexusUrl(new Uri(e.Args[i]));
+                    }
+                }
 
-                if (modArg != null)
+                if (!mutex.WaitOne(0, false))
                 {
-                    MessageBox.Show("Starting download!");
-                    new MainWindow(ref mutex).CreateMod(modArg);
+                    MessageBox.Show("Instance already running");
+
+                    if (modArg != null)
+                    {
+                        _namedPipeManager.SendToServer(modArg.SourceUrl);
+                    }
+                    return;
                 }
-                if (mutex != null)
+
+                // Create main application window, starting minimized if specified
+                MainWindow mainWindow = new MainWindow(ref mutex, ref _db, ref _jsonParser, ref _config, ref _namedPipeManager);
+                if (startMinimized)
                 {
-                    mutex.Close();
+                    mainWindow.WindowState = WindowState.Minimized;
                 }
-                return;
+                mainWindow.Show();
             }
-            // Create main application window, starting minimized if specified
-            MainWindow mainWindow = new MainWindow(ref mutex, true, modArg);
-            if (startMinimized)
-            {
-                mainWindow.WindowState = WindowState.Minimized;
-            }
-            mainWindow.Show();
         }
     }
 }

@@ -8,30 +8,15 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="549.187" Width="919.817">
     <Grid>
-        <TreeView HorizontalAlignment="Left" Height="283" Margin="36,44,0,0" VerticalAlignment="Top" Width="617">
-            <TreeViewItem Header="Models and Textures" Name="ModelsAndTexturesItem">
-            </TreeViewItem>
-            <TreeViewItem Header="Weapons">
-            </TreeViewItem>
-            <TreeViewItem Header="Armour">
-            </TreeViewItem>
-        </TreeView>
-        <Button Name="GameLaunchButton" Content="Launch Game" HorizontalAlignment="Left" Margin="710,438,0,0" VerticalAlignment="Top" Width="192" Height="70" Click="GameLaunchButton_Click"/>
-        <ComboBox x:Name="GamePicker" HorizontalAlignment="Left" Margin="570,481,0,0" VerticalAlignment="Top" Width="135" Height="27">
+        <TreeView HorizontalAlignment="Left" Height="283" Margin="36,44,0,0" VerticalAlignment="Top" Width="617" x:FieldModifier="public" Name="ModList_TreeView"/>
+        <Button Name="ApplicationLaunch_Button" Content="Launch Game" HorizontalAlignment="Left" Margin="710,438,0,0" VerticalAlignment="Top" Width="192" Height="70" Click="LaunchApplicationButton_Click"/>
+        <ComboBox x:Name="ApplicationPicker_Selection" HorizontalAlignment="Left" Margin="570,481,0,0" VerticalAlignment="Top" Width="135" Height="27">
             <StackPanel Orientation="Horizontal">
-                <Image Source="Images\test.png" Width="20"/>
-                <TextBlock Text="SSE" VerticalAlignment="Center"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Image Source="Images\test.png" Width="20"/>
                 <TextBlock Text="SKSE" VerticalAlignment="Center"/>
             </StackPanel>
         </ComboBox>
-        <Button Name="GameDirButton" Content="..." HorizontalAlignment="Left" Margin="827,10,0,0" VerticalAlignment="Top" Width="75" Click="GameDirButton_Click"/>
-        <Button Content="Install Mod" HorizontalAlignment="Left" Margin="710,372,0,0" VerticalAlignment="Top" Width="192" Height="61" Click="InstallModButton_Click"/>
         <Label Content="Mod List:" HorizontalAlignment="Left" Margin="36,13,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.769"/>
         <Button Content="Associate" HorizontalAlignment="Left" Margin="827,186,0,0" VerticalAlignment="Top" Width="75" Click="Association_Button_Click"/>
         <CheckBox x:Name="AssociationWithNXM_CheckBox" HorizontalAlignment="Left" Margin="806,189,0,0" VerticalAlignment="Top"/>
-        <Button Content="Test Download" HorizontalAlignment="Left" Margin="783,237,0,0" VerticalAlignment="Top" Width="119" Click="Test_Download_Click"/>
     </Grid>
 </Window>

@@ -13,7 +13,7 @@ namespace EeveexModManager.Services
         private string configPath;
         public Service_JsonParser()
         {
-            configPath = @"D:\OneDrive\EeveexModManager\EeveexModManager\config.json";
+            configPath = Directory.GetCurrentDirectory() + @"\config.json";
         }
 
         public string LoadFile(string path)

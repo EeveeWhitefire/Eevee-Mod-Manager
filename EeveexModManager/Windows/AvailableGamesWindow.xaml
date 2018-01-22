@@ -1,0 +1,34 @@
+﻿<Window x:Class="EeveexModManager.Windows.AvailableGamesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EeveexModManager.Windows"
+        xmlns:controls="clr-namespace:EeveexModManager.Controls"
+        mc:Ignorable="d"
+        Title="Please choose the games you'd like to mod:" Height="500" Width="760">
+    <Window.Resources>
+        <ResourceDictionary>
+            <BitmapImage x:Key="icon_skyrim" UriSource="/EeveexModManager;component/Resources/Icon - TESV Skyrim.png" />
+            <BitmapImage x:Key="icon_skyrimSe" UriSource="/EeveexModManager;component/Resources/Icon - TESV Skyrim Special Edition.png" />
+            <BitmapImage x:Key="icon_falloutNV" UriSource="/EeveexModManager;component/Resources/Icon - Fallout New Vegas.png" />
+            <BitmapImage x:Key="icon_fallout4" UriSource="/EeveexModManager;component/Resources/Icon - Fallout 4.png" />
+            <BitmapImage x:Key="button_redX" UriSource="/EeveexModManager;component/Resources/Button_RedX.png" />
+            <BitmapImage x:Key="button_greenCheck" UriSource="/EeveexModManager;component/Resources/Button_GreenCheckMark.png" />
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <StackPanel Orientation="Horizontal" Name="GameSearchers_StackPanel">
+            <StackPanel Orientation="Vertical" Margin="5, 5" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            <!--Left Stack panel-->
+            <StackPanel Orientation="Vertical" Margin="5, 5" VerticalAlignment="Top" HorizontalAlignment="Left"/> <!--Right Stack panel-->
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10" VerticalAlignment="Bottom">
+            <Button Content="Restart Scans" HorizontalAlignment="Right" Margin="0" VerticalAlignment="Bottom" Width="100" Height="50" Click="RestartScansButton_Click" FontSize="16"/>
+            <Button Content="Ignore All" HorizontalAlignment="Right" Margin="10,0,0,0" VerticalAlignment="Bottom" Width="100" Height="50" Click="IgnoreAllModsButton_Click" FontSize="16"/>
+            <Button Content="Confirm All" HorizontalAlignment="Right" Margin="10,0,0,0" VerticalAlignment="Bottom" Width="100" Height="50" Click="ConfirmGamesButton_Click" FontSize="16"/>
+        </StackPanel>
+    </Grid>
+</Window>

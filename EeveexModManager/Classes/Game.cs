@@ -101,13 +101,12 @@ namespace EeveexModManager.Classes
 
         #endregion
 
-        
         public static Game CreateByName(string n, string iPath, string regN)
         {
             switch (n)
             {
                 case "TESV : Skyrim Special Edition":
-                    return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("SkyrimSE.exe", iPath), n, "skyrimse", regN, GameListEnum.SkyrimSE);
+                    return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("SkyrimSE.exe", iPath), n, "skyrimspecialedition", regN, GameListEnum.SkyrimSE);
                 case "TESV : Skyrim":
                     return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("Skyrim.exe", iPath), n, "skyrim", regN, GameListEnum.Skyrim);
                 case "Fallout : New Vegas":

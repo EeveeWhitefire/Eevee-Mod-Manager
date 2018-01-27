@@ -8,7 +8,7 @@ namespace EeveexModManager.Interfaces
 {
     public enum GameListEnum
     {
-        SkyrimSE,
+        SkyrimSE = 1704,
         Skyrim,
         FalloutNV = 130,
         Fallout4

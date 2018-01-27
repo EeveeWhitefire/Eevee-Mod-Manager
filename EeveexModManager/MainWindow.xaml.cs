@@ -8,12 +8,15 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
+using Newtonsoft.Json;
+
 using EeveexModManager.Services;
 using EeveexModManager.Classes;
 using EeveexModManager.Classes.DatabaseClasses;
 using EeveexModManager.Classes.JsonClasses;
 using EeveexModManager.Controls;
 using EeveexModManager.Windows;
+using System.Windows.Media;
 
 namespace EeveexModManager
 {
@@ -36,6 +39,8 @@ namespace EeveexModManager
         private NamedPipeManager _namedPipeManager;
         private GamePicker_ComboBox _gamePicker;
         private Mutex _mutex;
+        private Json_AccountInfo User;
+        private bool IsLoggedIn = false;
 
         ModManager modManager;
 
@@ -56,6 +61,20 @@ namespace EeveexModManager
             _nxmHandler = new NxmHandler(config, _jsonParser, AssociationWithNXM_CheckBox);
             modManager = new ModManager(_db, ModList_TreeView);
             _namedPipeManager.ChangeMessageReceivedHandler(HandlePipeMessage);
+
+            if(File.Exists("UserCredentials"))
+            {
+                try
+                {
+                    string raw = Cryptographer.Decrypt(File.ReadAllText("UserCredentials"));
+                    User = JsonConvert.DeserializeObject<Json_AccountInfo>(raw);
+
+                    AccountLoginWindow.TryToLogIn(User.Username, User.Password, WhenLogsIn);
+                }
+                catch (Exception)
+                {
+                }
+            }
 
             if (!_namedPipeManager.IsRunning)
             {
@@ -149,11 +168,43 @@ namespace EeveexModManager
             });
         }
         
+        private void LogInButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(!IsLoggedIn)
+            {
+                AccountLoginWindow loginWindow = new AccountLoginWindow(WhenLogsIn);
+                loginWindow.Show();
+            }
+            else
+            {
+                WhenLogsOut();
+            }
+        }
+
+        private void WhenLogsIn(string CookieSid, Json_AccountInfo user)
+        {
+            User = user;
+            modManager.UpdateCookieSid(CookieSid);
+            IsLoggedIn = true;
+            LogInButton.Content = "Logout";
+            LoginState_TextBox.Text = $"Logged in, welcome {user.Username}!";
+            LoginState_TextBox.Foreground = Brushes.Green;
+        }
+
+        private void WhenLogsOut()
+        {
+            modManager.ToggleCanAccessApi();
+            IsLoggedIn = false;
+            LogInButton.Content = "Login";
+            LoginState_TextBox.Text = "Not logged in.";
+            LoginState_TextBox.Foreground = Brushes.Red;
+        }
+
         public void HandlePipeMessage(string arg)
         {
             Uri uri = new Uri(arg);
             Nexus.NexusUrl nexusUrl = new Nexus.NexusUrl(uri);
-            Dispatcher.Invoke( () => modManager.CreateMod(_currGame, new Nexus.NexusUrl(nexusUrl)).GetAwaiter().GetResult(), DispatcherPriority.Background);
+            Dispatcher.Invoke( () => modManager.CreateMod(_currGame, new Nexus.NexusUrl(nexusUrl)).GetAwaiter().GetResult(), DispatcherPriority.Normal);
         }
 
         public TreeView GetModListTree()

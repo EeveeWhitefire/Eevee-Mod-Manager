@@ -175,6 +175,10 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.Cryptography.ProtectedData, Version=4.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.ProtectedData.4.5.0-preview1-25914-04\lib\net461\System.Security.Cryptography.ProtectedData.dll</HintPath>
+    </Reference>
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Xml" />
@@ -195,6 +199,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\Cryptographer.cs" />
     <Compile Include="Classes\DatabaseClasses\Db_BaseMod.cs" />
     <Compile Include="Classes\DatabaseClasses\Db_Game.cs" />
     <Compile Include="Classes\DatabaseClasses\Db_OnlineMod.cs" />
@@ -204,6 +209,7 @@
     <Compile Include="Classes\JsonClasses\API\Api_ModDownloadInfo.cs" />
     <Compile Include="Classes\JsonClasses\API\Api_ModFileInfo.cs" />
     <Compile Include="Classes\JsonClasses\API\Api_ModInfo.cs" />
+    <Compile Include="Classes\JsonClasses\Json_AccountInfo.cs" />
     <Compile Include="Classes\JsonClasses\Json_Config.cs" />
     <Compile Include="Classes\BaseMod.cs" />
     <Compile Include="Classes\ModArchiveFile.cs" />
@@ -230,6 +236,9 @@
     <Compile Include="Interfaces\IOnlineMod.cs" />
     <Compile Include="Nexus\NexusUrl.cs" />
     <Compile Include="Services\Service_JsonParser.cs" />
+    <Compile Include="Windows\AccountLoginWindow.xaml.cs">
+      <DependentUpon>AccountLoginWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\AvailableGamesWindow.xaml.cs">
       <DependentUpon>AvailableGamesWindow.xaml</DependentUpon>
     </Compile>
@@ -249,6 +258,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Windows\AccountLoginWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\AvailableGamesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

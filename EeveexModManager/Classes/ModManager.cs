@@ -34,6 +34,8 @@ namespace EeveexModManager.Classes
         private HttpClient httpClient;
         private WebClient webClient;
         TreeView Mods_TreeView;
+        public string CookieSid { get; protected set; } = null;
+        public bool CanAccessApi { get; protected set; } = false;
 
         public ModManager(DatabaseContext db)
         {
@@ -47,6 +49,17 @@ namespace EeveexModManager.Classes
             httpClient = new HttpClient();
             webClient = new WebClient();
             Mods_TreeView = modsTreeView;
+        }
+
+        public void UpdateCookieSid(string newCookieSid)
+        {
+            CookieSid = newCookieSid;
+            ToggleCanAccessApi();
+        }
+
+        public void ToggleCanAccessApi()
+        {
+            CanAccessApi = !CanAccessApi;
         }
         
         public void CreateMod(Game CurrentGame, ModArchiveFile archive, bool GUI = true)
@@ -80,11 +93,13 @@ namespace EeveexModManager.Classes
                 httpClient.BaseAddress = new Uri("http://localhost:9000/");
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
-                httpClient.DefaultRequestHeaders.Add("User-Agent", "Nexus Client v0.55.8");
+                httpClient.DefaultRequestHeaders.Add("User-Agent", "Nexus Client v0.63.14");
+                if (CanAccessApi)
+                    httpClient.DefaultRequestHeaders.Add("Cookie", $"sid={CookieSid}");
 
-                string res1 = (await (await httpClient.GetAsync(API_DownloadLinkSource)).Content.ReadAsStringAsync()).Remove(0,1);
+                string res1 = (await (await httpClient.GetAsync(API_DownloadLinkSource)).Content.ReadAsStringAsync()).Remove(0, 1);
                 res1 = res1.Remove(res1.Length - 1, 1); //removing first and last '[' ']' cus i don't see any reason for it to be a list
-                
+
                 string res2 = (await (await httpClient.GetAsync(API_ModInfoSource)).Content.ReadAsStringAsync()); //gitting mod info
 
                 string res3 = (await (await httpClient.GetAsync(API_ModFileInfoSource)).Content.ReadAsStringAsync()); //gitting mod's file info
@@ -98,12 +113,12 @@ namespace EeveexModManager.Classes
                 webClient.DownloadFileAsync((new Uri(result_downloadInfo.URI)), DownloadTo);
 
                 ModArchiveFile archive = new ModArchiveFile(CurrentGame, DownloadTo, result_fileInfo.name);
-                
+
                 OnlineMod newMod = new OnlineMod(result_fileInfo.name, false, false, archive.FullNewPath, archive.ModDirectory,
                     CurrentGame.Id, (ModCategories)result_modInfo.category_id, nexusUrl.FileId, result_modInfo.version, nexusUrl.ModId, nexusUrl.SourceUrl.ToString(), result_modInfo.author);
 
                 _db.GetCollection<Db_OnlineMod>("online_mods").Insert(newMod.EncapsulateToDb_Online());
-                
+
 
                 if (GUI)
                 {

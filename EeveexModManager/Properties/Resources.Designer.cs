@@ -73,6 +73,16 @@ namespace EeveexModManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Button_GreenCheckMark_Disabled {
+            get {
+                object obj = ResourceManager.GetObject("Button_GreenCheckMark_Disabled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Button_GreenCheckMark_Hover {
             get {
                 object obj = ResourceManager.GetObject("Button_GreenCheckMark_Hover", resourceCulture);
@@ -93,9 +103,29 @@ namespace EeveexModManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Button_RedX_Disabled {
+            get {
+                object obj = ResourceManager.GetObject("Button_RedX_Disabled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Button_RedX_Hover {
             get {
                 object obj = ResourceManager.GetObject("Button_RedX_Hover", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap icon_dragonage2 {
+            get {
+                object obj = ResourceManager.GetObject("icon_dragonage2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

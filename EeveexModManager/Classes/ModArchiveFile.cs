@@ -21,19 +21,16 @@ namespace EeveexModManager.Classes
         public string FullNewPath { get; set; }
         public string ModDirectory { get; set; }
 
-        public ModArchiveFile(Game game, string fullPath)
+        public ModArchiveFile(Game game, string fullPath, string modName)
         {
             FileInfo x = new FileInfo(fullPath);
 
             Extension = x.Extension;
             FileName = x.Name;
-            ModDirectory = $@"Mods\{game.Name}\off-{FileName}";
+            ModDirectory = $@"{game.ModsDirectory}\{modName}";
             FullSourcePath = fullPath;
 
-            FullNewPath = $@"Downloads\{game.Name}\off-{FileName}{Extension}";
-            File.Copy(FullSourcePath, FullNewPath);
-
-
+            FullNewPath = fullPath;
 
             switch (Extension)
             {
@@ -52,8 +49,6 @@ namespace EeveexModManager.Classes
         }
         public void Extract()
         {
-
-
             switch (FileType)
             {
                 case ArchiveType.Rar:

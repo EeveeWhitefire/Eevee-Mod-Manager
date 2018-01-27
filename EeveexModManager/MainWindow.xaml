@@ -6,17 +6,19 @@
         xmlns:local="clr-namespace:EeveexModManager"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="EeveexModManager.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="549.187" Width="919.817">
-    <Grid>
-        <TreeView HorizontalAlignment="Left" Height="283" Margin="36,44,0,0" VerticalAlignment="Top" Width="617" x:FieldModifier="public" Name="ModList_TreeView"/>
-        <Button Name="ApplicationLaunch_Button" Content="Launch Game" HorizontalAlignment="Left" Margin="710,438,0,0" VerticalAlignment="Top" Width="192" Height="70" Click="LaunchApplicationButton_Click"/>
-        <ComboBox x:Name="ApplicationPicker_Selection" HorizontalAlignment="Left" Margin="570,481,0,0" VerticalAlignment="Top" Width="135" Height="27">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="SKSE" VerticalAlignment="Center"/>
-            </StackPanel>
-        </ComboBox>
-        <Label Content="Mod List:" HorizontalAlignment="Left" Margin="36,13,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.769"/>
-        <Button Content="Associate" HorizontalAlignment="Left" Margin="827,186,0,0" VerticalAlignment="Top" Width="75" Click="Association_Button_Click"/>
-        <CheckBox x:Name="AssociationWithNXM_CheckBox" HorizontalAlignment="Left" Margin="806,189,0,0" VerticalAlignment="Top"/>
+        Title="Eeveex Mod Manager" Height="650" Width="1250">
+    <Grid Name="MainGrid">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="40,20">
+            <Label Content="Mod List:" HorizontalAlignment="Left" FontSize="20"/>
+            <TreeView Height="500" Width="800" Name="ModList_TreeView"/>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
+            <Button Name="ApplicationLaunch_Button" Content="Launch" FontSize="40" Foreground="Green" Width="200" Height="70" Click="LaunchApplicationButton_Click" Margin="0,0,0,10"/>
+            <ComboBox Name="ApplicationPicker_Selection" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="40" Width="200"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <CheckBox Name="AssociationWithNXM_CheckBox" Margin="10,0" VerticalAlignment="Center"/>
+            <Button Content="Associate" HorizontalAlignment="Right" VerticalAlignment="Center" Width="75" Click="Association_Button_Click"/>
+        </StackPanel>
     </Grid>
 </Window>

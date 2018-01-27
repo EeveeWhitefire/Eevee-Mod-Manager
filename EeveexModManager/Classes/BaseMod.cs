@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using EeveexModManager.Interfaces;
+using EeveexModManager.Classes.DatabaseClasses;
 
 namespace EeveexModManager.Classes
 {
@@ -21,7 +22,7 @@ namespace EeveexModManager.Classes
 
         public GameListEnum GameId { get;}
         public ModCategories ModCategory { get;}
-        [Key]
+
         public string FileId { get; set; }
 
         public BaseMod(string n, bool active, bool installed, string source, 
@@ -39,13 +40,26 @@ namespace EeveexModManager.Classes
             Id = id;
         }
 
-        public void Set_isActive(bool to)
+        public void ToggleIsActive()
         {
-            if(Active != to)
-            {
-                Active = to;
-            }
+            Active = !Active;
         }
 
+        public Db_BaseMod EncapsulateToDb()
+        {
+            return new Db_BaseMod()
+            {
+                Name = Name,
+                Active = Active,
+                Installed = Installed,
+                SourceArchive = SourceArchive,
+                ModDirectory = ModDirectory,
+                GameId = GameId,
+                ModCategory = ModCategory,
+                FileId = FileId,
+                Version = Version,
+                Id = Id
+            };
+        }
     }
 }

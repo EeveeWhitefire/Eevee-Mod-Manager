@@ -12,6 +12,7 @@ using System.Threading;
 using Microsoft.Win32;
 
 using EeveexModManager.Controls;
+using System.Windows;
 
 namespace EeveexModManager.Classes
 {
@@ -27,27 +28,62 @@ namespace EeveexModManager.Classes
         
         public bool Exists { get; protected set; } = false;
         public bool Confirmed { get; set; } = false;
-        public bool Search { get; protected set; } = true;
+        public bool Search { get; set; } = true;
+
+        public GameDetector_Control GuiControl { get; protected set; }
 
         public GameSearcher(string n, GameDetector_Control control)
         {
             Name = n;
             SearchTextBox = control.ProgressBar;
-            control.Dispatcher.Invoke(() => StartSearch(control), DispatcherPriority.Background);
+            GuiControl = control;
+        }
+
+        public const int GameStateTextSize = 20;
+
+        public void RestartSearch()
+        {
+            GuiControl.ResetGUI();
+            Search = true;
+            Exists = false;
+            Confirmed = false;
+            StartSearch();
         }
 
         public void StopSearch()
         {
             Search = false;
             SearchTextBox.Background = Brushes.Gray;
+            if (!Exists)
+            {
+                GuiControl.CancelButton.State_ToDisabled();
+                GuiControl.ButtonsPanel.Children.Add(new TextBlock()
+                {
+                    Text = "Game Wasn't Found!",
+                    FontSize = GameStateTextSize,
+                    Margin = new Thickness(10, 0, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Foreground = Brushes.Red
+                });
+            }
+
         }
 
-        public void StartSearch(GameDetector_Control control)
+        public void StartSearch()
         {
+            GuiControl.CancelButton.State_ToEnabled();
             if (GameIsInstalled())
             {
                 Exists = true;
-                control.FoundGame();
+                GuiControl.FoundGame();
+                GuiControl.ButtonsPanel.Children.Add(new TextBlock()
+                {
+                    Text = "Game Was Found!",
+                    Margin = new Thickness(30, 0, 0, 0),
+                    FontSize = GameStateTextSize,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Foreground = Brushes.Green
+                });
             }
             StopSearch();
         }
@@ -57,67 +93,28 @@ namespace EeveexModManager.Classes
             RegistryKey parentKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
             foreach (var item in Game.GetRegistryName(Name))
             {
-
-                foreach (var regKey in parentKey.GetSubKeyNames().Select(x => parentKey.OpenSubKey(x))
-                    .Where(x => x.GetValue("DisplayName")?.ToString().ToLower().Replace(" ", string.Empty) == 
-                    item.ToLower().Replace(" ", string.Empty)))
+                if (Search)
                 {
-                    try
+                    foreach (var regKey in parentKey.GetSubKeyNames().Select(x => parentKey.OpenSubKey(x))
+                        .Where(x => x.GetValue("DisplayName")?.ToString().ToLower().Replace(" ", string.Empty) ==
+                        item.ToLower().Replace(" ", string.Empty)))
                     {
-                        InstallationPath = regKey.GetValue("InstallLocation").ToString();
-                        RegistryName = item;
-                        return true;
+                        if (Search)
+                        {
+                            try
+                            {
+                                InstallationPath = regKey.GetValue("InstallLocation").ToString();
+                                RegistryName = item;
+                                return true;
+                            }
+                            catch { }
+                        }
                     }
-                    catch { }
                 }
             }
             return false;
         }
+        
 
-        public static string GetExecutablePath(string n)
-        {
-            RegistryKey parentKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\App Paths");
-            string[] nameList = parentKey.GetSubKeyNames();
-
-            for (int i = 0; i < nameList.Length; i++)
-            {
-                RegistryKey regKey = parentKey.OpenSubKey(nameList[i]);
-                try
-                {
-                    if (nameList[i].ToLower() == n.ToLower())
-                    {
-                        return regKey.GetValue("(Default)").ToString();
-                    }
-                }
-                catch { }
-            }
-            return string.Empty;
-        }
-        /*
-        void ProcessDirectory(string p)
-        {
-            if (Search)
-            {
-                SearchTextBox.Text = p;
-                foreach (var x in FilesNeeded)
-                {
-                    if (p.EndsWith(x))
-                    {
-                        ExistingFilesCount++;
-                        break;
-                    };
-                }
-
-                if (ExistingFilesCount < FilesNeeded.Count)
-                {
-
-                    var dirs = Directory.GetDirectories(p);
-                    foreach (var item in dirs)
-                    {
-                        ProcessDirectory(p);
-                    }
-                }
-            }
-        }*/
     }
 }

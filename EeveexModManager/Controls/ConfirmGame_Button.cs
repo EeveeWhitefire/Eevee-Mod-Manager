@@ -17,25 +17,11 @@ namespace EeveexModManager.Controls
     {
         public string AssociatedGame { get; protected set; }
 
-        public ConfirmGame_Button(string game, double radX, double radY) : base(radX, radY, new Image() {
-            Width = Defined.MODPICKINGBUTTON_SIZE,
-            Height = Defined.MODPICKINGBUTTON_SIZE,
-            Source = new BitmapImage(new Uri("pack://application:,,,/EeveexModManager;component/Resources/Button_GreenCheckMark_Hover.png", UriKind.Absolute)),
-            VerticalAlignment = VerticalAlignment.Center})
-
+        public ConfirmGame_Button(string game, double radX, double radY) : base(radX, radY, "Button_GreenCheckMark" )
         {
             AssociatedGame = game;
             VerticalAlignment = VerticalAlignment.Bottom;
-            Margin = new Thickness(10, 0, 0, 10);
-            //Visibility = Visibility.Hidden;
-            Content = new Image
-            {
-                Width = Defined.MODPICKINGBUTTON_SIZE,
-                Height = Defined.MODPICKINGBUTTON_SIZE,
-                Source = new BitmapImage(new Uri("pack://application:,,,/EeveexModManager;component/Resources/Button_GreenCheckMark.png", UriKind.Absolute)),
-                VerticalAlignment = VerticalAlignment.Center
-            };
+            Margin = new Thickness(10, 0, 20, 10);
         }
-
     }
 }

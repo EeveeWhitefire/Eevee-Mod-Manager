@@ -14,18 +14,18 @@ using EeveexModManager.Services;
 
 namespace EeveexModManager.Classes
 {
-    public class NxmHanlder
+    public class NxmHandler
     {
         Json_Config _config;
         Service_JsonParser _jsonParser;
 
-        public NxmHanlder(ref Json_Config jsc, ref Service_JsonParser jsonParser, ref CheckBox IsAssociated_CheckBox)
+        public NxmHandler(Json_Config jsc, Service_JsonParser jsonParser, CheckBox IsAssociated_CheckBox)
         {
             _jsonParser = jsonParser;
             _config = jsc;
 
             if (IsUrlAssociated("nxm") != _config.Nxm_Handled)
-                AssociationManagement(IsUrlAssociated("nxm"), ref IsAssociated_CheckBox);
+                AssociationManagement(IsUrlAssociated("nxm"), IsAssociated_CheckBox);
         }
 
         void AssociateNxmFile(string Extension, string KeyName, string OpenWith, string FileDescription)
@@ -74,7 +74,7 @@ namespace EeveexModManager.Classes
             string strUrlId = "URL:" + desc;
             Registry.SetValue(@"HKEY_CLASSES_ROOT\" + name, null, strUrlId, RegistryValueKind.String);
             Registry.SetValue(@"HKEY_CLASSES_ROOT\" + name, "URL Protocol", "", RegistryValueKind.String);
-            Registry.SetValue(@"HKEY_CLASSES_ROOT\" + name + @"\DefaultIcon", null, exePath + ",0", RegistryValueKind.String);
+            Registry.SetValue(@"HKEY_CLASSES_ROOT\" + name + @"\DefaultIcon", null, exePath + ",101", RegistryValueKind.String);
             Registry.SetValue(@"HKEY_CLASSES_ROOT\" + name + @"\shell\open\command", null, "\"" + exePath + "\" \"%1\"", RegistryValueKind.String);
         }
         void UnassociateNxmUrl(string name)
@@ -87,7 +87,7 @@ namespace EeveexModManager.Classes
         [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
 
-        public void AssociationManagement(bool isAssociated, ref CheckBox cbx)
+        public void AssociationManagement(bool isAssociated, CheckBox cbx)
         {
             bool newState = !isAssociated;
             if (!isAssociated)

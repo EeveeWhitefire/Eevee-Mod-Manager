@@ -4,11 +4,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Collections.Generic;
+using System.IO;
 
 using EeveexModManager.Classes;
+using EeveexModManager.Classes.DatabaseClasses;
 using EeveexModManager.Classes.JsonClasses;
 using EeveexModManager.Services;
-using System.IO;
+using EeveexModManager.Controls;
 
 namespace EeveexModManager.Windows
 {
@@ -17,48 +19,62 @@ namespace EeveexModManager.Windows
     /// </summary>
     public partial class GamePickerWindow : Window
     {
-        DatabaseContext _db;
-        Mutex mutex;
-        Service_JsonParser _jsonParser;
-        Json_Config _config;
-        NamedPipeManager namedPipeManager;
+        private DatabaseContext _db;
+        private Mutex _mutex;
+        private Service_JsonParser _jsonParser;
+        private Json_Config _config;
+        private NamedPipeManager _namedPipeManager;
+        private GamePicker_ComboBox _gamePicker;
 
-        public GamePickerWindow(ref Mutex m, ref DatabaseContext db, ref Service_JsonParser jsp, ref Json_Config cnfg, ref NamedPipeManager npm)
+        public GamePickerWindow(Mutex m, DatabaseContext db, Service_JsonParser jsp, Json_Config cnfg, 
+            NamedPipeManager npm)
         {
             _db = db;
-            mutex = m;
+            _mutex = m;
             _jsonParser = jsp;
             _config = cnfg;
-            namedPipeManager = npm;
+            _namedPipeManager = npm;
 
             InitializeComponent();
-
-            db.GetCollection<Game>("games").FindAll().ToList().ForEach(x =>
+            _gamePicker = new GamePicker_ComboBox(_db.GetCollection<Db_Game>("games").FindAll(), 80, 25, RerunGameDetection)
             {
-                AddGame(x);
-            });
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Margin = new Thickness(20, 10, 0, 0),
+                VerticalAlignment = VerticalAlignment.Top,
+                Width = 450,
+                Height = 80
+            };
+
+            MainGrid.Children.Add(_gamePicker);
+        }
+
+        void RerunGameDetection()
+        {
+            AvailableGamesWindow gameDetectWindow = new AvailableGamesWindow(_mutex, _db, _jsonParser, _config, _namedPipeManager, true, WindowsEnum.GamePickerWindow);
+            gameDetectWindow.Show();
+            Close();
         }
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
-            List<Game> updatedGameList = _db.GetCollection<Game>("games").FindAll().ToList();
+            Game currGame = _db.GetCollection<Db_Game>("games").FindOne( x => x.IsCurrent).EncapsulateToSource();
+            Game selGame = _db.GetCollection<Db_Game>("games").FindAll().ElementAt(_gamePicker.SelectedIndex).EncapsulateToSource();
 
-            updatedGameList.ForEach(x =>
+            if(selGame != currGame)
             {
-               if (x.IsCurrent || updatedGameList.IndexOf(x) == GameDropdown.SelectedIndex)
-               {
-                   x.ToggleCurrent();
-               }
-            });
+                selGame.ToggleIsCurrentGame();
+                currGame.ToggleIsCurrentGame();
+            }
 
-            _db.GetCollection<Game>("games").Update(updatedGameList);
+            _db.GetCollection<Db_Game>("games").Update(selGame.EncapsulateToDb());
+            _db.GetCollection<Db_Game>("games").Update(currGame.EncapsulateToDb());
 
-            
+
             _config.First_Time = false;
             _config.Installation_Path = Directory.GetCurrentDirectory();
             _jsonParser.UpdateJson(_config);
 
-            MainWindow mainWindow = new MainWindow(ref mutex, ref _db, ref _jsonParser, ref _config, ref namedPipeManager);
+            MainWindow mainWindow = new MainWindow(_mutex, _db, _jsonParser, _config, _namedPipeManager);
 
             mainWindow.Show();
         }
@@ -67,33 +83,6 @@ namespace EeveexModManager.Windows
         {
             
             Close();
-        }
-
-        void AddGame(Game game)
-        {
-            StackPanel x = new StackPanel()
-            {
-                Orientation = Orientation.Horizontal,
-            };
-
-            Image icon = new Image
-            {
-                Width = 80,
-                Margin = new Thickness(10, 0, 40, 0),
-                Source = (BitmapImage)FindResource(game.IconName)
-            };
-
-            TextBlock txtBlock = new TextBlock()
-            {
-                Text = game.Name,
-                VerticalAlignment = VerticalAlignment.Center,
-                FontSize = 30
-            };
-
-            x.Children.Add(icon);
-            x.Children.Add(txtBlock);
-
-            GameDropdown.Items.Add(x);
         }
     }
 

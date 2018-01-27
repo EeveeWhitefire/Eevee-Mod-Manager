@@ -14,6 +14,7 @@ using EeveexModManager.Classes;
 using EeveexModManager.Services;
 using EeveexModManager.Classes.JsonClasses;
 using EeveexModManager.Windows;
+using EeveexModManager.Classes.DatabaseClasses;
 
 using Microsoft.EntityFrameworkCore;
 using System.Text;
@@ -33,18 +34,33 @@ namespace EeveexModManager
         private NamedPipeManager _namedPipeManager;
 
         Mutex mutex;
-        ~App()
+
+        private void ApplicationExit(object sender, ExitEventArgs e)
         {
+            ExitEVX();
+        }
+
+        public void ExitEVX()
+        {
+            _namedPipeManager.CloseConnections();
+            mutex.ReleaseMutex();
             mutex.Close();
+            Environment.Exit(0);
         }
 
         void Init()
         {
-            string[] neededDirs = new string[] { "Mods", "Downloads", "Profiles" };
+            string[] neededDirs = new string[] { "Mods", "Downloads", "Profiles" , "DLLs"};
             foreach (var dir in neededDirs)
             {
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
+            }
+
+            foreach (var game in _db.GetCollection<Db_Game>("games").FindAll().Select( x => x.EncapsulateToSource()))
+            {
+                if (!Directory.Exists(game.ModsDirectory))
+                    Directory.CreateDirectory(game.ModsDirectory);
             }
         }
 
@@ -52,54 +68,69 @@ namespace EeveexModManager
         [STAThread]
         void App_Startup(object sender, StartupEventArgs e)
         {
-            Init();
             NexusUrl modArg = null;
 
             mutex = new Mutex(false, "Global\\" + appGuid);
-            _namedPipeManager = new NamedPipeManager("EeveexModManager");
 
-            _db = new DatabaseContext();// Strong Type Class
+            _namedPipeManager = new NamedPipeManager("EeveexModManager", !mutex.WaitOne(0, false), this);
 
-            _jsonParser = new Service_JsonParser();
-            _config = _jsonParser.GetJsonFields<Json_Config>();
 
-            if (_config.First_Time)
+            // Application is running
+            // Process command line args
+            bool startMinimized = false;
+            for (int i = 0; i < e.Args.Length; ++i)
             {
-                AvailableGamesWindow window = new AvailableGamesWindow();
-                window.Show();
-            }
-
-            if (!_config.First_Time)
-            {
-                // Application is running
-                // Process command line args
-                bool startMinimized = false;
-                for (int i = 0; i != e.Args.Length; ++i)
+                if (e.Args[i] == "/StartMinimized")
                 {
-                    if (e.Args[i] == "/StartMinimized")
+                    startMinimized = true;
+                }
+                else
+                {
+                    try
                     {
-                        startMinimized = true;
-                    }
-                    else
-                    {
-                        MessageBox.Show(e.Args[i]);
                         modArg = new NexusUrl(new Uri(e.Args[i]));
                     }
-                }
-
-                if (!mutex.WaitOne(0, false))
-                {
-                    MessageBox.Show("Instance already running");
-
-                    if (modArg != null)
+                    catch (Exception)
                     {
-                        _namedPipeManager.SendToServer(modArg.SourceUrl);
+                        ExitEVX();
                     }
-                    return;
                 }
+            }
 
+            if (!mutex.WaitOne(0, false))
+            {
+                if (modArg != null)
+                {
+                    _namedPipeManager.SendToServer(modArg.SourceUrl);
+                }
+                return;
+            }
+
+
+            _jsonParser = new Service_JsonParser();
+
+            if (!File.Exists("config.json"))
+            {
+                _config = new Json_Config();
+                _jsonParser.UpdateJson(_config);
+            }
+            else
+                _config = _jsonParser.GetJsonFields<Json_Config>();
+
+
+            _db = new DatabaseContext(_config);// Strong Type Class
+
+            Init();
+
+            if (_config.First_Time || _db.GetCollection<Db_Game>("games").Find(x => x.IsCurrent).Count() < 1 || _db.GetCollection<Db_Game>("games").FindAll().Count() < 1)
+            {
+                _db.FirstTimeSetup(mutex, _jsonParser, _config, _namedPipeManager);
+                return;
+            }
+            else
+            {
                 // Create main application window, starting minimized if specified
-                MainWindow mainWindow = new MainWindow(ref mutex, ref _db, ref _jsonParser, ref _config, ref _namedPipeManager);
+                MainWindow mainWindow = new MainWindow(mutex, _db, _jsonParser, _config, _namedPipeManager);
                 if (startMinimized)
                 {
                     mainWindow.WindowState = WindowState.Minimized;

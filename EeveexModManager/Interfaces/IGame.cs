@@ -10,7 +10,7 @@ namespace EeveexModManager.Interfaces
     {
         SkyrimSE,
         Skyrim,
-        FalloutNV,
+        FalloutNV = 130,
         Fallout4
     }
 
@@ -23,9 +23,10 @@ namespace EeveexModManager.Interfaces
         string Name { get;}
         string Name_API { get;}
         string Name_Registry { get; }
+        string ModsDirectory { get; }
+        string DownloadsDirectory { get;}
 
         GameListEnum Id { get;}
-        string IconName { get;}
 
         bool IsCurrent { get; }
     }

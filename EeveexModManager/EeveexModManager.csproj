@@ -195,23 +195,32 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\DatabaseClasses\Db_BaseMod.cs" />
+    <Compile Include="Classes\DatabaseClasses\Db_Game.cs" />
+    <Compile Include="Classes\DatabaseClasses\Db_OnlineMod.cs" />
     <Compile Include="Classes\Game.cs" />
     <Compile Include="Classes\GameApplication.cs" />
     <Compile Include="Classes\GameSearcher.cs" />
     <Compile Include="Classes\JsonClasses\API\Api_ModDownloadInfo.cs" />
+    <Compile Include="Classes\JsonClasses\API\Api_ModFileInfo.cs" />
     <Compile Include="Classes\JsonClasses\API\Api_ModInfo.cs" />
     <Compile Include="Classes\JsonClasses\Json_Config.cs" />
     <Compile Include="Classes\BaseMod.cs" />
     <Compile Include="Classes\ModArchiveFile.cs" />
     <Compile Include="Classes\ModManager.cs" />
     <Compile Include="Classes\NamedPipeManager.cs" />
-    <Compile Include="Classes\NxmHanlder.cs" />
+    <Compile Include="Classes\NxmHandler.cs" />
     <Compile Include="Classes\OnlineMod.cs" />
     <Compile Include="Classes\PipeStreamString_In.cs" />
     <Compile Include="Classes\PipeStreamString_Out.cs" />
     <Compile Include="Controls\CircularButton.cs" />
     <Compile Include="Controls\ConfirmGame_Button.cs" />
     <Compile Include="Controls\GameDetector_Control.cs" />
+    <Compile Include="Controls\GamePicker_ComboBox.cs" />
+    <Compile Include="Controls\GamePicker_Control.cs" />
+    <Compile Include="Controls\Mod_Control.cs" />
+    <Compile Include="Controls\OnlineMod_Control.cs" />
+    <Compile Include="Controls\ShapedButton.cs" />
     <Compile Include="Controls\SquareButton.cs" />
     <Compile Include="Defined.cs" />
     <Compile Include="Interfaces\IGame.cs" />
@@ -235,7 +244,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Classes\DatabaseContext.cs" />
+    <Compile Include="Classes\DatabaseClasses\DatabaseContext.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -321,6 +330,15 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Button_RedX_Hover.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Button_GreenCheckMark_Disabled.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Button_RedX_Disabled.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icon - Dragon Age II.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EeveexModManager.Windows"
         mc:Ignorable="d"
-        Title="Please pick a game:" Height="153" Width="579">
+        Title="Please pick a game:" Height="160" Width="700">
     <Window.Resources>
         <ResourceDictionary>
             <BitmapImage x:Key="icon_skyrim" UriSource="/EeveexModManager;component/Resources/Icon_Skyrim.png" />
@@ -16,22 +16,20 @@
             <BitmapImage x:Key="button_greenCheck" UriSource="/EeveexModManager;component/Resources/Button_GreenCheckMark.png" />
         </ResourceDictionary>
     </Window.Resources>
-    <Grid Margin="0,2,0,-2">
-        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
-            <Button VerticalAlignment="Bottom" Margin="0,0,0,35" Width="150" Click="ConfirmButton_Click">
+    <Grid Name="MainGrid">
+        <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,10,10,0">
+            <Button VerticalAlignment="Bottom" Click="ConfirmButton_Click" Margin="0,0,0,30" Height="35">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Image Source="{StaticResource button_greenCheck}" Width="30" HorizontalAlignment="Left" />
-                    <TextBlock Text="Confirm" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" FontSize="20"/>
+                    <Image Source="{StaticResource button_greenCheck}" Width="32" HorizontalAlignment="Left" Height="32" Margin="0,0,30,0"/>
+                    <TextBlock Text="Confirm" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="30,0,10,0" FontSize="20"/>
                 </StackPanel>
             </Button>
-            <Button VerticalAlignment="Bottom" Margin="10,0,10,10" Click="ExitButton_Click" Width="150">
+            <Button VerticalAlignment="Bottom" Click="ExitButton_Click" Height="35">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Image HorizontalAlignment="Left" Source="{StaticResource button_redX}" Width="30"/>
-                    <TextBlock Text="Exit" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" FontSize="20"/>
+                    <Image HorizontalAlignment="Left" Source="{StaticResource button_redX}" Width="32" Height="32" Margin="0,0,75,0"/>
+                    <TextBlock Text="Exit" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0,25,0" FontSize="20"/>
                 </StackPanel>
             </Button>
         </StackPanel>
-        <ComboBox x:Name="GameDropdown" HorizontalAlignment="Left" VerticalAlignment="Top" SelectedIndex="0" Margin="20,10,0,0" Width="336">
-        </ComboBox>
     </Grid>
 </Window>

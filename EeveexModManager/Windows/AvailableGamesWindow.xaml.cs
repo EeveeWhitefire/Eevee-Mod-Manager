@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,9 +12,13 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 using EeveexModManager.Classes;
+using EeveexModManager.Classes.DatabaseClasses;
+using EeveexModManager.Classes.JsonClasses;
 using EeveexModManager.Controls;
+using EeveexModManager.Services;
 
 namespace EeveexModManager.Windows
 {
@@ -22,30 +27,66 @@ namespace EeveexModManager.Windows
     /// </summary>
     public partial class AvailableGamesWindow : Window
     {
-        List<GameSearcher> gameSeachers;
-        List<Game> games;
+        private List<GameSearcher> gameSeachers;
+        private List<Game> games;
+        private DatabaseContext _db;
+        private Service_JsonParser _jsonParser;
+        private Json_Config _config;
+        private NamedPipeManager _namedPipeManager;
+        private Mutex _mutex;
 
-        bool CommencingSearch = false;
-        
-        public AvailableGamesWindow()
+        private WindowsEnum GetBackTo = WindowsEnum.GameDetectionWindow;
+
+        public AvailableGamesWindow(Mutex m, DatabaseContext db, Service_JsonParser jsp, Json_Config cnfg,
+            NamedPipeManager npm, bool getBackButton = false, WindowsEnum backTo = WindowsEnum.MainWindow)
         {
+            _mutex = m;
+            _db = db;
+            _jsonParser = jsp;
+            _config = cnfg;
+            _namedPipeManager = npm;
+
             InitializeComponent();
             StartSearches();
+
+            if(getBackButton)
+            {
+                BackToMain_Button.Visibility = Visibility.Visible;
+                GetBackTo = backTo;
+            }
+        }
+
+        private void GetBackToMainWindow_Click(object sender, RoutedEventArgs e)
+        {
+            switch (GetBackTo)
+            {
+                case WindowsEnum.MainWindow:
+                    MainWindow mainWindow = new MainWindow(_mutex, _db, _jsonParser, _config, _namedPipeManager);
+                    mainWindow.Show();
+                    break;
+                case WindowsEnum.GamePickerWindow:
+                    GamePickerWindow pickingWindow = new GamePickerWindow(_mutex, _db, _jsonParser, _config, _namedPipeManager);
+                    pickingWindow.Show();
+                    break;
+            }
+            Close();
         }
 
         void StartSearches()
         {
            int counter = 0;
             string[] gameNames = new string[]
-                {"TESV : Skyrim Special Edition", "TESV : Skyrim", "Fallout : New Vegas", "Fallout 4", "Fallout 3"};
+                {"TESV : Skyrim Special Edition", "TESV : Skyrim", "Fallout : New Vegas",
+                    "Fallout 4", "Fallout 3", "Dragon Age II"};
 
             gameSeachers = new List<GameSearcher>();
             games = new List<Game>();
-            CommencingSearch = true;
 
             foreach (StackPanel item in GameSearchers_StackPanel.Children)
             {
-                foreach (var x in gameNames.Skip(counter))
+                var names = gameNames.Skip(counter);
+                counter = 0;
+                foreach (var x in names)
                 {
                     Border border = new Border()
                     {
@@ -56,16 +97,17 @@ namespace EeveexModManager.Windows
                         VerticalAlignment = VerticalAlignment.Top
                     };
 
-                    GameDetector_Control currDetectorControl = new GameDetector_Control(gameNames[counter]);
+                    GameDetector_Control currDetectorControl = new GameDetector_Control(x);
 
-                    gameSeachers.Add(new GameSearcher(gameNames[counter], currDetectorControl));
+                    gameSeachers.Add(new GameSearcher(x, currDetectorControl));
                     currDetectorControl.Searcher = gameSeachers.LastOrDefault();
+                    currDetectorControl.Dispatcher.Invoke(() => currDetectorControl.Searcher.StartSearch(), DispatcherPriority.Background);
 
                     border.Child = currDetectorControl;
 
                     item.Children.Add(border);
                     counter++;
-                    if (counter >= 3)
+                    if (counter >= 4)
                     {
                         break;
                     }
@@ -80,39 +122,53 @@ namespace EeveexModManager.Windows
 
         private void RestartScansButton_Click(object sender, RoutedEventArgs e)
         {
-            if(CommencingSearch)
+            if(gameSeachers.Where( x => x.Search).Count() > 0)
             {
                 MessageBox.Show("Error! There are still scans commencing! Please wait till each one of them has ended or click on the \"Ignore All\" button!");
             }
             else
             {
-                StartSearches();
+                gameSeachers.ForEach(x =>
+               {
+                   Confirm_Button.Dispatcher.Invoke(() => x.RestartSearch(), DispatcherPriority.Background);
+               });
             }
         }
 
         private void ConfirmGamesButton_Click(object sender, RoutedEventArgs e)
         {
-            if (gameSeachers.Count() > 0)
+            if (gameSeachers.Where( x => x.Confirmed).Count() > 0)
             {
-                gameSeachers.Where(x => x.Confirmed && x.Exists).ToList().ForEach(x =>
-                {
-                    games.Add(Game.CreateByName(x.Name, x.InstallationPath, x.RegistryName));
-                });
+                games = gameSeachers.Where(x => x.Confirmed)
+                    .Select(x => Game.CreateByName(x.Name, x.InstallationPath, x.RegistryName)).ToList();
+                games.Last().ToggleIsCurrentGame(); //first game is also the current one :)
+
+                _db.GetCollection<Db_Game>("games").Delete(x => true);
+
+                _db.GetCollection<Db_Game>("games").InsertBulk(games.Select( x => x.EncapsulateToDb()));
+
+                GamePickerWindow gamePickerWindow = new GamePickerWindow(_mutex, _db, _jsonParser, _config, _namedPipeManager);
+                gamePickerWindow.Show();
 
                 Close();
             }
             else
             {
                 MessageBox.Show("Error! No games were found! Please click on the \"Restart Scans\" button to retry!");
-                ((Button)sender).IsEnabled = false;
             }
         }
 
         private void IgnoreAllModsButton_Click(object sender, RoutedEventArgs e)
         {
-            gameSeachers.ForEach(x => x.StopSearch());
-            gameSeachers.RemoveAll(x => (!x.Search  && !x.Confirmed));
-            CommencingSearch = false;
+            gameSeachers.ForEach(x => x.GuiControl.IgnoreMod());
+        }
+
+        private void ConfirmAllGamesButton_Click(object sender, RoutedEventArgs e)
+        {
+            gameSeachers.Where(x => x.Exists).ToList().ForEach( x =>
+            {
+                x.GuiControl.ConfirmGame();
+            });
         }
     }
 }

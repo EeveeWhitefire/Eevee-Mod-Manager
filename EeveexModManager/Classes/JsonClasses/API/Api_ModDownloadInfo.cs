@@ -8,7 +8,7 @@ namespace EeveexModManager.Classes.JsonClasses.API
 {
     public class Api_ModDownloadInfo
     {
-        public Uri URI { get; set; }
+        public string URI { get; set; }
         public string Country { get; set; }
         public bool IsPremium { get; set; }
         public string Name { get; set; }

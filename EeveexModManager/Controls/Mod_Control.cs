@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,11 +15,11 @@ namespace EeveexModManager.Controls
 {
     public class Mod_Control : StackPanel
     {
-        public BaseMod AssociatedMod { get; protected set; }
+        public Mod AssociatedMod { get; protected set; }
         public DatabaseContext Database { get; protected set; }
         public Button ActivateGameButton { get; protected set; }
 
-        public Mod_Control(BaseMod mod, int index, DatabaseContext db) : base()
+        public Mod_Control(Mod mod, int index, DatabaseContext db) : base()
         {
             AssociatedMod = mod;
             Database = db;
@@ -42,10 +43,10 @@ namespace EeveexModManager.Controls
             Children.Add(ActivateGameButton);
             Children.Add(new TextBlock()
             {
-                Text = AssociatedMod.Name,
+                Text = $"{AssociatedMod.Name} [{AssociatedMod.ModFileName}]",
                 Margin = modListMargin,
                 VerticalAlignment = VerticalAlignment.Center,
-                Width = 250,
+                Width = 500,
                 FontSize = 15
             });
             Children.Add(new TextBlock()
@@ -64,6 +65,36 @@ namespace EeveexModManager.Controls
                 Width = 30,
                 FontSize = 15
             });
+            Button UninstallModButton = new Button()
+            {
+                Content = "X",
+                Background = Brushes.DarkRed,
+                Foreground = Brushes.White,
+                Margin = modListMargin,
+                VerticalAlignment = VerticalAlignment.Center,
+                Width = 20,
+                Height = 25,
+                FontSize = 15
+            };
+            UninstallModButton.Click += new RoutedEventHandler(UninstallMod);
+
+            Children.Add(UninstallModButton);
+        }
+        private void UninstallMod(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult dialogResult = MessageBox.Show($"Are you sure you'd like to uninstall the mod:\n\n{AssociatedMod.Name} [{AssociatedMod.ModFileName}]       ???", "Authorization Method", MessageBoxButton.YesNo);
+            if (dialogResult == MessageBoxResult.Yes)
+            {
+                if (Directory.Exists(AssociatedMod.ModDirectory))
+                    Directory.Delete(AssociatedMod.ModDirectory, true);
+
+                if(Directory.Exists(AssociatedMod.DownloadDirectory))
+                    Directory.Delete(AssociatedMod.DownloadDirectory, true);
+
+
+                Database.GetCollection<Db_Mod>("mods").Delete(x => x.FileId == AssociatedMod.FileId);
+                (Parent as TreeView).Items.Remove(this);
+            }
         }
 
         protected virtual void ActivateMod(object sender, RoutedEventArgs e)
@@ -78,7 +109,7 @@ namespace EeveexModManager.Controls
             }
 
             AssociatedMod.ToggleIsActive();
-            Database.GetCollection<Db_BaseMod>("offline_mods").Update(AssociatedMod.EncapsulateToDb());
+            Database.GetCollection<Db_Mod>("mods").Update(AssociatedMod.EncapsulateToDb());
         }
     }
 }

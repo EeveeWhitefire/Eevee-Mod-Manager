@@ -14,8 +14,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
     {
         public DatabaseContext(Json_Config config) : base(config.Installation_Path + @"\EeveexModManager.db")
         {
-            GetCollection<OnlineMod>("online_mods").EnsureIndex(x => x.FileId);
-            GetCollection<BaseMod>("offline_mods").EnsureIndex(x => x.FileId);
+            GetCollection<Db_Mod>("mods").EnsureIndex(x => x.FileId);
             GetCollection<Db_Game>("games").EnsureIndex(x => x.Name);
 
             GetCollection<GameApplication>("game_apps").EnsureIndex(x => x.Name);
@@ -28,10 +27,8 @@ namespace EeveexModManager.Classes.DatabaseClasses
 
         public void FirstTimeSetup(Mutex m, Service_JsonParser jsp, Json_Config cnfg, NamedPipeManager npm)
         {
-            if (GetCollection<OnlineMod>("online_mods").Count() > 0)
-                DropCollection("online_mods");
-            if (GetCollection<BaseMod>("offline_mods").Count() > 0)
-                DropCollection("offline_mods");
+            if (GetCollection<Db_Mod>("mods").Count() > 0)
+                DropCollection("mods");
 
             if (GetCollection<Game>("games").Count() > 0)
                 DropCollection("games");

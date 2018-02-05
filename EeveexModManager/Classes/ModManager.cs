@@ -24,7 +24,10 @@ using EeveexModManager.Classes.JsonClasses.API;
 using EeveexModManager.Interfaces;
 using EeveexModManager.Nexus;
 using EeveexModManager.Controls;
-
+using System.Security.Principal;
+using System.Security.AccessControl;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace EeveexModManager.Classes
 {
@@ -32,22 +35,27 @@ namespace EeveexModManager.Classes
     {
         private DatabaseContext _db;
         private HttpClient httpClient;
-        private WebClient webClient;
-        TreeView Mods_TreeView;
+
+        private TreeView Mods_TreeView { get; }
+        private TreeView Downloads_TreeView { get; }
+
         public string CookieSid { get; protected set; } = null;
         public bool CanAccessApi { get; protected set; } = false;
+
+        public DownloadManager DownloadsManager { get; protected set; }
 
         public ModManager(DatabaseContext db)
         {
             httpClient = new HttpClient();
-            webClient = new WebClient();
             _db = db;
         }
 
-        public ModManager(DatabaseContext db, TreeView modsTreeView) : this(db)
+        public ModManager(DatabaseContext db, TreeView modsTreeView, TreeView downloadsTreeView) : this(db)
         {
             httpClient = new HttpClient();
-            webClient = new WebClient();
+            DownloadsManager = new DownloadManager(downloadsTreeView, AddModToGUI);
+
+            Downloads_TreeView = downloadsTreeView;
             Mods_TreeView = modsTreeView;
         }
 
@@ -61,30 +69,34 @@ namespace EeveexModManager.Classes
         {
             CanAccessApi = !CanAccessApi;
         }
-        
-        public void CreateMod(Game CurrentGame, ModArchiveFile archive, bool GUI = true)
+
+        public void AddModToGUI(Mod m)
+        {
+            _db.GetCollection<Db_Mod>("mods").Insert(m.EncapsulateToDb());
+            Mods_TreeView.Items.Add(new Mod_Control(m, Mods_TreeView.Items.Count, _db));
+        }
+
+        [STAThread]
+        public void CreateMod(Game CurrentGame, ModArchiveFile archive)
         {
             /*OpenFileDialog dialog = new OpenFileDialog
             {
                 Filter = "Archive Files|*.rar;*.zip;*.7z;"
             };*/
-            BaseMod newMod = new BaseMod(archive.FileName, false, true, archive.FullNewPath, archive.ModDirectory,
-                CurrentGame.Id, ModCategories.Unknown, $"off-{_db.GetCollection<BaseMod>("offline_mods").Count()}");
+            int modIndex = _db.GetCollection<Db_Mod>("mods").Count();
 
 
-            if (GUI)
-            {
-                Mods_TreeView.Items.Add(new Mod_Control(newMod, Mods_TreeView.Items.Count, _db));
-            }
+            Mod newMod = new Mod($"Offline Mod #{modIndex}", archive.FileName, false, true, archive.FullNewPath, archive.ModDirectory, archive.DownloadDirectory,
+                CurrentGame.Id, ModCategories.Unknown, $"off-{modIndex}");
 
-            _db.GetCollection<Db_BaseMod>("offline_mods").Insert(newMod.EncapsulateToDb());
-            
+            archive.Extract();
+            AddModToGUI(newMod);
         }
 
-        public async Task CreateMod(Game CurrentGame, NexusUrl nexusUrl, bool GUI = true)
+        
+        public async Task CreateMod(Game CurrentGame, NexusUrl nexusUrl)
         {
-            if (!_db.GetCollection<BaseMod>("offline_mods").FindAll().Select(x => x.FileId).Contains(nexusUrl.FileId) &&
-                !_db.GetCollection<Db_OnlineMod>("online_mods").FindAll().Select(x => x.FileId).Contains(nexusUrl.FileId))
+            if (!_db.GetCollection<Db_Mod>("mods").FindAll().Select(x => x.FileId).Contains(nexusUrl.FileId))
             {
                 string API_DownloadLinkSource = $"http://nmm.nexusmods.com/{CurrentGame.Name_API}/Files/download/{nexusUrl.FileId}/?game_id={(int)CurrentGame.Id}";
                 string API_ModInfoSource = $"http://nmm.nexusmods.com/{CurrentGame.Name_API}/Mods/{nexusUrl.ModId}/?game_id={(int)CurrentGame.Id}";
@@ -108,22 +120,26 @@ namespace EeveexModManager.Classes
                 var result_modInfo = JsonConvert.DeserializeObject<Api_ModInfo>(res2);
                 var result_fileInfo = JsonConvert.DeserializeObject<Api_ModFileInfo>(res3);
 
-                string DownloadTo = $@"{CurrentGame.DownloadsDirectory }\{result_fileInfo.uri}";
-
-                webClient.DownloadFileAsync((new Uri(result_downloadInfo.URI)), DownloadTo);
-
-                ModArchiveFile archive = new ModArchiveFile(CurrentGame, DownloadTo, result_fileInfo.name);
-
-                OnlineMod newMod = new OnlineMod(result_fileInfo.name, false, false, archive.FullNewPath, archive.ModDirectory,
-                    CurrentGame.Id, (ModCategories)result_modInfo.category_id, nexusUrl.FileId, result_modInfo.version, nexusUrl.ModId, nexusUrl.SourceUrl.ToString(), result_modInfo.author);
-
-                _db.GetCollection<Db_OnlineMod>("online_mods").Insert(newMod.EncapsulateToDb_Online());
-
-
-                if (GUI)
+                string DownloadTo = $@"{CurrentGame.DownloadsDirectory }\{result_modInfo.name} - {result_fileInfo.name}";
+                string DownloadAs = DownloadTo + $@"\{result_fileInfo.uri}";
+                string InstallTo = $@"{CurrentGame.ModsDirectory}\{result_modInfo.name} - {result_fileInfo.name}";
+                if (!Directory.Exists(DownloadTo))
                 {
-                    Mods_TreeView.Items.Add(new OnlineMod_Control(newMod, Mods_TreeView.Items.Count, _db));
+                    Directory.CreateDirectory(DownloadTo);
                 }
+
+                if (File.Exists(DownloadAs))
+                    File.Delete(DownloadAs);
+
+                Mod newMod = new Mod(result_modInfo.name, result_fileInfo.name, false, true, DownloadAs, InstallTo, DownloadTo,
+                    CurrentGame.Id, (ModCategories)result_modInfo.category_id, nexusUrl.FileId, result_modInfo.version, nexusUrl.ModId,
+                    nexusUrl.SourceUrl.ToString(), result_modInfo.author, true);
+
+
+                Downloads_TreeView.Dispatcher.Invoke(() =>
+                {
+                    DownloadsManager.AddDownload(new Uri(result_downloadInfo.URI), DownloadAs, DownloadTo, InstallTo, result_modInfo.name, result_fileInfo.name, newMod);
+                }, DispatcherPriority.ApplicationIdle);
             }
         }
     }

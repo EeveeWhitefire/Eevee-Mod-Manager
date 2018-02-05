@@ -20,6 +20,14 @@ using Microsoft.EntityFrameworkCore;
 using System.Text;
 using LiteDB;
 
+
+public enum StatesOfConfiguartion
+{
+    FirstTime,
+    OnPickingCurrentGame,
+    Ready
+}
+
 namespace EeveexModManager
 {
     /// <summary>
@@ -57,10 +65,12 @@ namespace EeveexModManager
                     Directory.CreateDirectory(dir);
             }
 
-            foreach (var game in _db.GetCollection<Db_Game>("games").FindAll().Select( x => x.EncapsulateToSource()))
+            foreach (var game in _db.GetCollection<Db_Game>("games").FindAll())
             {
                 if (!Directory.Exists(game.ModsDirectory))
                     Directory.CreateDirectory(game.ModsDirectory);
+                if (!Directory.Exists(game.DownloadsDirectory))
+                    Directory.CreateDirectory(game.DownloadsDirectory);
             }
         }
 
@@ -69,10 +79,18 @@ namespace EeveexModManager
         void App_Startup(object sender, StartupEventArgs e)
         {
             NexusUrl modArg = null;
+            bool isMainProcess = false;
 
             mutex = new Mutex(false, "Global\\" + appGuid);
-
-            _namedPipeManager = new NamedPipeManager("EeveexModManager", !mutex.WaitOne(0, false), this);
+            try
+            {
+                isMainProcess = mutex.WaitOne(0, false);
+            }
+            catch (Exception)
+            {
+                isMainProcess = false;
+            }
+            _namedPipeManager = new NamedPipeManager("EeveexModManager", isMainProcess, this);
 
 
             // Application is running
@@ -97,7 +115,7 @@ namespace EeveexModManager
                 }
             }
 
-            if (!mutex.WaitOne(0, false))
+            if (!isMainProcess)
             {
                 if (modArg != null)
                 {
@@ -105,37 +123,53 @@ namespace EeveexModManager
                 }
                 return;
             }
-
-
-            _jsonParser = new Service_JsonParser();
-
-            if (!File.Exists("config.json"))
-            {
-                _config = new Json_Config();
-                _jsonParser.UpdateJson(_config);
-            }
-            else
-                _config = _jsonParser.GetJsonFields<Json_Config>();
-
-
-            _db = new DatabaseContext(_config);// Strong Type Class
-
-            Init();
-
-            if (_config.First_Time || _db.GetCollection<Db_Game>("games").Find(x => x.IsCurrent).Count() < 1 || _db.GetCollection<Db_Game>("games").FindAll().Count() < 1)
-            {
-                _db.FirstTimeSetup(mutex, _jsonParser, _config, _namedPipeManager);
-                return;
-            }
             else
             {
-                // Create main application window, starting minimized if specified
-                MainWindow mainWindow = new MainWindow(mutex, _db, _jsonParser, _config, _namedPipeManager);
-                if (startMinimized)
+
+
+                _jsonParser = new Service_JsonParser();
+
+                if (!File.Exists("config.json"))
                 {
-                    mainWindow.WindowState = WindowState.Minimized;
+                    _config = new Json_Config();
+                    _jsonParser.UpdateJson(_config);
                 }
-                mainWindow.Show();
+                else
+                {
+                    _config = _jsonParser.GetJsonFields<Json_Config>();
+                    if (_config.Installation_Path != Directory.GetCurrentDirectory())
+                    {
+                        _config.Installation_Path = Directory.GetCurrentDirectory();
+                        _jsonParser.UpdateJson(_config);
+                    }
+                }
+
+
+                _db = new DatabaseContext(_config);// Strong Type Class
+
+                Init();
+
+                if (_config.State == StatesOfConfiguartion.FirstTime || _db.GetCollection<Db_Game>("games").Find(x => x.IsCurrent).Count() < 1 || _db.GetCollection<Db_Game>("games").FindAll().Count() < 1)
+                {
+                    _db.FirstTimeSetup(mutex, _jsonParser, _config, _namedPipeManager);
+                    return;
+                }
+                else if(_config.State == StatesOfConfiguartion.OnPickingCurrentGame)
+                {
+                    GamePickerWindow window = new GamePickerWindow(mutex, _db, _jsonParser, _config, _namedPipeManager);
+                    window.Show();
+                    return;
+                }
+                else if(_config.State == StatesOfConfiguartion.Ready)
+                {
+                    // Create main application window, starting minimized if specified
+                    MainWindow mainWindow = new MainWindow(mutex, _db, _jsonParser, _config, _namedPipeManager);
+                    if (startMinimized)
+                    {
+                        mainWindow.WindowState = WindowState.Minimized;
+                    }
+                    mainWindow.Show();
+                }
             }
         }
     }

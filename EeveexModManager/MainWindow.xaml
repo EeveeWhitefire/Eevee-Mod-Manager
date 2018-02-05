@@ -6,15 +6,21 @@
         xmlns:local="clr-namespace:EeveexModManager"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="EeveexModManager.MainWindow"
         mc:Ignorable="d"
-        Title="Eeveex Mod Manager" Height="700" Width="1250">
+        Title="Eeveex Mod Manager" Height="880" Width="1400">
     <Grid Name="MainGrid">
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10">
-            <Button Content="Login" FontSize="30" Margin="0,0,20,0" Click="LogInButton_Click" Name="LogInButton" Width="150" Height="45"/>
-            <TextBlock Text="Not logged in." FontSize="25" Foreground="Red" VerticalAlignment="Center" Name="LoginState_TextBox"/>
-        </StackPanel>
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="40,20">
-            <Label Content="Mod List:" HorizontalAlignment="Left" FontSize="20"/>
-            <TreeView Height="500" Width="800" Name="ModList_TreeView"/>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
+                <Button Content="Login" FontSize="30" Margin="0,0,20,0" Click="LogInButton_Click" Name="LogInButton" Width="150" Height="45"/>
+                <TextBlock Text="Not logged in." FontSize="25" Foreground="Red" VerticalAlignment="Center" Name="LoginState_TextBox"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="40,10">
+                <TextBlock Text="Mod List:" HorizontalAlignment="Left" FontSize="20" Margin="0,0,0,10"/>
+                <TreeView Height="500" Width="1100" Name="ModList_TreeView"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="40,10">
+                <TextBlock Text="Downloads:" FontSize="20" Margin="0,0,0,10"/>
+                <TreeView Name="DownloadsTreeView" Width="1100" Height="150"/>
+            </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
             <Button Name="ApplicationLaunch_Button" Content="Launch" FontSize="40" Foreground="Green" Width="200" Height="70" Click="LaunchApplicationButton_Click" Margin="0,0,0,10"/>

@@ -11,15 +11,16 @@ namespace EeveexModManager.Classes
 {
     public class ModArchiveFile
     {
-        public string Extension { get; set; }
+        public string Extension { get; }
 
         ArchiveType FileType;
 
-        public string FileName { get; set; }
-        public string Path { get; set; }
-        public string FullSourcePath { get; set; }
-        public string FullNewPath { get; set; }
-        public string ModDirectory { get; set; }
+        public string FileName { get; }
+        public string Path { get; }
+        public string FullSourcePath { get; }
+        public string FullNewPath { get; }
+        public string ModDirectory { get; }
+        public string DownloadDirectory { get; }
 
         public ModArchiveFile(Game game, string fullPath, string modName)
         {
@@ -28,6 +29,7 @@ namespace EeveexModManager.Classes
             Extension = x.Extension;
             FileName = x.Name;
             ModDirectory = $@"{game.ModsDirectory}\{modName}";
+            DownloadDirectory = $@"{game.DownloadsDirectory}\{modName}";
             FullSourcePath = fullPath;
 
             FullNewPath = fullPath;
@@ -47,6 +49,32 @@ namespace EeveexModManager.Classes
                     break;
             }
         }
+
+        public ModArchiveFile(string fullPath, string installTo)
+        {
+            FullNewPath = fullPath;
+            FileInfo x = new FileInfo(fullPath);
+
+            Extension = x.Extension;
+            FileName = x.Name;
+            ModDirectory = installTo;
+
+            switch (Extension)
+            {
+                case ".rar":
+                    FileType = ArchiveType.Rar;
+                    break;
+                case ".zip":
+                    FileType = ArchiveType.Zip;
+                    break;
+                case ".7z":
+                    FileType = ArchiveType.SevenZip;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         public void Extract()
         {
             switch (FileType)
@@ -65,6 +93,7 @@ namespace EeveexModManager.Classes
                     break;
             }
         }
+
 
         enum ArchiveType
         {

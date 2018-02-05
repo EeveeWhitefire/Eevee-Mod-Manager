@@ -19,6 +19,7 @@ namespace EeveexModManager.Classes
         public string ExecutablePath { get; }
 
         public string Name { get; }
+        public string Name_Nexus { get; protected set; }
         public string Name_API { get; }
         public string Name_Registry { get; protected set; }
         public string ModsDirectory { get; protected set; }
@@ -49,6 +50,8 @@ namespace EeveexModManager.Classes
                     return new string[] { "Fallout3" };
                 case "Dragon Age II":
                     return new string[] { "Dragon Age II" };
+                case "Metal Gear Solid V : The Phantom Pain":
+                    return new string[] { "METAL GEAR SOLID V: THE PHANTOM PAIN" };
                 default:
                     return new string[] { };
             }
@@ -69,6 +72,30 @@ namespace EeveexModManager.Classes
                     return path + @"\Data";
                 case "Dragon Age II":
                     return string.Empty;
+                case "Metal Gear Solid V : The Phantom Pain":
+                    return string.Empty;
+                default:
+                    return string.Empty;
+            }
+        }
+        public static string GetNexusName(string n)
+        {
+            switch (n)
+            {
+                case "TESV : Skyrim Special Edition":
+                    return "skyrimse";
+                case "TESV : Skyrim":
+                    return "skyrim";
+                case "Fallout : New Vegas":
+                    return "falloutnv";
+                case "Fallout 4":
+                    return string.Empty;
+                case "Fallout 3":
+                    return string.Empty;
+                case "Dragon Age II":
+                    return "dragonage2";
+                case "Metal Gear Solid V : The Phantom Pain":
+                    return "metalgearsolidvtpp";
                 default:
                     return string.Empty;
             }
@@ -100,23 +127,31 @@ namespace EeveexModManager.Classes
         }
 
         #endregion
-
+        /// <summary>
+        /// Creates a Game object by its name (of the game)
+        /// </summary>
+        /// <param name="n">The name of the game</param>
+        /// <param name="iPath">Where the game is installed</param>
+        /// <param name="regN">The name of the game in the registry</param>
+        /// <returns></returns>
         public static Game CreateByName(string n, string iPath, string regN)
         {
             switch (n)
             {
                 case "TESV : Skyrim Special Edition":
-                    return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("SkyrimSE.exe", iPath), n, "skyrimspecialedition", regN, GameListEnum.SkyrimSE);
+                    return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("SkyrimSE.exe", iPath), n, GetNexusName(n), "skyrimspecialedition", regN, GameListEnum.SkyrimSE);
                 case "TESV : Skyrim":
-                    return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("Skyrim.exe", iPath), n, "skyrim", regN, GameListEnum.Skyrim);
+                    return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("Skyrim.exe", iPath), n, GetNexusName(n), "skyrim", regN, GameListEnum.Skyrim);
                 case "Fallout : New Vegas":
-                    return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("FalloutNV.exe", iPath), n, "newvegas", regN, GameListEnum.FalloutNV);
+                    return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("FalloutNV.exe", iPath), n, GetNexusName(n), "newvegas", regN, GameListEnum.FalloutNV);
                 case "Fallout 4":
                     return null;
                 case "Fallout 3":
                     return null;
                 case "Dragon Age II":
-                    return null;
+                    return null; 
+                case "Metal Gear Solid V : The Phantom Pain":
+                    return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("mgsvtpp.exe", iPath), n, GetNexusName(n), "newvegas", regN, GameListEnum.MGSVTPP);
                 default:
                     return null;
             }
@@ -137,12 +172,13 @@ namespace EeveexModManager.Classes
         /// <param name="nApi">Name of the game in Nexus Mods' API</param>
         /// <param name="nReg">Display name of the game in the registry (under Uninstall)</param>
         /// <param name="id">Nexus Mods' generated ID for the game</param>
-        public Game(string iPath, string dPath, string exePath, string n, string nApi, string nReg, GameListEnum id)
+        public Game(string iPath, string dPath, string exePath, string n, string nNxm, string nApi, string nReg, GameListEnum id)
         {
             InstallationPath = iPath;
             DataPath = dPath;
             ExecutablePath = exePath;
             Name_API = nApi;
+            Name_Nexus = nNxm;
             Id = id;
             Name_Registry = nReg;
             Name = n;
@@ -160,7 +196,8 @@ namespace EeveexModManager.Classes
         /// <param name="nReg">Display name of the game in the registry (under Uninstall)</param>
         /// <param name="id">Nexus Mods' generated ID for the game</param>
         /// <param name="isCurr">Whether this game is the current one</param>
-        public Game(string iPath, string dPath, string exePath, string n, string nApi, string nReg, GameListEnum id, bool isCurr) : this(iPath, dPath, exePath, n, nApi, nReg, id)
+        public Game(string iPath, string dPath, string exePath, string n, string nNxm, string nApi, string nReg, GameListEnum id, bool isCurr) : 
+            this(iPath, dPath, exePath, n, nNxm, nApi, nReg, id)
         {
             IsCurrent = isCurr;
         }
@@ -175,8 +212,11 @@ namespace EeveexModManager.Classes
                 InstallationPath = InstallationPath,
                 IsCurrent = IsCurrent,
                 Name = Name,
+                Name_Nexus = Name_Nexus,
                 Name_API = Name_API,
-                Name_Registry = Name_Registry
+                Name_Registry = Name_Registry,
+                ModsDirectory = ModsDirectory,
+                DownloadsDirectory = DownloadsDirectory
             };
         }
     }

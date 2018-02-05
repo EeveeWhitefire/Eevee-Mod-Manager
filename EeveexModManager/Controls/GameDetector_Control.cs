@@ -46,7 +46,7 @@ namespace EeveexModManager.Controls
                 VerticalAlignment = VerticalAlignment.Top,
                 Orientation = Orientation.Vertical,
                 Margin = new Thickness(0, 0, 10, 0),
-                Width = 320
+                Width = 350
             };
             
             UpperPanel.Children.Add(new TextBlock()

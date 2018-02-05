@@ -7,37 +7,49 @@ using System.Threading.Tasks;
 
 using EeveexModManager.Interfaces;
 using EeveexModManager.Classes.DatabaseClasses;
+using EeveexModManager.Define;
 
 namespace EeveexModManager.Classes
 {
-    public class BaseMod : IMod
+    public class Mod : IMod
     {
         public string Name { get;}
+        public string ModFileName { get; }
         public bool Active { get; protected set; }
         public bool Installed { get;}
         public string SourceArchive { get; }
         public string ModDirectory { get;}
+        public string DownloadDirectory { get; }
         public string Version { get; }
         public string Id { get; }
+        public bool IsOnline { get; protected set; } = false;
+        public string Author { get; protected set; } = "Unknown";
+        public string FullSourceUri { get; protected set; } = "Unknown";
 
         public GameListEnum GameId { get;}
         public ModCategories ModCategory { get;}
 
         public string FileId { get; set; }
 
-        public BaseMod(string n, bool active, bool installed, string source, 
-            string modDir, GameListEnum gameId, ModCategories category, string fileId, string version = "1.0.0", string id = "Unknown")
+        public Mod(string n, string fileN, bool active, bool installed, string source, string modDir, string dlDir, GameListEnum gameId, ModCategories category, string fileId, 
+            string version = Defined.DEFAULTMODVERSION, string id = Defined.DEFAULTMODID, string author = Defined.DEFAULTMODAUTHOR, string srcUri = Defined.DEFAULTSOURCEURI,
+            bool isOn = false)
         {
             Name = n;
+            IsOnline = isOn;
+            ModFileName = fileN;
             Active = active;
             Installed = installed;
             SourceArchive = source;
             ModDirectory = modDir;
+            DownloadDirectory = dlDir;
             GameId = gameId;
             ModCategory = category;
             FileId = fileId;
             Version = version;
             Id = id;
+            Author = author;
+            FullSourceUri = srcUri;
         }
 
         public void ToggleIsActive()
@@ -45,9 +57,9 @@ namespace EeveexModManager.Classes
             Active = !Active;
         }
 
-        public Db_BaseMod EncapsulateToDb()
+        public Db_Mod EncapsulateToDb()
         {
-            return new Db_BaseMod()
+            return new Db_Mod()
             {
                 Name = Name,
                 Active = Active,
@@ -58,7 +70,11 @@ namespace EeveexModManager.Classes
                 ModCategory = ModCategory,
                 FileId = FileId,
                 Version = Version,
-                Id = Id
+                IsOnline = IsOnline,
+                ModFileName = ModFileName,
+                Id = Id,
+                Author = Author,
+                FullSourceUri = FullSourceUri
             };
         }
     }

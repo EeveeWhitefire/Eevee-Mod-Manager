@@ -15,12 +15,13 @@ namespace EeveexModManager.Classes.DatabaseClasses
         public string DataPath { get; set; }
         public string InstallationPath { get; set; }
         public string ExecutablePath { get; set; }
+        public string Name_Nexus { get; set; }
 
         public string Name { get; set; }
         public string Name_API { get; set; }
         public string Name_Registry { get; set; }
         public string ModsDirectory { get; set; }
-        public string DownloadsDirectory { get; protected set; }
+        public string DownloadsDirectory { get; set; }
 
         public GameListEnum Id { get; set; }
 
@@ -32,7 +33,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
 
         public Game EncapsulateToSource()
         {
-            return new Game(InstallationPath, DataPath, ExecutablePath, Name, Name_API, Name_Registry, Id, IsCurrent);
+            return new Game(InstallationPath, DataPath, ExecutablePath, Name,Name_Nexus,  Name_API, Name_Registry, Id, IsCurrent);
         }
     }
 }

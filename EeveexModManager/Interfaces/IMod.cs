@@ -16,12 +16,17 @@ namespace EeveexModManager.Interfaces
     interface IMod
     {
         string Name { get; }
+        string ModFileName { get; }
+        bool IsOnline { get; }
         bool Active { get; }
         bool Installed { get; }
         string SourceArchive { get; }
         string ModDirectory { get; }
+        string DownloadDirectory { get; }
         string Version { get; }
         string Id { get; }
+        string Author { get; }
+        string FullSourceUri { get; }
 
         GameListEnum GameId { get; }
         ModCategories ModCategory { get; }

@@ -29,14 +29,15 @@ namespace EeveexModManager.Classes
 
         public bool IsRunning = false;
 
-        public NamedPipeManager(string n, bool isClient, App main)
+        public NamedPipeManager(string n, bool isServer, App main)
         {
             Name = n;
             MainApp = main;
-            if (isClient)
+            if (!isServer)
             {
                 NamedPipeStream_Client = new NamedPipeClientStream(".", Name, PipeDirection.InOut, PipeOptions.Asynchronous);
                 Th_namedPipeWriting = new Thread(Send_NamedPipe);
+                Th_namedPipeWriting.SetApartmentState(ApartmentState.STA);
             }
             else
             {
@@ -47,6 +48,7 @@ namespace EeveexModManager.Classes
                 
                 NamedPipeStream_Server = new NamedPipeServerStream(Name, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous, 512, 512, pipeSecurity);
                 Th_namedPipeListening = new Thread(Listen_NamedPipe);
+                Th_namedPipeListening.SetApartmentState(ApartmentState.STA);
             }
         }
 
@@ -66,7 +68,7 @@ namespace EeveexModManager.Classes
             }
 
         }
-
+        
         public void InitServer()
         {
             Th_namedPipeListening.Start();
@@ -91,7 +93,7 @@ namespace EeveexModManager.Classes
             }
             MainApp.ExitEVX();
         }
-
+        
         void Listen_NamedPipe()
         {
             while (true)
@@ -125,7 +127,10 @@ namespace EeveexModManager.Classes
             {
                 MessageBox.Show(e.ToString());
             }
-            MainApp.ExitEVX();
+            finally
+            {
+                MainApp.ExitEVX();
+            }
         }
     }
 }

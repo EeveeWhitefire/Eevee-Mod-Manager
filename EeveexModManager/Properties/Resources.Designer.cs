@@ -163,6 +163,26 @@ namespace EeveexModManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap icon_mgsvtpp {
+            get {
+                object obj = ResourceManager.GetObject("icon_mgsvtpp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap icon_oblivion {
+            get {
+                object obj = ResourceManager.GetObject("icon_oblivion", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap icon_skyrim {
             get {
                 object obj = ResourceManager.GetObject("icon_skyrim", resourceCulture);

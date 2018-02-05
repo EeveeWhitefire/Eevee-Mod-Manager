@@ -9,26 +9,32 @@ using EeveexModManager.Classes;
 
 namespace EeveexModManager.Classes.DatabaseClasses
 {
-    public class Db_BaseMod : IMod
+    public class Db_Mod : IMod
     {
         public string Name { get; set; }
+        public string ModFileName { get; set; }
         public bool Active { get; set; }
         public bool Installed { get; set; }
         public string SourceArchive { get; set; }
         public string ModDirectory { get; set; }
+        public string DownloadDirectory { get; }
         public string Version { get; set; }
         public string Id { get; set; }
-        public string FileId { get; set; }
+        public bool IsOnline { get; set; }
+        public string Author { get; set; }
+        public string FullSourceUri { get; set; }
 
         public GameListEnum GameId { get; set; }
         public ModCategories ModCategory { get; set; }
 
-        public Db_BaseMod()
+        public string FileId { get; set; }
+
+        public Db_Mod()
         { }
 
-        public BaseMod EncapsulateToSource()
+        public Mod EncapsulateToSource()
         {
-            return new BaseMod(Name, Active, Installed, SourceArchive, ModDirectory, GameId, ModCategory, Version, Id);
+            return new Mod(Name, ModFileName, Active, Installed, SourceArchive, ModDirectory, DownloadDirectory, GameId, ModCategory, FileId, Version, Id, Author, FullSourceUri, IsOnline);
         }
     }
 }

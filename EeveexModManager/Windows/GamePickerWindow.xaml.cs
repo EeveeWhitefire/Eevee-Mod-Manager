@@ -36,7 +36,7 @@ namespace EeveexModManager.Windows
             _namedPipeManager = npm;
 
             InitializeComponent();
-            _gamePicker = new GamePicker_ComboBox(_db.GetCollection<Db_Game>("games").FindAll(), 80, 25, RerunGameDetection)
+            _gamePicker = new GamePicker_ComboBox(_db.GetCollection<Db_Game>("games").FindAll(), 80, 25, RerunGameDetection, Temp)
             {
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(20, 10, 0, 0),
@@ -55,12 +55,17 @@ namespace EeveexModManager.Windows
             Close();
         }
 
+        void Temp(Game i)
+        {
+
+        }
+
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
             Game currGame = _db.GetCollection<Db_Game>("games").FindOne( x => x.IsCurrent).EncapsulateToSource();
             Game selGame = _db.GetCollection<Db_Game>("games").FindAll().ElementAt(_gamePicker.SelectedIndex).EncapsulateToSource();
 
-            if(selGame != currGame)
+            if(selGame.Id != currGame.Id)
             {
                 selGame.ToggleIsCurrentGame();
                 currGame.ToggleIsCurrentGame();
@@ -70,13 +75,14 @@ namespace EeveexModManager.Windows
             _db.GetCollection<Db_Game>("games").Update(currGame.EncapsulateToDb());
 
 
-            _config.First_Time = false;
+            _config.State = StatesOfConfiguartion.Ready;
             _config.Installation_Path = Directory.GetCurrentDirectory();
             _jsonParser.UpdateJson(_config);
 
             MainWindow mainWindow = new MainWindow(_mutex, _db, _jsonParser, _config, _namedPipeManager);
 
             mainWindow.Show();
+            Close();
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)

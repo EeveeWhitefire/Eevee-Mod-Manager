@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -72,12 +73,14 @@ namespace EeveexModManager.Windows
             Close();
         }
 
+        const int GamesPerTab = 5;
+
         void StartSearches()
         {
            int counter = 0;
             string[] gameNames = new string[]
                 {"TESV : Skyrim Special Edition", "TESV : Skyrim", "Fallout : New Vegas",
-                    "Fallout 4", "Fallout 3", "Dragon Age II"};
+                    "Fallout 4", "Fallout 3", "Dragon Age II", "Metal Gear Solid V : The Phantom Pain"};
 
             gameSeachers = new List<GameSearcher>();
             games = new List<Game>();
@@ -101,13 +104,13 @@ namespace EeveexModManager.Windows
 
                     gameSeachers.Add(new GameSearcher(x, currDetectorControl));
                     currDetectorControl.Searcher = gameSeachers.LastOrDefault();
-                    currDetectorControl.Dispatcher.Invoke(() => currDetectorControl.Searcher.StartSearch(), DispatcherPriority.Background);
+                    currDetectorControl.Dispatcher.BeginInvoke((Action)( () => currDetectorControl.Searcher.StartSearch()), DispatcherPriority.Background);
 
                     border.Child = currDetectorControl;
 
                     item.Children.Add(border);
                     counter++;
-                    if (counter >= 4)
+                    if (counter >= GamesPerTab)
                     {
                         break;
                     }
@@ -130,9 +133,20 @@ namespace EeveexModManager.Windows
             {
                 gameSeachers.ForEach(x =>
                {
-                   Confirm_Button.Dispatcher.Invoke(() => x.RestartSearch(), DispatcherPriority.Background);
+                   Confirm_Button.Dispatcher.BeginInvoke((Action)(() => x.RestartSearch()), DispatcherPriority.Background);
                });
             }
+        }
+
+        void InitGames(List<Game> games)
+        {
+            games.ForEach(x =>
+            {
+                if (!Directory.Exists(x.ModsDirectory))
+                    Directory.CreateDirectory(x.ModsDirectory);
+                if (!Directory.Exists(x.DownloadsDirectory))
+                    Directory.CreateDirectory(x.DownloadsDirectory);
+            });
         }
 
         private void ConfirmGamesButton_Click(object sender, RoutedEventArgs e)
@@ -143,9 +157,14 @@ namespace EeveexModManager.Windows
                     .Select(x => Game.CreateByName(x.Name, x.InstallationPath, x.RegistryName)).ToList();
                 games.Last().ToggleIsCurrentGame(); //first game is also the current one :)
 
+                InitGames(games);
+
                 _db.GetCollection<Db_Game>("games").Delete(x => true);
 
                 _db.GetCollection<Db_Game>("games").InsertBulk(games.Select( x => x.EncapsulateToDb()));
+
+                _config.State = StatesOfConfiguartion.OnPickingCurrentGame;
+                _jsonParser.UpdateJson(_config);
 
                 GamePickerWindow gamePickerWindow = new GamePickerWindow(_mutex, _db, _jsonParser, _config, _namedPipeManager);
                 gamePickerWindow.Show();

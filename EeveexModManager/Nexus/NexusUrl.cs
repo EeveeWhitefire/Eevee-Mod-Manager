@@ -60,14 +60,14 @@ namespace EeveexModManager.Nexus
         #endregion
 
         #region Constructors
-        public NexusUrl(Uri p_uriUrl)
-            : base(p_uriUrl.ToString())
+        public NexusUrl(Uri uri)
+            : base(uri.ToString())
         {
             if (!Scheme.Equals("nxm", StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException("Scheme must be NXM.");
             else
             {
-                SourceUrl = p_uriUrl;
+                SourceUrl = uri;
             }
         }
 

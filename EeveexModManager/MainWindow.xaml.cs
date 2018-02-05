@@ -7,6 +7,7 @@ using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using System.ComponentModel;
 
 using Newtonsoft.Json;
 
@@ -59,7 +60,7 @@ namespace EeveexModManager
             _namedPipeManager = npm;
 
             _nxmHandler = new NxmHandler(config, _jsonParser, AssociationWithNXM_CheckBox);
-            modManager = new ModManager(_db, ModList_TreeView);
+            modManager = new ModManager(_db, ModList_TreeView, DownloadsTreeView);
             _namedPipeManager.ChangeMessageReceivedHandler(HandlePipeMessage);
 
             if(File.Exists("UserCredentials"))
@@ -78,7 +79,7 @@ namespace EeveexModManager
 
             if (!_namedPipeManager.IsRunning)
             {
-                ApplicationPicker_Selection.Dispatcher.Invoke(() => _namedPipeManager.InitServer(), System.Windows.Threading.DispatcherPriority.Background);
+                ApplicationPicker_Selection.Dispatcher.BeginInvoke((Action)( () => _namedPipeManager.InitServer()), DispatcherPriority.Background);
             }
 
 
@@ -156,12 +157,7 @@ namespace EeveexModManager
                 ApplicationPicker_Selection.Items.Add(stkPanel);
             });
 
-            _db.GetCollection<Db_OnlineMod>("online_mods").FindAll().ToList().ForEach(x =>
-            {
-                ModList_TreeView.Items.Add(new OnlineMod_Control(x.EncapsulateToSource(), ModList_TreeView.Items.Count, _db));
-
-            });
-            _db.GetCollection<Db_BaseMod>("offline_mods").FindAll().ToList().ForEach( x =>
+            _db.GetCollection<Db_Mod>("mods").FindAll().ToList().ForEach(x =>
             {
                 ModList_TreeView.Items.Add(new Mod_Control(x.EncapsulateToSource(), ModList_TreeView.Items.Count, _db));
 
@@ -199,12 +195,37 @@ namespace EeveexModManager
             LoginState_TextBox.Text = "Not logged in.";
             LoginState_TextBox.Foreground = Brushes.Red;
         }
-
+        
         public void HandlePipeMessage(string arg)
         {
             Uri uri = new Uri(arg);
             Nexus.NexusUrl nexusUrl = new Nexus.NexusUrl(uri);
-            Dispatcher.Invoke( () => modManager.CreateMod(_currGame, new Nexus.NexusUrl(nexusUrl)).GetAwaiter().GetResult(), DispatcherPriority.Normal);
+            int correctedIndex = -1;
+            Dispatcher.Invoke(() => correctedIndex = _gamePicker.SelectedIndex);
+            if (nexusUrl.GameName != _currGame.Name_Nexus)
+            {
+                var games = _db.GetCollection<Db_Game>("games").FindAll().Select( x => x.EncapsulateToSource()).ToList();
+                correctedIndex = games.FindIndex(x => x.Name_Nexus == nexusUrl.GameName);
+            }
+
+            if(correctedIndex >= 0)
+            {
+
+                Dispatcher.Invoke((Action)(async () =>
+                {
+                    _gamePicker.SelectedIndex = correctedIndex;
+                    await modManager.CreateMod(_currGame, nexusUrl);
+                }), DispatcherPriority.ApplicationIdle);
+            }
+            else
+            {
+                MessageBox.Show("Error: You are trying to install a mod for a game you don't have on your machine or isn't configured");
+            }
+
+
+            //Thread t = new Thread(modManager.CreateMod);
+            //t.SetApartmentState(ApartmentState.STA);
+            //t.Start();
         }
 
         public TreeView GetModListTree()
@@ -251,8 +272,8 @@ namespace EeveexModManager
             var AvailableApplications = _db.GetCollection<GameApplication>("game_apps").FindAll().Where(x => x.AssociatedGame == _currGame.Id);
             var Application = AvailableApplications.FirstOrDefault(x => x.Index == ApplicationPicker_Selection.SelectedIndex);
 
-            var ActivatedMods = _db.GetCollection<BaseMod>("offline_mods").FindAll().Where(x => x.GameId == _currGame.Id && x.Installed && x.Active).ToList();
-            ActivatedMods.AddRange(_db.GetCollection<Db_OnlineMod>("online_mods").Find(x => x.GameId == _currGame.Id && x.Installed && x.Active).Select( x => x.EncapsulateToSource()));
+            var ActivatedMods = _db.GetCollection<Db_Mod>("mods").FindAll().Where(x => x.GameId == _currGame.Id && x.Installed && x.Active).ToList();
+            ActivatedMods.AddRange(_db.GetCollection<Db_Mod>("mods").Find(x => x.GameId == _currGame.Id && x.Installed && x.Active));
 
             var ActivatedModDirs = ActivatedMods.Select(x => x.ModDirectory).ToList();
 

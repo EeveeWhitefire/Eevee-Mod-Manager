@@ -11,7 +11,8 @@ namespace EeveexModManager.Interfaces
         SkyrimSE = 1704,
         Skyrim,
         FalloutNV = 130,
-        Fallout4
+        Fallout4,
+        MGSVTPP
     }
 
     public interface IGame
@@ -20,7 +21,8 @@ namespace EeveexModManager.Interfaces
         string InstallationPath { get; }
         string ExecutablePath { get;}
 
-        string Name { get;}
+        string Name { get; }
+        string Name_Nexus { get; }
         string Name_API { get;}
         string Name_Registry { get; }
         string ModsDirectory { get; }

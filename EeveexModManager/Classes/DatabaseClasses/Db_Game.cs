@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using EeveexModManager.Classes;
 using EeveexModManager.Interfaces;
+using LiteDB;
 
 namespace EeveexModManager.Classes.DatabaseClasses
 {
@@ -17,6 +18,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
         public string ExecutablePath { get; set; }
         public string Name_Nexus { get; set; }
 
+        [BsonId]
         public string Name { get; set; }
         public string Name_API { get; set; }
         public string Name_Registry { get; set; }
@@ -27,9 +29,6 @@ namespace EeveexModManager.Classes.DatabaseClasses
 
         public bool IsCurrent { get; set; }
         #endregion
-
-        public Db_Game()
-        { }
 
         public Game EncapsulateToSource()
         {

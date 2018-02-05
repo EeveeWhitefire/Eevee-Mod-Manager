@@ -46,6 +46,7 @@ namespace EeveexModManager.Windows
             };
 
             MainGrid.Children.Add(_gamePicker);
+            _gamePicker.SelectedIndex = 0;
         }
 
         void RerunGameDetection()

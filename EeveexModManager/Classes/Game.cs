@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -118,14 +119,58 @@ namespace EeveexModManager.Classes
                 {
                     return ProcessDirectory(p, n);
                 }
-                return "";
+                return string.Empty;
             }
             else
             {
-                return "";
+                return string.Empty;
             }
         }
 
+        public List<GameApplication> AutoDetectApplications()
+        {
+            List<GameApplication> apps = new List<GameApplication>();
+            List<string> names = new List<string>();
+            IEnumerable<KeyValuePair<string, string>> exes;
+
+            switch (Name)
+            {
+                case "TESV : Skyrim Special Edition":
+                    names = new List<string>()
+                    {
+                        "SKSE.exe", "SkyrimSE.exe", "SkyrimSELauncher.exe"
+                    };
+                    break;
+                case "TESV : Skyrim":
+                    break;
+                case "Fallout : New Vegas":
+                    names = new List<string>()
+                    {
+                        "FalloutNV.exe", "FalloutNVLauncher.exe"
+                    };
+                    break;
+                case "Fallout 4":
+                    break;
+                case "Fallout 3":
+                    break;
+                case "Dragon Age II":
+                    break;
+                case "Metal Gear Solid V : The Phantom Pain":
+                    break;
+                default:
+                    break;
+            }
+
+            exes = Directory.EnumerateFiles(InstallationPath, "*.*", SearchOption.AllDirectories)
+                .Where(s => names.Any(s.Contains)).Select(x => new KeyValuePair<string, string>(x.Split('\\').Last(), x));
+
+            foreach (var item in exes)
+            {
+                apps.Add(new GameApplication(item.Key, item.Value, Id));
+            }
+
+            return apps;
+        }
         #endregion
         /// <summary>
         /// Creates a Game object by its name (of the game)

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using EeveexModManager.Interfaces;
 using EeveexModManager.Controls;
 using System.ComponentModel;
+using System.IO;
 
 namespace EeveexModManager.Classes
 {
@@ -39,7 +40,6 @@ namespace EeveexModManager.Classes
             
             Client.DownloadFileCompleted += new AsyncCompletedEventHandler(DownloadCompletedCallback);
             Client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgressCallback);
-
             Client.DownloadFileAsync(DownloadFrom, DownloadTo);
         }
 

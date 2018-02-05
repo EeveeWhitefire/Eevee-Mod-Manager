@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:EeveexModManager"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="EeveexModManager.MainWindow"
         mc:Ignorable="d"
-        Title="Eeveex Mod Manager" Height="880" Width="1400">
+        Title="Eeveex Mod Manager" Height="880" Width="1600">
     <Grid Name="MainGrid">
         <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
@@ -23,8 +23,8 @@
             </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
-            <Button Name="ApplicationLaunch_Button" Content="Launch" FontSize="40" Foreground="Green" Width="200" Height="70" Click="LaunchApplicationButton_Click" Margin="0,0,0,10"/>
-            <ComboBox Name="ApplicationPicker_Selection" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="40" Width="200"/>
+            <Button Name="ApplicationLaunch_Button" Content="Launch" FontSize="40" Foreground="Green" Height="70" Click="LaunchApplicationButton_Click" Margin="0,0,0,10"/>
+            <ComboBox Name="ApplicationPicker_Selection" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="80" Width="400"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
             <CheckBox Name="AssociationWithNXM_CheckBox" Margin="10,0" VerticalAlignment="Center"/>

@@ -197,6 +197,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Classes\Cryptographer.cs" />
+    <Compile Include="Classes\DatabaseClasses\Db_GameApplication.cs" />
     <Compile Include="Classes\DatabaseClasses\Db_Mod.cs" />
     <Compile Include="Classes\DatabaseClasses\Db_Game.cs" />
     <Compile Include="Classes\Download.cs" />
@@ -204,6 +205,8 @@
     <Compile Include="Classes\Game.cs" />
     <Compile Include="Classes\GameApplication.cs" />
     <Compile Include="Classes\GameSearcher.cs" />
+    <Compile Include="Classes\IconExtractor.cs" />
+    <Compile Include="Classes\IconUtil.cs" />
     <Compile Include="Classes\JsonClasses\API\Api_ModDownloadInfo.cs" />
     <Compile Include="Classes\JsonClasses\API\Api_ModFileInfo.cs" />
     <Compile Include="Classes\JsonClasses\API\Api_ModInfo.cs" />
@@ -213,6 +216,7 @@
     <Compile Include="Classes\ModArchiveFile.cs" />
     <Compile Include="Classes\ModManager.cs" />
     <Compile Include="Classes\NamedPipeManager.cs" />
+    <Compile Include="Classes\NativeMethods.cs" />
     <Compile Include="Classes\NxmHandler.cs" />
     <Compile Include="Classes\PipeStreamString_In.cs" />
     <Compile Include="Classes\PipeStreamString_Out.cs" />
@@ -228,6 +232,7 @@
     <Compile Include="Defined.cs" />
     <Compile Include="Interfaces\IDownload.cs" />
     <Compile Include="Interfaces\IGame.cs" />
+    <Compile Include="Interfaces\IGameApplication.cs" />
     <Compile Include="Interfaces\IGameSearcher.cs" />
     <Compile Include="Interfaces\IMod.cs" />
     <Compile Include="Interfaces\INamedPipe.cs" />

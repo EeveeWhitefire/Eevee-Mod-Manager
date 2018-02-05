@@ -17,7 +17,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
             GetCollection<Db_Mod>("mods").EnsureIndex(x => x.FileId);
             GetCollection<Db_Game>("games").EnsureIndex(x => x.Name);
 
-            GetCollection<GameApplication>("game_apps").EnsureIndex(x => x.Name);
+            GetCollection<Db_GameApplication>("game_apps");
         }
 
         public Game GetCurrentGame()
@@ -32,7 +32,8 @@ namespace EeveexModManager.Classes.DatabaseClasses
 
             if (GetCollection<Game>("games").Count() > 0)
                 DropCollection("games");
-            if (GetCollection<GameApplication>("game_apps").Count() > 0)
+
+            if (GetCollection<Db_GameApplication>("game_apps").Count() > 0)
                 DropCollection("game_apps");
 
             AvailableGamesWindow chooseGames = new AvailableGamesWindow(m, this, jsp, cnfg, npm);

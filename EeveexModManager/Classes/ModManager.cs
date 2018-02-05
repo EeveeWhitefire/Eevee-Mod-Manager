@@ -120,9 +120,9 @@ namespace EeveexModManager.Classes
                 var result_modInfo = JsonConvert.DeserializeObject<Api_ModInfo>(res2);
                 var result_fileInfo = JsonConvert.DeserializeObject<Api_ModFileInfo>(res3);
 
-                string DownloadTo = $@"{CurrentGame.DownloadsDirectory }\{result_modInfo.name} - {result_fileInfo.name}";
+                string DownloadTo = $@"{CurrentGame.DownloadsDirectory }\{result_modInfo.name} [{result_fileInfo.name}]";
                 string DownloadAs = DownloadTo + $@"\{result_fileInfo.uri}";
-                string InstallTo = $@"{CurrentGame.ModsDirectory}\{result_modInfo.name} - {result_fileInfo.name}";
+                string InstallTo = $@"{CurrentGame.ModsDirectory}\{result_modInfo.name} [{result_fileInfo.name}]";
                 if (!Directory.Exists(DownloadTo))
                 {
                     Directory.CreateDirectory(DownloadTo);
@@ -133,13 +133,15 @@ namespace EeveexModManager.Classes
 
                 Mod newMod = new Mod(result_modInfo.name, result_fileInfo.name, false, true, DownloadAs, InstallTo, DownloadTo,
                     CurrentGame.Id, (ModCategories)result_modInfo.category_id, nexusUrl.FileId, result_modInfo.version, nexusUrl.ModId,
-                    nexusUrl.SourceUrl.ToString(), result_modInfo.author, true);
-
-
+                    result_modInfo.author, nexusUrl.SourceUrl.ToString(), true);
+                
+                Thread t = new Thread( () =>
                 Downloads_TreeView.Dispatcher.Invoke(() =>
                 {
                     DownloadsManager.AddDownload(new Uri(result_downloadInfo.URI), DownloadAs, DownloadTo, InstallTo, result_modInfo.name, result_fileInfo.name, newMod);
-                }, DispatcherPriority.ApplicationIdle);
+                }, DispatcherPriority.ApplicationIdle));
+                //t.SetApartmentState(ApartmentState.STA);
+                t.Start();
             }
         }
     }

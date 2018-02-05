@@ -40,13 +40,36 @@ namespace EeveexModManager.Controls
             };
             ActivateGameButton.Click += new RoutedEventHandler(ActivateMod);
 
+            Button UninstallModButton = new Button()
+            {
+                Content = "X",
+                Background = Brushes.DarkRed,
+                Foreground = Brushes.White,
+                Margin = modListMargin,
+                VerticalAlignment = VerticalAlignment.Center,
+                Width = 20,
+                Height = 25,
+                FontSize = 15
+            };
+            UninstallModButton.Click += new RoutedEventHandler(UninstallMod);
+
+
+            Children.Add(UninstallModButton);
             Children.Add(ActivateGameButton);
             Children.Add(new TextBlock()
             {
                 Text = $"{AssociatedMod.Name} [{AssociatedMod.ModFileName}]",
                 Margin = modListMargin,
                 VerticalAlignment = VerticalAlignment.Center,
-                Width = 500,
+                Width = 400,
+                FontSize = 15
+            });
+            Children.Add(new TextBlock()
+            {
+                Text = $"By: {AssociatedMod.Author}",
+                Margin = modListMargin,
+                VerticalAlignment = VerticalAlignment.Center,
+                Width = 100,
                 FontSize = 15
             });
             Children.Add(new TextBlock()
@@ -65,20 +88,6 @@ namespace EeveexModManager.Controls
                 Width = 30,
                 FontSize = 15
             });
-            Button UninstallModButton = new Button()
-            {
-                Content = "X",
-                Background = Brushes.DarkRed,
-                Foreground = Brushes.White,
-                Margin = modListMargin,
-                VerticalAlignment = VerticalAlignment.Center,
-                Width = 20,
-                Height = 25,
-                FontSize = 15
-            };
-            UninstallModButton.Click += new RoutedEventHandler(UninstallMod);
-
-            Children.Add(UninstallModButton);
         }
         private void UninstallMod(object sender, RoutedEventArgs e)
         {

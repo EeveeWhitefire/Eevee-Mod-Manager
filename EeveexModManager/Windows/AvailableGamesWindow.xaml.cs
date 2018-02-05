@@ -163,6 +163,10 @@ namespace EeveexModManager.Windows
 
                 _db.GetCollection<Db_Game>("games").InsertBulk(games.Select( x => x.EncapsulateToDb()));
 
+                var gameApps = games.Select(x => x.AutoDetectApplications()).SelectMany( x => x).Select(y => y.EncapsulateToDb());
+
+                _db.GetCollection<Db_GameApplication>("game_apps").InsertBulk(gameApps);
+
                 _config.State = StatesOfConfiguartion.OnPickingCurrentGame;
                 _jsonParser.UpdateJson(_config);
 

@@ -43,14 +43,14 @@ namespace EeveexModManager.Controls
             DownloadInfo = new TextBlock()
             {
                 Text = $"{AssociatedDownload.ModName} [{AssociatedDownload.ModFileName}]",
-                Margin = ListMargin,
+                Margin = new Thickness(0, 2, 10, 0),
                 VerticalAlignment = VerticalAlignment.Center,
                 Width = 300,
                 FontSize = 15
             };
             CurrentNumberOfBytes = new TextBlock()
             {
-                Text = "Downloaded: 0 bytes",
+                Text = "Downloaded: 0 KB",
                 Margin = ListMargin,
                 VerticalAlignment = VerticalAlignment.Center,
                 Width = 200,
@@ -58,7 +58,7 @@ namespace EeveexModManager.Controls
             };
             NumberOfBytesInTotal = new TextBlock()
             {
-                Text = "Out of: 0 bytes",
+                Text = "Out of: 0 KB",
                 Margin = ListMargin,
                 VerticalAlignment = VerticalAlignment.Center,
                 Width = 180,
@@ -69,7 +69,7 @@ namespace EeveexModManager.Controls
                 Text = "Percentage: 0 %",
                 Margin = ListMargin,
                 VerticalAlignment = VerticalAlignment.Center,
-                Width = 120,
+                Width = 125,
                 FontSize = 15
             };
             State = new TextBlock()
@@ -77,7 +77,7 @@ namespace EeveexModManager.Controls
                 Text = "State: Starting",
                 Margin = ListMargin,
                 VerticalAlignment = VerticalAlignment.Center,
-                Width = 100,
+                Width = 130,
                 FontSize = 15
             };
 
@@ -108,7 +108,7 @@ namespace EeveexModManager.Controls
             CurrentNumberOfBytes.Text = $"Downloaded: {e.BytesReceived / 1000} KB";
             NumberOfBytesInTotal.Text = $"Out of: {e.TotalBytesToReceive / 1000} KB";
             DownloadedPercentage.Text = $"Percentage: {e.ProgressPercentage} %";
-            State.Text = "Downloading";
+            State.Text = "State: Downloading";
         }
 
         public void DownloadFinished(AsyncCompletedEventArgs e)
@@ -117,9 +117,7 @@ namespace EeveexModManager.Controls
             {
                 if (DownloadedPercentage.Text.Contains("100"))
                 {
-                    State.Text = "Done";
-                    AssociatedDownload.Client.CancelAsync();
-                    AssociatedDownload.Client.Dispose();
+                    State.Text = "State: Done";
                     CancelDownloadButton.IsEnabled = false;
                     CancelDownloadButton.Background = Brushes.Gray;
 
@@ -137,13 +135,17 @@ namespace EeveexModManager.Controls
                     archive.Extract();
                 }
             }
+            AssociatedDownload.Client.CancelAsync();
+            AssociatedDownload.Client.Dispose();
         }
 
         private void CancelDownloadButton_Click(object sender, RoutedEventArgs e)
         {
-            State.Text = "Canceled";
+            State.Text = "State: Canceled";
             AssociatedDownload.Client.CancelAsync();
             AssociatedDownload.Client.Dispose();
+            CancelDownloadButton.IsEnabled = false;
+            CancelDownloadButton.Background = Brushes.Gray;
 
             if (Directory.Exists(AssociatedDownload.DownloadAt))
                 Directory.Delete(AssociatedDownload.DownloadAt, true);

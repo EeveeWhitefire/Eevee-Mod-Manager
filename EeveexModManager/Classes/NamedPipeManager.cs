@@ -11,6 +11,7 @@ using System.IO;
 using System.Windows;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Windows.Threading;
 
 namespace EeveexModManager.Classes
 {
@@ -21,23 +22,16 @@ namespace EeveexModManager.Classes
         private NamedPipeServerStream NamedPipeStream_Server;
         private NamedPipeClientStream NamedPipeStream_Client;
 
-        private Thread Th_namedPipeListening;
-        private Thread Th_namedPipeWriting;
-        private App MainApp;
-
         private Action<string> MessageReceivedHandler;
 
         public bool IsRunning = false;
 
-        public NamedPipeManager(string n, bool isServer, App main)
+        public NamedPipeManager(string n, bool isServer)
         {
             Name = n;
-            MainApp = main;
             if (!isServer)
             {
                 NamedPipeStream_Client = new NamedPipeClientStream(".", Name, PipeDirection.InOut, PipeOptions.Asynchronous);
-                Th_namedPipeWriting = new Thread(Send_NamedPipe);
-                Th_namedPipeWriting.SetApartmentState(ApartmentState.STA);
             }
             else
             {
@@ -47,77 +41,38 @@ namespace EeveexModManager.Classes
                 pipeSecurity.AddAccessRule(psRule);
                 
                 NamedPipeStream_Server = new NamedPipeServerStream(Name, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous, 512, 512, pipeSecurity);
-                Th_namedPipeListening = new Thread(Listen_NamedPipe);
-                Th_namedPipeListening.SetApartmentState(ApartmentState.STA);
             }
         }
 
         public void CloseConnections()
         {
-            if(Th_namedPipeWriting != null)
-            {
-                Th_namedPipeWriting.Abort();
-                
-                NamedPipeStream_Client.Close();
-            }
-            else
-            {
-                Th_namedPipeListening.Abort();
-
-                NamedPipeStream_Server.Close();
-            }
-
-        }
-        
-        public void InitServer()
-        {
-            Th_namedPipeListening.Start();
-            IsRunning = true;
-        }
-
-        public void ChangeMessageReceivedHandler(Action<string> handler)
-        {
-            MessageReceivedHandler = handler;
-        }
-
-        public void SendToServer(object message)
-        {
             try
             {
-                Th_namedPipeWriting.Start(message);
-                Th_namedPipeWriting.Join();
+                NamedPipeStream_Client.Close();
             }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.ToString());
-            }
-            MainApp.ExitEVX();
-        }
-        
-        void Listen_NamedPipe()
-        {
-            while (true)
+            catch (Exception)
             {
                 try
                 {
-                    NamedPipeStream_Server.WaitForConnection();
-                    PipeStreamString_In streamStr = new PipeStreamString_In(NamedPipeStream_Server);
-                    MessageReceivedHandler(streamStr.ReadString());
-
+                    NamedPipeStream_Server.Close();
                 }
                 catch (Exception)
                 {
                 }
-
-                Thread.Sleep(2000);
             }
-        }
 
-        void Send_NamedPipe(object data)
+        }
+        public void ChangeMessageReceivedHandler(Action<string> handler)
+        {
+            MessageReceivedHandler = handler;
+        }
+        
+
+        public void Send_NamedPipe(object data)
         {
             try
             {
-                NamedPipeStream_Client.Connect();
+                NamedPipeStream_Client.Connect(2000);
 
                 PipeStreamString_Out streamStr = new PipeStreamString_Out(NamedPipeStream_Client);
 
@@ -127,10 +82,22 @@ namespace EeveexModManager.Classes
             {
                 MessageBox.Show(e.ToString());
             }
-            finally
+        }
+
+        public void Listen_NamedPipe(Dispatcher d)
+        {
+            IsRunning = true;
+
+            while (true)
             {
-                MainApp.ExitEVX();
+                NamedPipeStream_Server.WaitForConnection();
+                d.Invoke(() =>
+                {
+                    PipeStreamString_In streamStr = new PipeStreamString_In(NamedPipeStream_Server);
+                    MessageReceivedHandler(streamStr.ReadString());
+                });
             }
         }
+
     }
 }

@@ -17,6 +17,7 @@ namespace EeveexModManager.Classes
 
         public DownloadManager(TreeView view, Action<Mod> addToGui)
         {
+            System.Net.ServicePointManager.DefaultConnectionLimit = 10;
             ViewControl = view;
             AddToGUI = addToGui;
             Downloads = new List<Download>();

@@ -10,32 +10,40 @@ using System.IO;
 using System.Windows;
 
 using EeveexModManager.Interfaces;
+using EeveexModManager.Classes.DatabaseClasses;
+using System.Drawing;
 
 namespace EeveexModManager.Classes
 {
 
-    public class GameApplication
+    public class GameApplication : IGameApplication
     {
-        [Key]
-        public int DbIndex { get; set; }
-
-        public int Index { get; set; }
-        public string Name { get; set; }
-        public string ExecutablePath { get; set; }
-
+        public string Name { get; }
+        public string ExecutablePath { get;}
+        public GameListEnum AssociatedGameId { get; }
+        
         public Process process;
-        public GameListEnum AssociatedGame;
 
-        public GameApplication(string n, string exe, int index, GameListEnum game)
+        public GameApplication(string n, string exe, GameListEnum game)
         {
             Name = n;
             ExecutablePath = exe;
-            Index = index;
-            AssociatedGame = game;
+            AssociatedGameId = game;
 
             process = new Process
             {
                 StartInfo = new ProcessStartInfo(ExecutablePath)
+            };
+        }
+
+
+        public Db_GameApplication EncapsulateToDb()
+        {
+            return new Db_GameApplication()
+            {
+                AssociatedGameId = AssociatedGameId,
+                ExecutablePath = ExecutablePath,
+                Name = Name
             };
         }
 

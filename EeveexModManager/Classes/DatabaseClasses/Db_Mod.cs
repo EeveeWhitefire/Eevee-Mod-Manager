@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using EeveexModManager.Interfaces;
 using EeveexModManager.Classes;
+using LiteDB;
 
 namespace EeveexModManager.Classes.DatabaseClasses
 {
@@ -27,11 +28,9 @@ namespace EeveexModManager.Classes.DatabaseClasses
         public GameListEnum GameId { get; set; }
         public ModCategories ModCategory { get; set; }
 
+        [BsonId]
         public string FileId { get; set; }
-
-        public Db_Mod()
-        { }
-
+        
         public Mod EncapsulateToSource()
         {
             return new Mod(Name, ModFileName, Active, Installed, SourceArchive, ModDirectory, DownloadDirectory, GameId, ModCategory, FileId, Version, Id, Author, FullSourceUri, IsOnline);

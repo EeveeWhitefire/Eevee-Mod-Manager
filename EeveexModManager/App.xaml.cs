@@ -8,6 +8,7 @@ using System.Windows;
 using System.IO;
 using System.Threading;
 using System.IO.Pipes;
+using System.Windows.Threading;
 
 using EeveexModManager.Nexus;
 using EeveexModManager.Classes;
@@ -53,7 +54,6 @@ namespace EeveexModManager
             _namedPipeManager.CloseConnections();
             mutex.ReleaseMutex();
             mutex.Close();
-            Environment.Exit(0);
         }
 
         void Init()
@@ -90,7 +90,7 @@ namespace EeveexModManager
             {
                 isMainProcess = false;
             }
-            _namedPipeManager = new NamedPipeManager("EeveexModManager", isMainProcess, this);
+            _namedPipeManager = new NamedPipeManager("EeveexModManager", isMainProcess);
 
 
             // Application is running
@@ -117,9 +117,22 @@ namespace EeveexModManager
 
             if (!isMainProcess)
             {
-                if (modArg != null)
+                mutex.ReleaseMutex();
+                mutex.Close();
+                try
                 {
-                    _namedPipeManager.SendToServer(modArg.SourceUrl);
+                    if (modArg != null)
+                    {
+                        Thread t = new Thread(() => _namedPipeManager.Send_NamedPipe(modArg.SourceUrl));
+                        t.SetApartmentState(ApartmentState.STA);
+                        t.Start();
+                    }
+                    else
+                        MessageBox.Show("hmm");
+                }
+                catch (Exception ee)
+                {
+                    MessageBox.Show(ee.ToString());
                 }
                 return;
             }
@@ -149,12 +162,12 @@ namespace EeveexModManager
 
                 Init();
 
-                if (_config.State == StatesOfConfiguartion.FirstTime || _db.GetCollection<Db_Game>("games").Find(x => x.IsCurrent).Count() < 1 || _db.GetCollection<Db_Game>("games").FindAll().Count() < 1)
+                if (_config.State == StatesOfConfiguartion.FirstTime || _db.GetCollection<Db_Game>("games").FindAll().Count() < 1)
                 {
                     _db.FirstTimeSetup(mutex, _jsonParser, _config, _namedPipeManager);
                     return;
                 }
-                else if(_config.State == StatesOfConfiguartion.OnPickingCurrentGame)
+                else if(_config.State == StatesOfConfiguartion.OnPickingCurrentGame || _db.GetCollection<Db_Game>("games").Find(x => x.IsCurrent).Count() < 1)
                 {
                     GamePickerWindow window = new GamePickerWindow(mutex, _db, _jsonParser, _config, _namedPipeManager);
                     window.Show();

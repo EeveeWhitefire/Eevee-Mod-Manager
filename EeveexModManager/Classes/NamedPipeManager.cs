@@ -46,6 +46,7 @@ namespace EeveexModManager.Classes
 
         public void CloseConnections()
         {
+            IsRunning = false;
             try
             {
                 NamedPipeStream_Client.Close();
@@ -88,7 +89,7 @@ namespace EeveexModManager.Classes
         {
             IsRunning = true;
 
-            while (true)
+            while (IsRunning)
             {
                 NamedPipeStream_Server.WaitForConnection();
                 d.Invoke(() =>
@@ -98,6 +99,5 @@ namespace EeveexModManager.Classes
                 });
             }
         }
-
     }
 }

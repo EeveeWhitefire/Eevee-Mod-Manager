@@ -6,29 +6,29 @@
         xmlns:local="clr-namespace:EeveexModManager"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="EeveexModManager.MainWindow"
         mc:Ignorable="d"
-        Title="Eeveex Mod Manager" Height="880" Width="1600">
+        Title="Eeveex Mod Manager" Height="730" Width="1600">
     <Grid Name="MainGrid">
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,10,0,0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
                 <Button Content="Login" FontSize="30" Margin="0,0,20,0" Click="LogInButton_Click" Name="LogInButton" Width="150" Height="45"/>
                 <TextBlock Text="Not logged in." FontSize="25" Foreground="Red" VerticalAlignment="Center" Name="LoginState_TextBox"/>
             </StackPanel>
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="40,10">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,10, 0 ,0">
                 <TextBlock Text="Mod List:" HorizontalAlignment="Left" FontSize="20" Margin="0,0,0,10"/>
-                <TreeView Height="500" Width="1100" Name="ModList_TreeView"/>
+                <TreeView Height="350" Width="900" Name="ModList_TreeView"/>
             </StackPanel>
-            <StackPanel Orientation="Vertical" Margin="40,10">
-                <TextBlock Text="Downloads:" FontSize="20" Margin="0,0,0,10"/>
-                <TreeView Name="DownloadsTreeView" Width="1100" Height="150"/>
+            <StackPanel Orientation="Vertical" Margin="30,10, 0, 0">
+                <TextBlock Text="Downloads:" FontSize="20" Margin="0,0,0,10" HorizontalAlignment="Left"/>
+                <TreeView Name="DownloadsTreeView" Width="900" Height="150" HorizontalAlignment="Left"/>
             </StackPanel>
         </StackPanel>
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Name="RightStack">
             <Button Name="ApplicationLaunch_Button" Content="Launch" FontSize="40" Foreground="Green" Height="70" Click="LaunchApplicationButton_Click" Margin="0,0,0,10"/>
             <ComboBox Name="ApplicationPicker_Selection" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="80" Width="400"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
             <CheckBox Name="AssociationWithNXM_CheckBox" Margin="10,0" VerticalAlignment="Center"/>
-            <Button Content="Associate" HorizontalAlignment="Right" VerticalAlignment="Center" Width="75" Click="Association_Button_Click"/>
+            <Button Content="Associate NXM" HorizontalAlignment="Right" FontSize="30" VerticalAlignment="Center" Click="Association_Button_Click"/>
         </StackPanel>
     </Grid>
 </Window>

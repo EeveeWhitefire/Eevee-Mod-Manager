@@ -73,7 +73,7 @@ namespace EeveexModManager.Windows
             Close();
         }
 
-        const int GamesPerTab = 5;
+        const int GamesPerTab = 4;
 
         void StartSearches()
         {

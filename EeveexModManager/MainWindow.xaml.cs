@@ -82,13 +82,12 @@ namespace EeveexModManager
             _gamePicker = new GamePicker_ComboBox(_db.GetCollection<Db_Game>("games").FindAll(), 50, 20, RerunGameDetection, SetGame)
             {
                 HorizontalAlignment = HorizontalAlignment.Right,
-                Margin = new Thickness(10, 10, 10, 0),
+                Margin = new Thickness(0, 10, 0, 10),
                 VerticalAlignment = VerticalAlignment.Top,
-                Width = 350,
+                Width = 400,
                 Height = 60
-            };
-            
-            MainGrid.Children.Add(_gamePicker);
+            };       
+            RightStack.Children.Add(_gamePicker);
             AssociationWithNXM_CheckBox.IsChecked = _config.Nxm_Handled;
 
             SetGame(_db.GetCollection<Db_Game>("games").FindOne(x => x.IsCurrent).EncapsulateToSource());

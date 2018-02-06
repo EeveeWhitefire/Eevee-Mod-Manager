@@ -69,31 +69,37 @@ namespace EeveexModManager.Windows
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
                 httpClient.DefaultRequestHeaders.Add("User-Agent", "Nexus Client v0.63.14");
 
-                string CookieSid = ((httpClient.GetAsync(API_LoginSource).GetAwaiter().GetResult()).Content.ReadAsStringAsync())
-                    .GetAwaiter().GetResult();
-
-                if (CookieSid != null)
+                try
                 {
-                    CookieSid = CookieSid.Replace("\"", string.Empty);
+                    string CookieSid = ((httpClient.GetAsync(API_LoginSource).GetAwaiter().GetResult()).Content.ReadAsStringAsync())
+                        .GetAwaiter().GetResult();
 
-                    Json_AccountInfo accInfo = new Json_AccountInfo()
+                    if (CookieSid != null)
                     {
-                        Username = username,
-                        Password = password
-                    };
+                        CookieSid = CookieSid.Replace("\"", string.Empty);
 
-                    string raw = JsonConvert.SerializeObject(accInfo);
-                    var d = Environment.UserName;
+                        Json_AccountInfo accInfo = new Json_AccountInfo()
+                        {
+                            Username = username,
+                            Password = password
+                        };
 
-                    File.WriteAllText("UserCredentials", Cryptographer.Encrypt(raw));
+                        string raw = JsonConvert.SerializeObject(accInfo);
+                        var d = Environment.UserName;
 
-                    WhenLoggedIn(CookieSid, accInfo);
+                        File.WriteAllText("UserCredentials", Cryptographer.Encrypt(raw));
+
+                        WhenLoggedIn(CookieSid, accInfo);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Error : Wrong username or password. Please try again!");
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    MessageBox.Show("Error : Wrong username or password. Please try again!");
+                    MessageBox.Show("Error : No internet connection!");
                 }
-
             }
         }
 

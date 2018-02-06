@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:EeveexModManager.Windows"
         xmlns:controls="clr-namespace:EeveexModManager.Controls"
         mc:Ignorable="d"
-        Title="Please choose the games you'd like to mod:" Height="800" Width="1200">
+        Title="Please choose the games you'd like to mod:" Height="650" Width="1300">
     <Window.Resources>
         <ResourceDictionary>
             <BitmapImage x:Key="icon_skyrim" UriSource="/EeveexModManager;component/Resources/Icon - TESV Skyrim.png" />

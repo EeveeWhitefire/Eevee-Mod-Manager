@@ -93,12 +93,19 @@ namespace EeveexModManager
             SetGame(_db.GetCollection<Db_Game>("games").FindOne(x => x.IsCurrent).EncapsulateToSource());
             if (!_namedPipeManager.IsRunning)
             {
-                Thread t = new Thread(new ThreadStart(() =>
+                _namedPipeManager.IsRunning = true;
+                Task.Run(() =>
+               {
+                   while (_namedPipeManager.IsRunning)
+                   {
+                       _namedPipeManager.Listen_NamedPipe(Dispatcher);
+                   }
+               });
+                /*Thread t = new Thread(new ThreadStart(() =>
                 {
-                    _namedPipeManager.Listen_NamedPipe(Dispatcher);
                 }));
                 t.SetApartmentState(ApartmentState.STA);
-                t.Start();
+                t.Start();*/
                 
             }
         }
@@ -233,28 +240,31 @@ namespace EeveexModManager
         
         public void HandlePipeMessage(string arg)
         {
-            Uri uri = new Uri(arg);
-            Nexus.NexusUrl nexusUrl = new Nexus.NexusUrl(uri);
-            int correctedIndex = -1;
-            Dispatcher.Invoke(() => correctedIndex = _gamePicker.SelectedIndex);
-            if (nexusUrl.GameName != _currGame.Name_Nexus)
+            if(arg != string.Empty)
             {
-                var games = _db.GetCollection<Db_Game>("games").FindAll().Select( x => x.EncapsulateToSource()).ToList();
-                correctedIndex = games.FindIndex(x => x.Name_Nexus == nexusUrl.GameName);
-            }
-
-            if(correctedIndex >= 0)
-            {
-
-                Dispatcher.Invoke((Action)(async () =>
+                Uri uri = new Uri(arg);
+                Nexus.NexusUrl nexusUrl = new Nexus.NexusUrl(uri);
+                int correctedIndex = -1;
+                Dispatcher.Invoke(() => correctedIndex = _gamePicker.SelectedIndex);
+                if (nexusUrl.GameName != _currGame.Name_Nexus)
                 {
-                    _gamePicker.SelectedIndex = correctedIndex;
-                    await modManager.CreateMod(_currGame, nexusUrl);
-                }), DispatcherPriority.ApplicationIdle);
-            }
-            else
-            {
-                MessageBox.Show("Error: You are trying to install a mod for a game you don't have on your machine or isn't configured");
+                    var games = _db.GetCollection<Db_Game>("games").FindAll().Select(x => x.EncapsulateToSource()).ToList();
+                    correctedIndex = games.FindIndex(x => x.Name_Nexus == nexusUrl.GameName);
+                }
+
+                if (correctedIndex >= 0)
+                {
+
+                    Dispatcher.Invoke((Action)(async () =>
+                    {
+                        _gamePicker.SelectedIndex = correctedIndex;
+                        await modManager.CreateMod(_currGame, nexusUrl);
+                    }), DispatcherPriority.ApplicationIdle);
+                }
+                else
+                {
+                    MessageBox.Show("Error: You are trying to install a mod for a game you don't have on your machine or isn't configured");
+                }
             }
 
 

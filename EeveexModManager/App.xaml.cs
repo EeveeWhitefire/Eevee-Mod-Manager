@@ -51,9 +51,15 @@ namespace EeveexModManager
 
         public void ExitEVX()
         {
-            _namedPipeManager.CloseConnections();
-            mutex.ReleaseMutex();
-            mutex.Close();
+            try
+            {
+                _namedPipeManager.CloseConnections();
+                mutex.ReleaseMutex();
+                mutex.Close();
+            }
+            catch (Exception)
+            {
+            }
         }
 
         void Init()
@@ -117,15 +123,14 @@ namespace EeveexModManager
 
             if (!isMainProcess)
             {
-                mutex.ReleaseMutex();
-                mutex.Close();
                 try
                 {
                     if (modArg != null)
                     {
-                        Thread t = new Thread(() => _namedPipeManager.Send_NamedPipe(modArg.SourceUrl));
+                        Task.Run(() => _namedPipeManager.Send_NamedPipe(modArg.SourceUrl));
+                        /*Thread t = new Thread(() =>);
                         t.SetApartmentState(ApartmentState.STA);
-                        t.Start();
+                        t.Start();*/
                     }
                     else
                         MessageBox.Show("hmm");
@@ -134,12 +139,11 @@ namespace EeveexModManager
                 {
                     MessageBox.Show(ee.ToString());
                 }
-                return;
+                mutex.ReleaseMutex();
+                mutex.Close();
             }
             else
             {
-
-
                 _jsonParser = new Service_JsonParser();
 
                 if (!File.Exists("config.json"))

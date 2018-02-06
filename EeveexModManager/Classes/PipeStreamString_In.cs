@@ -18,13 +18,19 @@ namespace EeveexModManager.Classes
         public string ReadString()
         {
             int len = 0;
+            try
+            {
+                len = ioStream.ReadByte() * 256;
+                len += ioStream.ReadByte();
+                byte[] inBuffer = new byte[len];
+                ioStream.Read(inBuffer, 0, len);
+                return streamEncoding.GetString(inBuffer);
+            }
+            catch (System.Exception)
+            {
+                return string.Empty;
+            }
 
-            len = ioStream.ReadByte() * 256;
-            len += ioStream.ReadByte();
-            byte[] inBuffer = new byte[len];
-            ioStream.Read(inBuffer, 0, len);
-
-            return streamEncoding.GetString(inBuffer);
         }
     }
 }

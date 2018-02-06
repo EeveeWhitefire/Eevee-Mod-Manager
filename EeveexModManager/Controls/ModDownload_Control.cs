@@ -17,7 +17,7 @@ namespace EeveexModManager.Controls
 {
     public class ModDownload_Control : StackPanel
     {
-        public TreeView AssociatedDownloadsView { get;}
+        public TreeView AssociatedDownloadsView { get; }
         public Download AssociatedDownload { get; }
         public Action<Mod> AddToGUI { get; }
 
@@ -45,7 +45,7 @@ namespace EeveexModManager.Controls
                 Text = $"{AssociatedDownload.ModName} [{AssociatedDownload.ModFileName}]",
                 Margin = new Thickness(0, 2, 10, 0),
                 VerticalAlignment = VerticalAlignment.Center,
-                Width = 300,
+                Width = 350,
                 FontSize = 15
             };
             CurrentNumberOfBytes = new TextBlock()
@@ -113,7 +113,11 @@ namespace EeveexModManager.Controls
 
         public void DownloadFinished(AsyncCompletedEventArgs e)
         {
-            if (!e.Cancelled)
+            if (e.Error != null)
+            {
+                AssociatedDownload.StartDownload();
+            }
+            else if(!e.Cancelled)
             {
                 if (DownloadedPercentage.Text.Contains("100"))
                 {
@@ -134,9 +138,9 @@ namespace EeveexModManager.Controls
 
                     archive.Extract();
                 }
+                AssociatedDownload.Client.CancelAsync();
+                AssociatedDownload.Client.Dispose();
             }
-            AssociatedDownload.Client.CancelAsync();
-            AssociatedDownload.Client.Dispose();
         }
 
         private void CancelDownloadButton_Click(object sender, RoutedEventArgs e)
@@ -147,9 +151,40 @@ namespace EeveexModManager.Controls
             CancelDownloadButton.IsEnabled = false;
             CancelDownloadButton.Background = Brushes.Gray;
 
+            FileInfo fileInfo = new FileInfo(AssociatedDownload.DownloadTo);
+            while(IsFileLocked(fileInfo))
+            {
+                Task.Delay(1000);
+            }
             if (Directory.Exists(AssociatedDownload.DownloadAt))
                 Directory.Delete(AssociatedDownload.DownloadAt, true);
 
+        }
+
+        bool IsFileLocked(FileInfo file)
+        {
+            FileStream stream = null;
+
+            try
+            {
+                stream = file.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            }
+            catch (IOException)
+            {
+                //the file is unavailable because it is:
+                //still being written to
+                //or being processed by another thread
+                //or does not exist (has already been processed)
+                return true;
+            }
+            finally
+            {
+                if (stream != null)
+                    stream.Close();
+            }
+
+            //file is not locked
+            return false;
         }
     }
 }

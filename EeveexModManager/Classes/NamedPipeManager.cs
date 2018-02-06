@@ -21,6 +21,7 @@ namespace EeveexModManager.Classes
 
         private NamedPipeServerStream NamedPipeStream_Server;
         private NamedPipeClientStream NamedPipeStream_Client;
+        private PipeSecurity pipeSecurity;
 
         private Action<string> MessageReceivedHandler;
 
@@ -37,7 +38,7 @@ namespace EeveexModManager.Classes
             {
                 SecurityIdentifier sid = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
                 PipeAccessRule psRule = new PipeAccessRule(sid, PipeAccessRights.ReadWrite, AccessControlType.Allow);
-                PipeSecurity pipeSecurity = new PipeSecurity();
+                pipeSecurity = new PipeSecurity();
                 pipeSecurity.AddAccessRule(psRule);
                 
                 NamedPipeStream_Server = new NamedPipeServerStream(Name, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous, 512, 512, pipeSecurity);
@@ -49,17 +50,20 @@ namespace EeveexModManager.Classes
             IsRunning = false;
             try
             {
-                NamedPipeStream_Client.Close();
-            }
-            catch (Exception)
-            {
-                try
+                if(NamedPipeStream_Client != null)
                 {
+                    NamedPipeStream_Client.Dispose();
+                    NamedPipeStream_Client.Close();
+                }
+                else
+                {
+                    NamedPipeStream_Server.Dispose();
                     NamedPipeStream_Server.Close();
                 }
-                catch (Exception)
-                {
-                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString());
             }
 
         }
@@ -78,6 +82,9 @@ namespace EeveexModManager.Classes
                 PipeStreamString_Out streamStr = new PipeStreamString_Out(NamedPipeStream_Client);
 
                 streamStr.WriteString(data.ToString());
+                Task.Delay(10);
+                CloseConnections();
+                Environment.Exit(0);
             }
             catch (Exception e)
             {
@@ -89,14 +96,23 @@ namespace EeveexModManager.Classes
         {
             IsRunning = true;
 
-            while (IsRunning)
+            try
             {
                 NamedPipeStream_Server.WaitForConnection();
-                d.Invoke(() =>
+                if (NamedPipeStream_Server.IsConnected)
                 {
-                    PipeStreamString_In streamStr = new PipeStreamString_In(NamedPipeStream_Server);
-                    MessageReceivedHandler(streamStr.ReadString());
-                });
+
+                    Task.Run(() =>
+                   d.Invoke(() =>
+                   {
+                       PipeStreamString_In streamStr = new PipeStreamString_In(NamedPipeStream_Server);
+                       MessageReceivedHandler(streamStr.ReadString());
+                       NamedPipeStream_Server.Disconnect();
+                   }, DispatcherPriority.Background));
+                }
+            }
+            catch (Exception)
+            {
             }
         }
     }

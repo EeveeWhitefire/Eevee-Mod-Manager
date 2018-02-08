@@ -148,6 +148,7 @@ namespace EeveexModManager.Controls
             State.Text = "State: Canceled";
             AssociatedDownload.Client.CancelAsync();
             AssociatedDownload.Client.Dispose();
+            GC.Collect();
             CancelDownloadButton.IsEnabled = false;
             CancelDownloadButton.Background = Brushes.Gray;
 
@@ -180,7 +181,11 @@ namespace EeveexModManager.Controls
             finally
             {
                 if (stream != null)
+                {
+                    stream.Flush();
+                    stream.Dispose();
                     stream.Close();
+                }
             }
 
             //file is not locked

@@ -26,10 +26,6 @@ namespace EeveexModManager.Classes
 
         public Download(Uri from, string As, string At, string installAt, string modN, string modFileN)
         {
-            using (StreamWriter write = new StreamWriter(As, true))
-            {
-
-            }
             Client = new WebClient();
             ModName = modN;
             ModFileName = modFileN;

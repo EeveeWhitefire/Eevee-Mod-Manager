@@ -136,6 +136,9 @@
   <data name="Button_RedX_Hover" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Button_RedX_Hover.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="icon_dragonage" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icon - Dragon Age Origins.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="icon_dragonage2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icon - Dragon Age II.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -148,9 +151,6 @@
   <data name="icon_falloutnv" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icon - Fallout New Vegas.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="icon_mgsvtpp" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Icon - Metal Gear Solid V The Phantom Pain.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="icon_oblivion" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icon - TESIV Oblivion.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -159,5 +159,8 @@
   </data>
   <data name="icon_skyrimse" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icon - TESV Skyrim Special Edition.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="icon_thewitcher3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icon - The Witcher 3 Wild Hunt.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

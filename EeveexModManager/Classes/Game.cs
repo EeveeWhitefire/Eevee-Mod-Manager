@@ -51,8 +51,10 @@ namespace EeveexModManager.Classes
                     return new string[] { "Fallout3" };
                 case "Dragon Age II":
                     return new string[] { "Dragon Age II" };
-                case "Metal Gear Solid V : The Phantom Pain":
-                    return new string[] { "METAL GEAR SOLID V: THE PHANTOM PAIN" };
+                case "Dragon Age Origins":
+                    return new string[] { "Dragon Age Origins" };
+                case "The Witcher 3 : Wild Hunt":
+                    return new string[] { "The Witcher 3" };
                 default:
                     return new string[] { };
             }
@@ -73,7 +75,9 @@ namespace EeveexModManager.Classes
                     return path + @"\Data";
                 case "Dragon Age II":
                     return string.Empty;
-                case "Metal Gear Solid V : The Phantom Pain":
+                case "Dragon Age Origins":
+                    return string.Empty;
+                case "The Witcher 3 : Wild Hunt":
                     return string.Empty;
                 default:
                     return string.Empty;
@@ -95,8 +99,10 @@ namespace EeveexModManager.Classes
                     return string.Empty;
                 case "Dragon Age II":
                     return "dragonage2";
-                case "Metal Gear Solid V : The Phantom Pain":
-                    return "metalgearsolidvtpp";
+                case "Dragon Age Origins":
+                    return "dragonage";
+                case "The Witcher 3 : Wild Hunt":
+                    return "witcher3";
                 default:
                     return string.Empty;
             }
@@ -155,8 +161,6 @@ namespace EeveexModManager.Classes
                     break;
                 case "Dragon Age II":
                     break;
-                case "Metal Gear Solid V : The Phantom Pain":
-                    break;
                 default:
                     break;
             }
@@ -194,9 +198,11 @@ namespace EeveexModManager.Classes
                 case "Fallout 3":
                     return null;
                 case "Dragon Age II":
-                    return null; 
-                case "Metal Gear Solid V : The Phantom Pain":
-                    return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("mgsvtpp.exe", iPath), n, GetNexusName(n), "newvegas", regN, GameListEnum.MGSVTPP);
+                    return null;
+                case "Dragon Age Origins":
+                    return null;
+                case "The Witcher 3 : Wild Hunt":
+                    return null;
                 default:
                     return null;
             }

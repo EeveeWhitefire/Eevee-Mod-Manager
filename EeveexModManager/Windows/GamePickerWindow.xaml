@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EeveexModManager.Windows"
         mc:Ignorable="d"
-        Title="Please pick a game:" Height="160" Width="700">
+        Title="Please pick a game:" Height="160" Width="700" ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
             <BitmapImage x:Key="icon_skyrim" UriSource="/EeveexModManager;component/Resources/Icon_Skyrim.png" />

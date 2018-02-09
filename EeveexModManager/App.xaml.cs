@@ -64,13 +64,6 @@ namespace EeveexModManager
 
         void Init()
         {
-            string[] neededDirs = new string[] { "Mods", "Downloads", "Profiles" , "DLLs"};
-            foreach (var dir in neededDirs)
-            {
-                if (!Directory.Exists(dir))
-                    Directory.CreateDirectory(dir);
-            }
-
             foreach (var game in _db.GetCollection<Db_Game>("games").FindAll())
             {
                 if (!Directory.Exists(game.ModsDirectory))

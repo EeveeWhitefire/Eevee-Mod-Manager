@@ -20,7 +20,7 @@ namespace EeveexModManager.Classes
         public string DownloadTo { get; }
         public string DownloadAt { get; }
         public string InstallAt { get; }
-        public WebClient Client { get; }
+        public WebClient Client { get; protected set; }
 
         public ModDownload_Control AssociatedDownloadControl { get; set; }
 
@@ -33,6 +33,14 @@ namespace EeveexModManager.Classes
             DownloadTo = As;
             DownloadAt = At;
             InstallAt = installAt;
+        }
+
+        public void DisposeOfClient()
+        {
+            Client.CancelAsync();
+            Client.Dispose();
+            Client = null;
+            GC.Collect();
         }
 
         public void StartDownload()

@@ -79,8 +79,8 @@ namespace EeveexModManager.Windows
         {
            int counter = 0;
             string[] gameNames = new string[]
-                {"TESV : Skyrim Special Edition", "TESV : Skyrim", "Fallout : New Vegas",
-                    "Fallout 4", "Fallout 3", "Dragon Age II", "Metal Gear Solid V : The Phantom Pain"};
+                {"TESV : Skyrim Special Edition", "TESV : Skyrim", "Fallout 4", "Fallout : New Vegas",
+                     "Fallout 3", "Dragon Age Origins", "Dragon Age II", "The Witcher 3 : Wild Hunt"};
 
             gameSeachers = new List<GameSearcher>();
             games = new List<Game>();

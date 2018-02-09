@@ -291,6 +291,9 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="App.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="config.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -359,11 +362,22 @@
     <Resource Include="Resources\Icon - TESIV Oblivion.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Icon - Metal Gear Solid V The Phantom Pain.png" />
+    <Content Include="7z.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Resources\Icon - The Witcher 3 Wild Hunt.png" />
+    <Resource Include="Resources\Icon - Dragon Age Origins.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>mkdir "DLLs" "Downloads" "Profiles" "Mods"
+for /r "$(TargetDir)" %25%25x in (*.dll) do move "%25%25x" "$(TargetDir)DLLs"
+for /r "$(TargetDir)" %25%25x in (*.xml) do move "%25%25x" "$(TargetDir)DLLs"
+mt.exe -manifest "App.manifest" -outputresource:"$(TargetPath)";#1
+del "App.manifest"</PostBuildEvent>
   </PropertyGroup>
 </Project>

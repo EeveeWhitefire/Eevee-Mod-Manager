@@ -145,10 +145,8 @@ namespace EeveexModManager.Controls
 
         private void CancelDownloadButton_Click(object sender, RoutedEventArgs e)
         {
+            AssociatedDownload.DisposeOfClient();
             State.Text = "State: Canceled";
-            AssociatedDownload.Client.CancelAsync();
-            AssociatedDownload.Client.Dispose();
-            GC.Collect();
             CancelDownloadButton.IsEnabled = false;
             CancelDownloadButton.Background = Brushes.Gray;
 

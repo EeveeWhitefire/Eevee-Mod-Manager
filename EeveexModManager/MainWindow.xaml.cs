@@ -40,15 +40,14 @@ namespace EeveexModManager
         private NxmHandler _nxmHandler;
         private NamedPipeManager _namedPipeManager;
         private GamePicker_ComboBox _gamePicker;
+        private ApplicationPicker_ComboBox _appPicker;
         private Mutex _mutex;
         private Json_AccountInfo User;
-        private IconExtractor _iconExtractor;
         private bool IsLoggedIn = false;
 
         ModManager modManager;
 
         Game _currGame;
-        List<GameApplication> AvailableApplications;
 
         public MainWindow(Mutex mutex, DatabaseContext db, Service_JsonParser jsonParser, Json_Config config, NamedPipeManager npm)
         {
@@ -61,7 +60,7 @@ namespace EeveexModManager
             _currGame = _db.GetCurrentGame();
             _namedPipeManager = npm;
 
-            _nxmHandler = new NxmHandler(config, _jsonParser, AssociationWithNXM_CheckBox);
+            _nxmHandler = new NxmHandler(config, _jsonParser, AssociationWithNXM_CheckBox, _db);
             modManager = new ModManager(_db, ModList_TreeView, DownloadsTreeView);
             _namedPipeManager.ChangeMessageReceivedHandler(HandlePipeMessage);
 
@@ -86,11 +85,12 @@ namespace EeveexModManager
                 VerticalAlignment = VerticalAlignment.Top,
                 Width = 400,
                 Height = 60
-            };       
+            };
+            SetGame(_db.GetCollection<Db_Game>("games").FindOne(x => x.IsCurrent).EncapsulateToSource());
+            RightStack.Children.Add(_appPicker);
             RightStack.Children.Add(_gamePicker);
             AssociationWithNXM_CheckBox.IsChecked = _config.Nxm_Handled;
 
-            SetGame(_db.GetCollection<Db_Game>("games").FindOne(x => x.IsCurrent).EncapsulateToSource());
             if (!_namedPipeManager.IsRunning)
             {
                 _namedPipeManager.IsRunning = true;
@@ -101,12 +101,6 @@ namespace EeveexModManager
                        _namedPipeManager.Listen_NamedPipe(Dispatcher);
                    }
                });
-                /*Thread t = new Thread(new ThreadStart(() =>
-                {
-                }));
-                t.SetApartmentState(ApartmentState.STA);
-                t.Start();*/
-                
             }
         }
 
@@ -117,7 +111,7 @@ namespace EeveexModManager
             {
                 if (_config.Nxm_Handled != AssociationWithNXM_CheckBox.IsChecked)
                 {
-                    _nxmHandler.AssociationManagement(_config.Nxm_Handled, AssociationWithNXM_CheckBox);
+                    _nxmHandler.AssociationManagement(_config.Nxm_Handled, AssociationWithNXM_CheckBox, _db.GetCollection<Db_Game>("games").FindAll());
                 }
             }
             catch (Exception)
@@ -132,6 +126,15 @@ namespace EeveexModManager
             gameDetectWindow.Show();
             Close();
         }
+        void AddGameApplication()
+        {
+            GameApplicationAdderWindow window = new GameApplicationAdderWindow(_db, _currGame, AddAppToSelector);
+            window.Show();
+        }
+        void AddAppToSelector(GameApplication app)
+        {
+            _appPicker.Items.Add(new ApplicationPicker_Control(app));
+        }
 
         void SetGame(Game game)
         {
@@ -142,66 +145,34 @@ namespace EeveexModManager
             if(game.Name != _currGame.Name)
             {
                 _currGame.ToggleIsCurrentGame();
+                if (_currGame.IsCurrent)
+                    _currGame.ToggleIsCurrentGame();
+
                 game.ToggleIsCurrentGame();
+                if (!game.IsCurrent)
+                    game.ToggleIsCurrentGame();
                 _db.GetCollection<Db_Game>("games").Update(game.EncapsulateToDb());
                 _db.GetCollection<Db_Game>("games").Update(_currGame.EncapsulateToDb());
             }
             _currGame = game;
 
-            ApplicationPicker_Selection.Items.Clear();
+            _appPicker?.Items.Clear();
+            var AvailableApplications = _db.GetCollection<Db_GameApplication>("game_apps").FindAll()
+                .Where(x => x.AssociatedGameId == _currGame.Id).ToList();
+
+            if(_appPicker != null)
+            {
+                _appPicker.Init(AvailableApplications);
+            }
+            else
+                _appPicker = new ApplicationPicker_ComboBox(AvailableApplications, AddGameApplication);
+
             ModList_TreeView.Items.Clear();
 
-            AvailableApplications = _db.GetCollection<Db_GameApplication>("game_apps").FindAll()
-                .Where(x => x.AssociatedGameId == _currGame.Id).Select( x => x.EncapsulateToSource()).ToList();
-            AvailableApplications.ForEach(x =>
-            {
-                StackPanel stkPanel = new StackPanel()
-                {
-                    Orientation = Orientation.Horizontal
-                };
-
-                _iconExtractor = new IconExtractor(x.ExecutablePath);
-                int iconCount = _iconExtractor.Count;
-
-                // Extract all the icons in one go.
-
-                //Icon[] allIcons = ie.GetAllIcons();
-
-                // Split the variations of icon0 into separate icon objects.
-
-                System.Drawing.Icon[] splitIcons = IconUtil.Split(_iconExtractor.GetIcon(0));
-
-                // Convert an icon into bitmap. Unlike Icon.ToBitmap() it preserves the transparency.
-                ImageSource imageSource;
-
-                System.Drawing.Bitmap bitmap = IconUtil.ToBitmap(splitIcons[3]);
-                var stream = new MemoryStream();
-                bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                imageSource = BitmapFrame.Create(stream);
-
-                stkPanel.Children.Add(new Image()
-                {
-                    Source = imageSource,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    MaxHeight = 75,
-                    MaxWidth = 75,
-                    Margin = new Thickness(0, 0, 20, 0)
-                });
-
-                stkPanel.Children.Add(new TextBlock()
-                {
-                    Text = x.Name,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = 25
-                });
-
-                ApplicationPicker_Selection.Items.Add(stkPanel);
-            });
-            ApplicationPicker_Selection.SelectedIndex = 0;
 
             _db.GetCollection<Db_Mod>("mods").FindAll().Where( x => x.GameId == _currGame.Id).ToList().ForEach(x =>
             {
-                ModList_TreeView.Items.Add(new Mod_Control(x.EncapsulateToSource(), ModList_TreeView.Items.Count, _db));
+                ModList_TreeView.Items.Add(new Mod_Control(x.EncapsulateToSource(), _db));
 
             });
         }
@@ -278,58 +249,32 @@ namespace EeveexModManager
             return ModList_TreeView;
         }
 
-        List<string> GetAllFilesInDir(string d, List<string> Specifics)
-        {
-            List<string> files = new List<string>();
-
-            ProcessDirectory(files, d, Specifics);
-
-            return files;
-        }
-
-        void ProcessDirectory(List<string> files, string p, List<string> Specifics)
-        {
-            bool OK = false;
-            foreach (var x in Specifics)
-            {
-                if (p.Contains(x))
-                {
-                    OK = true;
-                    break;
-                };
-            }
-
-            if (OK || p.EndsWith(_currGame.ModsDirectory))
-            {
-
-                files.AddRange(Directory.GetFiles(p));
-
-                var dirs = Directory.GetDirectories(p);
-                foreach (var item in dirs)
-                {
-                    ProcessDirectory(files, item, Specifics);
-                }
-            }
-        }
-
         private void LaunchApplicationButton_Click(object sender, RoutedEventArgs e)
         {
-            var AvailableApplications = _db.GetCollection<Db_GameApplication>("game_apps").FindAll()
-                .Where(x => x.AssociatedGameId == _currGame.Id).Select( x => x.EncapsulateToSource()).ToList();
-            var Application = AvailableApplications[ApplicationPicker_Selection.SelectedIndex];
+            var Application = (_appPicker.SelectedItem as ApplicationPicker_Control).App;
 
-            var ActivatedMods = _db.GetCollection<Db_Mod>("mods").FindAll().Where(x => x.GameId == _currGame.Id && x.Installed && x.Active).ToList();
-            ActivatedMods.AddRange(_db.GetCollection<Db_Mod>("mods").Find(x => x.GameId == _currGame.Id && x.Installed && x.Active));
+            var ActivatedMods = _db.GetCollection<Db_Mod>("mods").FindAll()
+                .Where(x => x.GameId == _currGame.Id && x.Installed && x.Active).ToList();
 
             var ActivatedModDirs = ActivatedMods.Select(x => x.ModDirectory).ToList();
 
-            Application.Launch(_currGame, GetAllFilesInDir($@"Mods\{_currGame.Name}", ActivatedModDirs));
+            using (StreamWriter x = new StreamWriter($"{_currGame.ProfilesDirectory}\\modlist.txt"))
+            {
+                ActivatedMods.ForEach(m =>
+                {
+                    var dd = new DirectoryInfo(m.ModDirectory);
+                    x.WriteLine($"1 {dd.Name}");
+                });
+                x.Close();
+            }
+
+            Application.Launch(_currGame);
 
         }
 
         private void Association_Button_Click(object sender, RoutedEventArgs e)
         {
-            _nxmHandler.AssociationManagement(_config.Nxm_Handled, AssociationWithNXM_CheckBox);
+            _nxmHandler.AssociationManagement(_config.Nxm_Handled, AssociationWithNXM_CheckBox, _db.GetCollection<Db_Game>("games").FindAll());
         }
     }
 }

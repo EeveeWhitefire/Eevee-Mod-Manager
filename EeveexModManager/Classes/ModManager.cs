@@ -73,7 +73,7 @@ namespace EeveexModManager.Classes
         public void AddModToGUI(Mod m)
         {
             _db.GetCollection<Db_Mod>("mods").Insert(m.EncapsulateToDb());
-            Mods_TreeView.Items.Add(new Mod_Control(m, Mods_TreeView.Items.Count, _db));
+            Mods_TreeView.Items.Add(new Mod_Control(m, _db));
         }
 
         [STAThread]

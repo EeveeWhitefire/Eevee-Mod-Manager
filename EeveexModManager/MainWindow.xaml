@@ -15,16 +15,23 @@
             </StackPanel>
             <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,10, 0 ,0">
                 <TextBlock Text="Mod List:" HorizontalAlignment="Left" FontSize="20" Margin="0,0,0,10"/>
-                <TreeView Height="350" Width="900" Name="ModList_TreeView"/>
+                <StackPanel Orientation="Horizontal" Width="920" >
+                    <TextBlock Text="State:" HorizontalAlignment="Left" FontSize="10" Margin="10,0,10,0"/>
+                    <TextBlock Text="Uninstall:" HorizontalAlignment="Left" FontSize="10" Margin="0,0,10,0"/>
+                    <TextBlock Text="Name:" HorizontalAlignment="Left" FontSize="10" Margin="0,0,443,0"/>
+                    <TextBlock Text="Author:" HorizontalAlignment="Left" FontSize="10" Margin="0,0,138,0"/>
+                    <TextBlock Text="Mod ID:" HorizontalAlignment="Left" FontSize="10" Margin="0,0,82,0"/>
+                    <TextBlock Text="Version:" HorizontalAlignment="Left" FontSize="10" Margin="0,0,10,0"/>
+                </StackPanel>
+                <TreeView Height="350" Width="920" Name="ModList_TreeView"/>
             </StackPanel>
             <StackPanel Orientation="Vertical" Margin="30,10, 0, 0">
                 <TextBlock Text="Downloads:" FontSize="20" Margin="0,0,0,10" HorizontalAlignment="Left"/>
-                <TreeView Name="DownloadsTreeView" Width="900" Height="150" HorizontalAlignment="Left"/>
+                <TreeView Name="DownloadsTreeView" Width="920" Height="150" HorizontalAlignment="Left"/>
             </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Name="RightStack">
-            <Button Name="ApplicationLaunch_Button" Content="Launch" FontSize="40" Foreground="Green" Height="70" Click="LaunchApplicationButton_Click" Margin="0,0,0,10"/>
-            <ComboBox Name="ApplicationPicker_Selection" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="80" Width="400"/>
+            <Button Name="ApplicationLaunch_Button" Content="Launch" FontSize="40" Foreground="Green" Height="70" Width="400" Click="LaunchApplicationButton_Click" Margin="0,0,0,10"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
             <CheckBox Name="AssociationWithNXM_CheckBox" Margin="10,0" VerticalAlignment="Center"/>

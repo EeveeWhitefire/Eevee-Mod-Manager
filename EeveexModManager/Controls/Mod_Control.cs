@@ -17,9 +17,9 @@ namespace EeveexModManager.Controls
     {
         public Mod AssociatedMod { get; protected set; }
         public DatabaseContext Database { get; protected set; }
-        public Button ActivateGameButton { get; protected set; }
+        public CheckBox ActivateGameCheckBox { get; protected set; }
 
-        public Mod_Control(Mod mod, int index, DatabaseContext db) : base()
+        public Mod_Control(Mod mod, DatabaseContext db) : base()
         {
             AssociatedMod = mod;
             Database = db;
@@ -27,49 +27,47 @@ namespace EeveexModManager.Controls
             Orientation = Orientation.Horizontal;
             Thickness modListMargin = new Thickness(10, 2, 10, 0);
 
-            ActivateGameButton = new Button()
+            ActivateGameCheckBox = new CheckBox()
             {
-                Background = AssociatedMod.Active ? Brushes.Green : Brushes.Red,
-                Content = index,
-                Margin = modListMargin,
-                Foreground = Brushes.White,
-                VerticalAlignment = VerticalAlignment.Center,
-                Width = 20,
-                Height = 25,
-                FontSize = 15
+                Margin = new Thickness(0, 2, 10, 0),
+                VerticalAlignment = VerticalAlignment.Center
             };
-            ActivateGameButton.Click += new RoutedEventHandler(ActivateMod);
+            ActivateGameCheckBox.LayoutTransform = new ScaleTransform(1.5, 1.5);
 
+            ActivateGameCheckBox.Checked += new RoutedEventHandler(ActivateMod);
+            ActivateGameCheckBox.Unchecked += new RoutedEventHandler(ActivateMod);
+            ActivateGameCheckBox.IsChecked = mod.Active;
+            
             Button UninstallModButton = new Button()
             {
                 Content = "X",
                 Background = Brushes.DarkRed,
                 Foreground = Brushes.White,
-                Margin = modListMargin,
+                Margin = new Thickness(0, 2, 10, 0),
                 VerticalAlignment = VerticalAlignment.Center,
                 Width = 20,
-                Height = 25,
-                FontSize = 15
+                Height = 20,
+                FontSize = 12
             };
             UninstallModButton.Click += new RoutedEventHandler(UninstallMod);
 
 
+            Children.Add(ActivateGameCheckBox);
             Children.Add(UninstallModButton);
-            Children.Add(ActivateGameButton);
             Children.Add(new TextBlock()
             {
                 Text = $"{AssociatedMod.Name} [{AssociatedMod.ModFileName}]",
                 Margin = modListMargin,
                 VerticalAlignment = VerticalAlignment.Center,
-                Width = 400,
+                Width = 450,
                 FontSize = 15
             });
             Children.Add(new TextBlock()
             {
-                Text = $"By: {AssociatedMod.Author}",
+                Text = AssociatedMod.Author,
                 Margin = modListMargin,
                 VerticalAlignment = VerticalAlignment.Center,
-                Width = 100,
+                Width = 150,
                 FontSize = 15
             });
             Children.Add(new TextBlock()
@@ -77,7 +75,7 @@ namespace EeveexModManager.Controls
                 Text = AssociatedMod.Id.ToString(),
                 Margin = modListMargin,
                 VerticalAlignment = VerticalAlignment.Center,
-                Width = 50,
+                Width = 100,
                 FontSize = 15
             });
             Children.Add(new TextBlock()
@@ -85,7 +83,7 @@ namespace EeveexModManager.Controls
                 Text = AssociatedMod.Version,
                 Margin = modListMargin,
                 VerticalAlignment = VerticalAlignment.Center,
-                Width = 30,
+                Width = 100,
                 FontSize = 15
             });
         }
@@ -108,17 +106,9 @@ namespace EeveexModManager.Controls
 
         protected virtual void ActivateMod(object sender, RoutedEventArgs e)
         {
-            if (AssociatedMod.Active)
-            {
-                ActivateGameButton.Background = Brushes.Red;
-            }
-            else
-            {
-                ActivateGameButton.Background = Brushes.Green;
-            }
-
             AssociatedMod.ToggleIsActive();
             Database.GetCollection<Db_Mod>("mods").Update(AssociatedMod.EncapsulateToDb());
+
         }
     }
 }

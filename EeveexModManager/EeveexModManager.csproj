@@ -220,6 +220,8 @@
     <Compile Include="Classes\NxmHandler.cs" />
     <Compile Include="Classes\PipeStreamString_In.cs" />
     <Compile Include="Classes\PipeStreamString_Out.cs" />
+    <Compile Include="Controls\ApplicationPicker_ComboBox.cs" />
+    <Compile Include="Controls\ApplicationPicker_Control.cs" />
     <Compile Include="Controls\CircularButton.cs" />
     <Compile Include="Controls\ConfirmGame_Button.cs" />
     <Compile Include="Controls\GameDetector_Control.cs" />
@@ -244,6 +246,9 @@
     <Compile Include="Windows\AvailableGamesWindow.xaml.cs">
       <DependentUpon>AvailableGamesWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\GameApplicationAdderWindow.xaml.cs">
+      <DependentUpon>GameApplicationAdderWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\GamePickerWindow.xaml.cs">
       <DependentUpon>GamePickerWindow.xaml</DependentUpon>
     </Compile>
@@ -265,6 +270,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\AvailableGamesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\GameApplicationAdderWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -365,6 +374,9 @@
     <Content Include="7z.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="launchvfs.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Resources\Icon - The Witcher 3 Wild Hunt.png" />
     <Resource Include="Resources\Icon - Dragon Age Origins.png" />
   </ItemGroup>
@@ -374,7 +386,7 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>mkdir "DLLs" "Downloads" "Profiles" "Mods"
+    <PostBuildEvent>mkdir "DLLs" "Downloads" "Profiles" "Mods" "Data"
 for /r "$(TargetDir)" %25%25x in (*.dll) do move "%25%25x" "$(TargetDir)DLLs"
 for /r "$(TargetDir)" %25%25x in (*.xml) do move "%25%25x" "$(TargetDir)DLLs"
 mt.exe -manifest "App.manifest" -outputresource:"$(TargetPath)";#1

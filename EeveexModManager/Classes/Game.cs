@@ -25,6 +25,7 @@ namespace EeveexModManager.Classes
         public string Name_Registry { get; protected set; }
         public string ModsDirectory { get; protected set; }
         public string DownloadsDirectory { get; protected set; }
+        public string ProfilesDirectory { get; }
 
         public GameListEnum Id { get; }
         public bool IsCurrent { get; protected set; } = false;
@@ -235,6 +236,7 @@ namespace EeveexModManager.Classes
             Name = n;
             ModsDirectory = @"Mods\" + Name.Replace(':', '-');
             DownloadsDirectory = @"Downloads\" + Name.Replace(':', '-');
+            ProfilesDirectory = @"Profiles\" + Name.Replace(':', '-');
         }
         /// <summary>
         /// Full Constructor
@@ -267,7 +269,8 @@ namespace EeveexModManager.Classes
                 Name_API = Name_API,
                 Name_Registry = Name_Registry,
                 ModsDirectory = ModsDirectory,
-                DownloadsDirectory = DownloadsDirectory
+                DownloadsDirectory = DownloadsDirectory,
+                ProfilesDirectory = ProfilesDirectory
             };
         }
     }

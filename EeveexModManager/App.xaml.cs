@@ -70,6 +70,8 @@ namespace EeveexModManager
                     Directory.CreateDirectory(game.ModsDirectory);
                 if (!Directory.Exists(game.DownloadsDirectory))
                     Directory.CreateDirectory(game.DownloadsDirectory);
+                if (!Directory.Exists(game.ProfilesDirectory))
+                    Directory.CreateDirectory(game.ProfilesDirectory);
             }
         }
 

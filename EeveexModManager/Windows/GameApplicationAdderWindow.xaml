@@ -1,0 +1,17 @@
+﻿<Window x:Class="EeveexModManager.Windows.GameApplicationAdderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EeveexModManager.Windows"
+        mc:Ignorable="d"
+        Title="GameApplicationAdderWindow" Height="150" Width="300">
+    <Grid>
+        <StackPanel Orientation="Vertical" Margin="10">
+            <Button Content="Choose exe" Click="ChooseExeButton_Click"/>
+            <TextBox Name="ApplicationNameTBox"/>
+            <Button Content="Done" Name="DoneButton" Click="DoneButton_Click" IsEnabled="False"/>
+            <Button Content="Cancel" Click="CancelButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -24,7 +24,7 @@ namespace EeveexModManager.Controls
 
             Items.Add(new TextBlock()
             {
-                Text = "Run Game Detection",
+                Text = "Add new",
                 FontSize = 20,
                 VerticalAlignment = System.Windows.VerticalAlignment.Center,
                 HorizontalAlignment = System.Windows.HorizontalAlignment.Left
@@ -40,13 +40,13 @@ namespace EeveexModManager.Controls
         void SelectionChanged_Event(object sender, SelectionChangedEventArgs e)
         {
             int index = (sender as ComboBox).SelectedIndex;
-            if(index + 1 == (sender as ComboBox).Items.Count)
+            if(index + 1 == (sender as ComboBox).Items.Count && Utility != null)
             {
                 Utility();
             }
             else
             {
-                ChangeGame(Games[index].EncapsulateToSource());
+                ChangeGame?.Invoke(Games[index].EncapsulateToSource());
             }
         }
     }

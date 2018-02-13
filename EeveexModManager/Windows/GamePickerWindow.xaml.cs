@@ -36,7 +36,7 @@ namespace EeveexModManager.Windows
             _namedPipeManager = npm;
 
             InitializeComponent();
-            _gamePicker = new GamePicker_ComboBox(_db.GetCollection<Db_Game>("games").FindAll(), 80, 25, RerunGameDetection, Temp)
+            _gamePicker = new GamePicker_ComboBox(_db.GetCollection<Db_Game>("games").FindAll(), 80, 25, RerunGameDetection)
             {
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(20, 10, 0, 0),
@@ -54,11 +54,6 @@ namespace EeveexModManager.Windows
             AvailableGamesWindow gameDetectWindow = new AvailableGamesWindow(_mutex, _db, _jsonParser, _config, _namedPipeManager, true, WindowsEnum.GamePickerWindow);
             gameDetectWindow.Show();
             Close();
-        }
-
-        void Temp(Game i)
-        {
-
         }
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)

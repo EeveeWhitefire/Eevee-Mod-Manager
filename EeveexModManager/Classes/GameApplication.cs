@@ -84,78 +84,23 @@ namespace EeveexModManager.Classes
             }
         }
 
-        public void Launch(Game game, List<string> modFiles, bool block = false)
+        public void Launch(Game game)
         {
-            List<string> DirectoriesToDelete = new List<string>();
-            List<string> LinksToDelete = new List<string>();
-            List<BackupFile> BackupsToRetrieve = new List<BackupFile>();
+            string mods_full = Directory.GetCurrentDirectory() + '\\' + game.ModsDirectory;
+            string prof_full = Directory.GetCurrentDirectory() + '\\' + game.ProfilesDirectory;
+            string vfs_full = Directory.GetCurrentDirectory() + "\\launchvfs.py";
 
-            foreach (string file in modFiles)
+            ProcessStartInfo start = new ProcessStartInfo
             {
-                FileInfo fileInfo = new FileInfo(file);
+                FileName = @"I:\Python37\python.exe",
+                Arguments = $"\"{vfs_full}\" \"{ExecutablePath}\" \"{mods_full}\" \"{prof_full}\" \"{game.DataPath}\"",
+                UseShellExecute = false,
+                RedirectStandardOutput = true
+            };
 
-                var relativePathFile = file.Replace(Directory.GetCurrentDirectory() + $@"\Mods\{game.Name}\", string.Empty);
-
-                string inData = game.DataPath + $@"\{relativePathFile}"; 
-
-                var NeededDirectories = relativePathFile.Split('\\').ToList();
-
-                if (File.Exists(inData))
-                {
-                    if (!Directory.Exists("Backup Files"))
-                    {
-                        Directory.CreateDirectory("Backup Files");
-                    }
-
-                    string bckup = $@"Backup Files\ev!{fileInfo.Name + fileInfo.Extension}";
-                    File.Copy(inData, bckup);
-                    BackupsToRetrieve.Add(new BackupFile(inData, bckup));
-                    File.Delete(inData);
-                }
-                else if (NeededDirectories.Count > 1)
-                {
-                    int count = 1;
-                    NeededDirectories.ForEach(y =>
-                    {
-                        var x = Directory.GetCurrentDirectory() + $@"\{string.Join(@"\", NeededDirectories.Take(count))}";
-                        if (!Directory.Exists(x))
-                        {
-                            Directory.CreateDirectory(x);
-                            DirectoriesToDelete.Add(x);
-                        }
-                    });
-                }
-
-
-                string linkPath = game.DataPath + $@"\{relativePathFile}";
-
-                CreateHardLink(linkPath, file, IntPtr.Zero);
+            using (Process process = Process.Start(start))
+            {
             }
-
-            process.Start();
-
-            if(block)
-            {
-
-
-                process.WaitForExit();
-            }
-
-            LinksToDelete.ForEach(x =>
-            {
-                File.Delete(x);
-            });
-
-            BackupsToRetrieve.ForEach(x =>
-            {
-                x.MoveBack();
-            });
-
-            DirectoriesToDelete.ForEach(x =>
-           {
-               Directory.Delete(x);
-           });
-
         }
 
         [DllImport("Kernel32.dll", CharSet = CharSet.Unicode)]

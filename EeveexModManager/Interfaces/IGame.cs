@@ -25,8 +25,10 @@ namespace EeveexModManager.Interfaces
         string Name_Nexus { get; }
         string Name_API { get;}
         string Name_Registry { get; }
+
         string ModsDirectory { get; }
-        string DownloadsDirectory { get;}
+        string DownloadsDirectory { get; }
+        string ProfilesDirectory { get; }
 
         GameListEnum Id { get;}
 

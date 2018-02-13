@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using Microsoft.Win32;
 
 using EeveexModManager.Classes.JsonClasses;
+using EeveexModManager.Classes.DatabaseClasses;
 using EeveexModManager.Interfaces;
 using EeveexModManager.Services;
 
@@ -16,16 +17,18 @@ namespace EeveexModManager.Classes
 {
     public class NxmHandler
     {
-        Json_Config _config;
-        Service_JsonParser _jsonParser;
+        private Json_Config _config;
+        private Service_JsonParser _jsonParser;
+        private DatabaseContext _db;
 
-        public NxmHandler(Json_Config jsc, Service_JsonParser jsonParser, CheckBox IsAssociated_CheckBox)
+        public NxmHandler(Json_Config jsc, Service_JsonParser jsonParser, CheckBox IsAssociated_CheckBox, DatabaseContext db)
         {
             _jsonParser = jsonParser;
             _config = jsc;
+            _db = db;
 
             if (IsUrlAssociated("nxm") != _config.Nxm_Handled)
-                AssociationManagement(IsUrlAssociated("nxm"), IsAssociated_CheckBox);
+                AssociationManagement(IsUrlAssociated("nxm"), IsAssociated_CheckBox, _db.GetCollection<Db_Game>("games").FindAll());
         }
 
         void AssociateNxmFile(string Extension, string KeyName, string OpenWith, string FileDescription)
@@ -87,19 +90,24 @@ namespace EeveexModManager.Classes
         [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
 
-        public void AssociationManagement(bool isAssociated, CheckBox cbx)
+        public void AssociationManagement(bool isAssociated, CheckBox cbx, IEnumerable<Db_Game> games)
         {
             bool newState = !isAssociated;
             if (!isAssociated)
             {
                 //AssociateNxmFile(".nxm", "NXM_File_Handler", Directory.GetCurrentDirectory() + @"\" + "EeveexModManager.exe", "NXM File");
-                AssociateNxmUrl("nxm", "Nexus Url", _config.Installation_Path + @"\" + "EeveexModManager.exe");
+                foreach (var item in games)
+                {
+                    AssociateNxmUrl($"nxm://{item.Name_Nexus}", "Nexus Url", _config.Installation_Path + @"\" + "EeveexModManager.exe");
+                }
                 cbx.IsChecked = newState;
             }
             else
             {
-                //UnassociateNxmFile("nxm");
-                UnassociateNxmUrl("nxm");
+                foreach (var item in games)
+                {
+                    UnassociateNxmUrl($"nxm://{item.Name_Nexus}");
+                }
                 cbx.IsChecked = newState;
 
             }

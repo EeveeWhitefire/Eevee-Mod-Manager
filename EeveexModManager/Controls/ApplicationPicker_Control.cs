@@ -27,6 +27,20 @@ namespace EeveexModManager.Controls
             ImageSource imageSource;
 
             System.Drawing.Bitmap bitmap = IconUtil.ToBitmap(splitIcons[3]);
+            try
+            {
+                int c = 2;
+                while (bitmap.Size.Width < 256 && c >= 0)
+                {
+                    bitmap = IconUtil.ToBitmap(splitIcons[c]);
+                    c++;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
             var stream = new MemoryStream();
             bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
             imageSource = BitmapFrame.Create(stream);

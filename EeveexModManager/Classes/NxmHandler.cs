@@ -19,9 +19,9 @@ namespace EeveexModManager.Classes
     {
         private Json_Config _config;
         private Service_JsonParser _jsonParser;
-        private DatabaseContext _db;
+        private DatabaseContext_Main _db;
 
-        public NxmHandler(Json_Config jsc, Service_JsonParser jsonParser, CheckBox IsAssociated_CheckBox, DatabaseContext db)
+        public NxmHandler(Json_Config jsc, Service_JsonParser jsonParser, CheckBox IsAssociated_CheckBox, DatabaseContext_Main db)
         {
             _jsonParser = jsonParser;
             _config = jsc;

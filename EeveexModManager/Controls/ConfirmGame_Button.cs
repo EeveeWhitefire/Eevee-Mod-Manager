@@ -9,7 +9,6 @@ using System.Windows.Media.Imaging;
 
 using EeveexModManager.Classes;
 using EeveexModManager.Interfaces;
-using EeveexModManager.Define;
 
 namespace EeveexModManager.Controls
 {

@@ -19,37 +19,46 @@ using EeveexModManager.Controls;
 using EeveexModManager.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using EeveexModManager.Interfaces;
+using System.Diagnostics;
 
 namespace EeveexModManager
 {
     public enum WindowsEnum
     {
         MainWindow,
-        GameDetectionWindow,
-        GamePickerWindow
+        GameDetectionWindow
     }
+
+    //sorting: 🔼 🔽
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        private DatabaseContext _db;
+        private DatabaseContext_Main _db;
+        private List<DatabaseContext_Profile> _dbProfiles;
         private Service_JsonParser _jsonParser;
         private Json_Config _config;
-        private NxmHandler _nxmHandler;
         private NamedPipeManager _namedPipeManager;
+        private ProfilesManager _profilesManager;
         private GamePicker_ComboBox _gamePicker;
         private ApplicationPicker_ComboBox _appPicker;
         private Mutex _mutex;
-        private Json_AccountInfo User;
+        private ModManager _modManager;
+        private AccountHandler _accountHandler;
         private bool IsLoggedIn = false;
 
-        ModManager modManager;
+        #region Current State Variables
+        private Game _currGame;
+        private UserProfile _currProfile;
+        private DatabaseContext_Profile _currProfileDb;
+        #endregion
 
-        Game _currGame;
-
-        public MainWindow(Mutex mutex, DatabaseContext db, Service_JsonParser jsonParser, Json_Config config, NamedPipeManager npm)
+        public MainWindow(Mutex mutex, DatabaseContext_Main db, Service_JsonParser jsonParser, 
+            Json_Config config, NamedPipeManager npm, List<DatabaseContext_Profile> profiles, 
+            ProfilesManager profMngr)
         {
             InitializeComponent();
 
@@ -58,38 +67,34 @@ namespace EeveexModManager
             _config = config;
             _db = db;
             _currGame = _db.GetCurrentGame();
+            _dbProfiles = profiles;
+            _currProfileDb = _dbProfiles.FirstOrDefault(x => _currGame.Id == x.GameId);
             _namedPipeManager = npm;
+            _profilesManager = profMngr;
 
-            _nxmHandler = new NxmHandler(config, _jsonParser, AssociationWithNXM_CheckBox, _db);
-            modManager = new ModManager(_db, ModList_TreeView, DownloadsTreeView);
             _namedPipeManager.ChangeMessageReceivedHandler(HandlePipeMessage);
 
-            if(File.Exists("UserCredentials"))
+            _modManager = new ModManager(_currProfileDb, ModList_View, Downloads_View);
+            Task.Run( () =>
             {
-                try
-                {
-                    string raw = Cryptographer.Decrypt(File.ReadAllText("UserCredentials"));
-                    User = JsonConvert.DeserializeObject<Json_AccountInfo>(raw);
+                _accountHandler = new AccountHandler(_config, WhenLogsIn);
+                _modManager.SetAccountHandler(_accountHandler);
+            });
 
-                    AccountLoginWindow.TryToLogIn(User.Username, User.Password, WhenLogsIn);
-                }
-                catch (Exception)
-                {
-                }
-            }
-
-            _gamePicker = new GamePicker_ComboBox(_db.GetCollection<Db_Game>("games").FindAll(), 50, 20, RerunGameDetection, SetGame)
+            _gamePicker = new GamePicker_ComboBox(_db.GetCollection<Db_Game>("games").FindAll(), 75, 25, RerunGameDetection, SetGame)
             {
                 HorizontalAlignment = HorizontalAlignment.Right,
                 Margin = new Thickness(0, 10, 0, 10),
                 VerticalAlignment = VerticalAlignment.Top,
-                Width = 400,
-                Height = 60
+                Width = 430,
+                Height = 80
             };
-            SetGame(_db.GetCollection<Db_Game>("games").FindOne(x => x.IsCurrent).EncapsulateToSource());
+            ProfileSelector.SelectionChanged += ProfileSelector_SelectionChanged;
+            _gamePicker.SelectedIndex = _db.GetCollection<Db_Game>("games").FindAll().ToList().FindIndex(x => x.IsCurrent) + 1;
+
             RightStack.Children.Add(_appPicker);
             RightStack.Children.Add(_gamePicker);
-            AssociationWithNXM_CheckBox.IsChecked = _config.Nxm_Handled;
+
 
             if (!_namedPipeManager.IsRunning)
             {
@@ -102,17 +107,39 @@ namespace EeveexModManager
                    }
                });
             }
+            GC.Collect();
         }
 
+        private void ProfileSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int index = ((ComboBox)sender).SelectedIndex;
+            if(index == 0)
+            {
+
+            }
+            else
+            {
+                _currProfile = _db.GetCollection<Db_UserProfile>("profiles").FindAll()
+                    .Where(x => x.GameId == _currGame.Id).Select(x => x.EncapsulateToSource()).ElementAt(index - 1);
+
+                _currProfileDb = _dbProfiles.ElementAt(index - 1);
+                ChangeProfile();
+            }
+        }
+
+        private void ChangeProfile()
+        {
+            _modManager.ChangeProfile(_currProfileDb);
+
+            Downloads_View.ItemsSource.GetEnumerator().Reset();
+            ModList_View.ItemsSource.GetEnumerator().Reset();
+            GC.Collect();
+        }
 
         ~MainWindow() //removing the symlinks / mod files
         {
             try
             {
-                if (_config.Nxm_Handled != AssociationWithNXM_CheckBox.IsChecked)
-                {
-                    _nxmHandler.AssociationManagement(_config.Nxm_Handled, AssociationWithNXM_CheckBox, _db.GetCollection<Db_Game>("games").FindAll());
-                }
             }
             catch (Exception)
             {
@@ -122,7 +149,8 @@ namespace EeveexModManager
 
         void RerunGameDetection()
         {
-            AvailableGamesWindow gameDetectWindow = new AvailableGamesWindow(_mutex, _db, _jsonParser, _config, _namedPipeManager, true, WindowsEnum.MainWindow);
+            AvailableGamesWindow gameDetectWindow = new AvailableGamesWindow(_mutex, _db, _jsonParser, _config, 
+                _namedPipeManager, _dbProfiles, _profilesManager, true, WindowsEnum.MainWindow);
             gameDetectWindow.Show();
             Close();
         }
@@ -140,8 +168,8 @@ namespace EeveexModManager
         {
             var games = _db.GetCollection<Db_Game>("games").FindAll().Select(x => x.EncapsulateToSource()).ToList();
 
-            (_gamePicker.Items[games.FindIndex(x => x.Id == _currGame.Id)] as GamePicker_Control).GameToCurrent(false);
-            (_gamePicker.Items[games.FindIndex(x => x.Id == game.Id)] as GamePicker_Control).GameToCurrent();
+            (_gamePicker.Items[games.FindIndex(x => x.Id == _currGame.Id) + 1] as GamePicker_Control).GameToCurrent(false);
+            (_gamePicker.Items[games.FindIndex(x => x.Id == game.Id) + 1] as GamePicker_Control).GameToCurrent();
             if(game.Name != _currGame.Name)
             {
                 _currGame.ToggleIsCurrentGame();
@@ -167,48 +195,50 @@ namespace EeveexModManager
             else
                 _appPicker = new ApplicationPicker_ComboBox(AvailableApplications, AddGameApplication);
 
-            ModList_TreeView.Items.Clear();
-
-
-            _db.GetCollection<Db_Mod>("mods").FindAll().Where( x => x.GameId == _currGame.Id).ToList().ForEach(x =>
+            foreach (var item in _db.GetCollection<Db_UserProfile>("profiles")
+                .FindAll().Where(x => x.GameId == _currGame.Id))
             {
-                ModList_TreeView.Items.Add(new Mod_Control(x.EncapsulateToSource(), _db));
-
-            });
+                ProfileSelector.Items.Add(new UserProfile_Control(item, _profilesManager));
+            }
+            ProfileSelector.SelectedIndex = 1;
         }
-        
+
+        #region Login
         private void LogInButton_Click(object sender, RoutedEventArgs e)
         {
-            if(!IsLoggedIn)
+            if (!IsLoggedIn)
             {
-                AccountLoginWindow loginWindow = new AccountLoginWindow(WhenLogsIn);
-                loginWindow.Show();
+                LogInButton.Dispatcher.Invoke(() => _accountHandler.TryToLogIn().GetAwaiter().GetResult());
             }
             else
             {
                 WhenLogsOut();
             }
         }
-
-        private void WhenLogsIn(string CookieSid, Json_AccountInfo user)
+        private void WhenLogsIn(string username)
         {
-            User = user;
-            modManager.UpdateCookieSid(CookieSid);
-            IsLoggedIn = true;
-            LogInButton.Content = "Logout";
-            LoginState_TextBox.Text = $"Logged in, welcome {user.Username}!";
-            LoginState_TextBox.Foreground = Brushes.Green;
+            ModList_View.Dispatcher.Invoke(() =>
+            {
+               IsLoggedIn = true;
+               LogInButton.Content = "Logout";
+               LoginState_TextBox.Text = $"Logged in! Welcome {username}!";
+               LoginState_TextBox.Foreground = Brushes.Green;
+            });
         }
-
         private void WhenLogsOut()
         {
-            modManager.ToggleCanAccessApi();
-            IsLoggedIn = false;
-            LogInButton.Content = "Login";
-            LoginState_TextBox.Text = "Not logged in.";
-            LoginState_TextBox.Foreground = Brushes.Red;
+            ModList_View.Dispatcher.Invoke(() =>
+            {
+                IsLoggedIn = false;
+                LogInButton.Content = "Login";
+                LoginState_TextBox.Text = "Not logged in.";
+                LoginState_TextBox.Foreground = Brushes.Red;
+                if (File.Exists(_config.AppData_Path + "\\token"))
+                    File.Delete(_config.AppData_Path + "\\token");
+            });
         }
-        
+        #endregion
+
         public void HandlePipeMessage(string arg)
         {
             if(arg != string.Empty)
@@ -225,12 +255,14 @@ namespace EeveexModManager
 
                 if (correctedIndex >= 0)
                 {
-
-                    Dispatcher.Invoke((Action)(async () =>
+                    Task.Run(() =>
                     {
-                        _gamePicker.SelectedIndex = correctedIndex;
-                        await modManager.CreateMod(_currGame, nexusUrl);
-                    }), DispatcherPriority.ApplicationIdle);
+                       Dispatcher.Invoke((Action)(async () =>
+                       {
+                           _gamePicker.SelectedIndex = correctedIndex;
+                           await _modManager.CreateMod(_currGame, nexusUrl);
+                       }), DispatcherPriority.ApplicationIdle);
+                    });
                 }
                 else
                 {
@@ -239,42 +271,145 @@ namespace EeveexModManager
             }
 
 
-            //Thread t = new Thread(modManager.CreateMod);
+            //Thread t = new Thread(_modManager.CreateMod);
             //t.SetApartmentState(ApartmentState.STA);
             //t.Start();
-        }
-
-        public TreeView GetModListTree()
-        {
-            return ModList_TreeView;
         }
 
         private void LaunchApplicationButton_Click(object sender, RoutedEventArgs e)
         {
             var Application = (_appPicker.SelectedItem as ApplicationPicker_Control).App;
 
-            var ActivatedMods = _db.GetCollection<Db_Mod>("mods").FindAll()
-                .Where(x => x.GameId == _currGame.Id && x.Installed && x.Active).ToList();
+            var ActivatedMods = _currProfileDb.GetCollection<Db_Mod>("mods").FindAll()
+                .Where(x => x.GameId == _currGame.Id && x.Installed && x.Active).Select( x => x.EncapsulateToSource()).ToList();
 
-            var ActivatedModDirs = ActivatedMods.Select(x => x.ModDirectory).ToList();
-
-            using (StreamWriter x = new StreamWriter($"{_currGame.ProfilesDirectory}\\modlist.txt"))
+            using (StreamWriter x = new StreamWriter($"{_currProfile.ProfileDirectory}\\modlist.txt"))
             {
                 ActivatedMods.ForEach(m =>
                 {
-                    var dd = new DirectoryInfo(m.ModDirectory);
-                    x.WriteLine($"1 {dd.Name}");
+                    x.WriteLine($"1 {m.Name}");
                 });
                 x.Close();
             }
 
-            Application.Launch(_currGame);
+            Application.Launch(_currGame, ActivatedMods);
 
         }
 
-        private void Association_Button_Click(object sender, RoutedEventArgs e)
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            _nxmHandler.AssociationManagement(_config.Nxm_Handled, AssociationWithNXM_CheckBox, _db.GetCollection<Db_Game>("games").FindAll());
+            SettingsWindow window = new SettingsWindow(_config, _db, _jsonParser);
+            window.Show();
         }
+
+        #region Mod List View Event Handlers
+
+        private void ModList_View_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (ModList_View.SelectedItems.Count == 1) //double clicked on only one download
+            {
+                var mControl = ModList_View.SelectedItem as Mod_Control;
+                mControl.AssociatedMod.ToggleIsActive();
+                mControl.UpdateProperties();
+                ModList_View.Items.Refresh();
+                _modManager.UpdateMod(mControl.AssociatedMod);
+            }
+        }
+
+        #region Mod Right Click Menu Events
+
+        private void Mod_OpenInExplorer_Click(object sender, RoutedEventArgs e)
+        {
+            if (ModList_View.SelectedItems.Count == 1)
+            {
+                var control = ModList_View.SelectedItem as Mod_Control;
+
+                using (Process p = Process.Start(new ProcessStartInfo(control.AssociatedMod.ModDirectory)))
+                {
+
+                };
+            }
+        }
+
+        private void Mod_UninstallButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ModList_View.SelectedItems.Count == 1)
+            {
+                var control = ModList_View.SelectedItem as Mod_Control;
+
+                _modManager.RemoveMod(control.AssociatedMod.FileId, ModList_View.SelectedIndex);
+            }
+        }
+        #endregion
+
+        #endregion
+
+        #region Download List View Event Handlers
+
+        private void Downloads_View_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Downloads_View.SelectedItems.Count == 1) //double clicked on only one download
+            {
+                var dlControl = Downloads_View.SelectedItem as ModDownload_Control;
+                if (dlControl.AssociatedDownload.DownloadState == DownloadStates.Finished)
+                    dlControl.InstallMod();
+            }
+        }
+
+        private void Downloads_View_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (Downloads_View.SelectedItems.Count == 1)
+            {
+                var dl = Downloads_View.SelectedItem as ModDownload_Control;
+
+                FrameworkElement fe = e.Source as FrameworkElement;
+                fe.ContextMenu = BuildDownloadContextMenu(dl.AssociatedDownload);
+            }
+
+        }
+
+        private ContextMenu BuildDownloadContextMenu(Download dl)
+        {
+            ContextMenu theMenu = new ContextMenu();
+
+            if(dl.DownloadState == DownloadStates.InProgress || dl.DownloadState == DownloadStates.Paused)
+            {
+                MenuItem mia = new MenuItem()
+                {
+                    Header = dl.DownloadState == DownloadStates.InProgress ? "Pause" : "Resume"
+                };
+                mia.Click += Downloads_View_PauseOrResumeHandler;
+                theMenu.Items.Add(mia);
+            }
+            if(dl.DownloadState == DownloadStates.Canceled || dl.DownloadState == DownloadStates.InProgress)
+            {
+                MenuItem mia = new MenuItem()
+                {
+                    Header = dl.DownloadState == DownloadStates.Canceled ? "Restart" : "Cancel",
+                };
+                mia.Click += Downloads_View_RestartOrCancelHandler;
+                theMenu.Items.Add(mia);
+            }
+            return theMenu.Items.Count > 0 ? theMenu : null;
+        }
+
+        private void Downloads_View_RestartOrCancelHandler(object sender, RoutedEventArgs e)
+        {
+            var dlControl = Downloads_View.SelectedItem as ModDownload_Control;
+            if (dlControl.AssociatedDownload.DownloadState == DownloadStates.InProgress)
+                dlControl.CancelDownload();
+            else if (dlControl.AssociatedDownload.DownloadState == DownloadStates.Canceled)
+                dlControl.RestartDownload();
+        }
+
+        private void Downloads_View_PauseOrResumeHandler(object sender, RoutedEventArgs e)
+        {
+            var dlControl = Downloads_View.SelectedItem as ModDownload_Control;
+            if (dlControl.AssociatedDownload.DownloadState == DownloadStates.InProgress)
+                dlControl.PauseDownload();
+            else if (dlControl.AssociatedDownload.DownloadState == DownloadStates.Paused)
+                dlControl.ResumeDownload();
+        }
+        #endregion
     }
 }

@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 
 namespace EeveexModManager.Interfaces
 {
+    public enum DownloadStates
+    {
+        PreStart,
+        InProgress,
+        Paused,
+        Finished,
+        Canceled
+    }
+
     public interface IDownload
     {
         string ModName { get; }

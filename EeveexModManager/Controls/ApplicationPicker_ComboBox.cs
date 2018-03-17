@@ -20,7 +20,7 @@ namespace EeveexModManager.Controls
             HorizontalAlignment = HorizontalAlignment.Right;
             VerticalAlignment = VerticalAlignment.Bottom;
             Height = 80;
-            Width = 400;
+            Width = 430;
             Init(apps);
             Utility = OnUtility;
 

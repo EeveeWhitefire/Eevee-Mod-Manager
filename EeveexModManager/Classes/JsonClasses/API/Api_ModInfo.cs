@@ -3,20 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using EeveexModManager.Interfaces;
+
+using Newtonsoft.Json;
 
 namespace EeveexModManager.Classes.JsonClasses.API
 {
     public class Api_ModInfo
     {
-        public ulong id { get; set; }
-        public int game_id { get; set; }
         public string name { get; set; }
-        public int category_id { get; set; }
         public string summary { get; set; }
         public string description { get; set; }
+        public int category_id { get; set; }
         public string version { get; set; }
         public string author { get; set; }
-        public string mod_page_uri { get; set; }
+
+        [JsonProperty("contains_adult_content?")]
+        public bool contains_adult_content { get; set; }
+        public string uploaded_by { get; set; }
+        public string picture_url { get; set; }
     }
 }

@@ -21,6 +21,8 @@ using EeveexModManager.Classes.JsonClasses;
 using EeveexModManager.Controls;
 using EeveexModManager.Services;
 
+
+
 namespace EeveexModManager.Windows
 {
     /// <summary>
@@ -28,24 +30,41 @@ namespace EeveexModManager.Windows
     /// </summary>
     public partial class AvailableGamesWindow : Window
     {
-        private List<GameSearcher> gameSeachers;
-        private List<Game> games;
-        private DatabaseContext _db;
+        private List<GameSearcher> _gameSeachers;
+        private List<Game> _games;
+        private List<DatabaseContext_Profile> _dbProfiles;
+        private DatabaseContext_Main _db;
+        private ProfilesManager _profilesManager;
         private Service_JsonParser _jsonParser;
         private Json_Config _config;
         private NamedPipeManager _namedPipeManager;
         private Mutex _mutex;
+        private GamePicker_ComboBox _gamePicker;
+
+        private int GamesConfigured = 0;
 
         private WindowsEnum GetBackTo = WindowsEnum.GameDetectionWindow;
 
-        public AvailableGamesWindow(Mutex m, DatabaseContext db, Service_JsonParser jsp, Json_Config cnfg,
-            NamedPipeManager npm, bool getBackButton = false, WindowsEnum backTo = WindowsEnum.MainWindow)
+        public AvailableGamesWindow(Mutex m, DatabaseContext_Main db, Service_JsonParser jsp, Json_Config cnfg,
+            NamedPipeManager npm, List<DatabaseContext_Profile> profiles, ProfilesManager profMng, 
+            bool getBackButton = false, WindowsEnum backTo = WindowsEnum.MainWindow)
         {
             _mutex = m;
             _db = db;
             _jsonParser = jsp;
             _config = cnfg;
             _namedPipeManager = npm;
+            _dbProfiles = profiles;
+            _profilesManager = profMng;
+            _gamePicker = new GamePicker_ComboBox(80, 25)
+            {
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Margin = new Thickness(20, 10, 0, 0),
+                VerticalAlignment = VerticalAlignment.Top,
+                Width = 450,
+                Height = 80,
+                SelectedIndex = 0
+            };
 
             InitializeComponent();
             StartSearches();
@@ -55,6 +74,7 @@ namespace EeveexModManager.Windows
                 BackToMain_Button.Visibility = Visibility.Visible;
                 GetBackTo = backTo;
             }
+
         }
 
         private void GetBackToMainWindow_Click(object sender, RoutedEventArgs e)
@@ -62,12 +82,9 @@ namespace EeveexModManager.Windows
             switch (GetBackTo)
             {
                 case WindowsEnum.MainWindow:
-                    MainWindow mainWindow = new MainWindow(_mutex, _db, _jsonParser, _config, _namedPipeManager);
+                    MainWindow mainWindow = new MainWindow(_mutex, _db, _jsonParser, _config, 
+                        _namedPipeManager, _dbProfiles, _profilesManager);
                     mainWindow.Show();
-                    break;
-                case WindowsEnum.GamePickerWindow:
-                    GamePickerWindow pickingWindow = new GamePickerWindow(_mutex, _db, _jsonParser, _config, _namedPipeManager);
-                    pickingWindow.Show();
                     break;
             }
             Close();
@@ -82,8 +99,8 @@ namespace EeveexModManager.Windows
                 {"TESV : Skyrim Special Edition", "TESV : Skyrim", "Fallout 4", "Fallout : New Vegas",
                      "Fallout 3", "Dragon Age Origins", "Dragon Age II", "The Witcher 3 : Wild Hunt"};
 
-            gameSeachers = new List<GameSearcher>();
-            games = new List<Game>();
+            _gameSeachers = new List<GameSearcher>();
+            _games = new List<Game>();
 
             foreach (StackPanel item in GameSearchers_StackPanel.Children)
             {
@@ -100,10 +117,10 @@ namespace EeveexModManager.Windows
                         VerticalAlignment = VerticalAlignment.Top
                     };
 
-                    GameDetector_Control currDetectorControl = new GameDetector_Control(x);
+                    GameDetector_Control currDetectorControl = new GameDetector_Control(x, _gamePicker, GamePicker_StkPanel);
 
-                    gameSeachers.Add(new GameSearcher(x, currDetectorControl));
-                    currDetectorControl.Searcher = gameSeachers.LastOrDefault();
+                    _gameSeachers.Add(new GameSearcher(x, currDetectorControl));
+                    currDetectorControl.Searcher = _gameSeachers.LastOrDefault();
                     currDetectorControl.Dispatcher.BeginInvoke((Action)( () => currDetectorControl.Searcher.StartSearch()), DispatcherPriority.Background);
 
                     border.Child = currDetectorControl;
@@ -117,78 +134,101 @@ namespace EeveexModManager.Windows
                 }
             }
         }
-
-        public IList<Game> GetAvailableGames()
-        {
-            return games;
-        }
-
         private void RestartScansButton_Click(object sender, RoutedEventArgs e)
         {
-            if(gameSeachers.Where( x => x.Search).Count() > 0)
+            if(_gameSeachers.Where( x => x.Search).Count() > 0)
             {
                 MessageBox.Show("Error! There are still scans commencing! Please wait till each one of them has ended or click on the \"Ignore All\" button!");
             }
             else
             {
-                gameSeachers.ForEach(x =>
+                _gameSeachers.ForEach(x =>
                {
                    Confirm_Button.Dispatcher.BeginInvoke((Action)(() => x.RestartSearch()), DispatcherPriority.Background);
                });
             }
         }
 
-        void InitGames(List<Game> games)
+        void InitGames(List<Game> _games)
         {
-            games.ForEach(x =>
+            _games.ForEach(x =>
             {
-                if (!Directory.Exists(x.ModsDirectory))
-                    Directory.CreateDirectory(x.ModsDirectory);
-                if (!Directory.Exists(x.DownloadsDirectory))
-                    Directory.CreateDirectory(x.DownloadsDirectory);
+                GameConfigurationWindow win = new GameConfigurationWindow(x, ConfiguartionPart2);
+                win.Show();
             });
         }
 
         private void ConfirmGamesButton_Click(object sender, RoutedEventArgs e)
         {
-            if (gameSeachers.Where( x => x.Confirmed).Count() > 0)
+            if (_gameSeachers.Where( x => x.Confirmed).Count() > 0)
             {
-                games = gameSeachers.Where(x => x.Confirmed)
-                    .Select(x => Game.CreateByName(x.Name, x.InstallationPath, x.RegistryName)).ToList();
-                games.Last().ToggleIsCurrentGame(); //first game is also the current one :)
+                _games = _gameSeachers.Where(x => x.Confirmed)
+                    .Select(x => x.AssociatedGame).ToList();
 
-                InitGames(games);
+                _games.ElementAt(_gamePicker.SelectedIndex).ToggleIsCurrentGame();
 
-                _db.GetCollection<Db_Game>("games").Delete(x => true);
-
-                _db.GetCollection<Db_Game>("games").InsertBulk(games.Select( x => x.EncapsulateToDb()));
-
-                var gameApps = games.Select(x => x.AutoDetectApplications()).SelectMany( x => x).Select(y => y.EncapsulateToDb());
-
-                _db.GetCollection<Db_GameApplication>("game_apps").InsertBulk(gameApps);
-
-                _config.State = StatesOfConfiguartion.OnPickingCurrentGame;
-                _jsonParser.UpdateJson(_config);
-
-                GamePickerWindow gamePickerWindow = new GamePickerWindow(_mutex, _db, _jsonParser, _config, _namedPipeManager);
-                gamePickerWindow.Show();
-
-                Close();
+                InitGames(_games);
             }
             else
             {
-                MessageBox.Show("Error! No games were found! Please click on the \"Restart Scans\" button to retry!");
+                MessageBox.Show("Error! No _games were found! Please click on the \"Restart Scans\" button to retry!");
+            }
+        }
+
+        private void ConfiguartionPart2()
+        {
+            GamesConfigured++;
+            if(GamesConfigured == _games.Count)
+            {
+                _db.GetCollection<Db_Game>("games").Delete(x => true);
+                _db.GetCollection<Db_GameApplication>("game_apps").Delete(x => true);
+                _db.GetCollection<Db_UserProfile>("profiles").Delete(x => true);
+
+                _db.GetCollection<Db_Game>("games").InsertBulk(_games.Select(x => x.EncapsulateToDb()));
+
+                var gameApps = _games.Select(x => x.AutoDetectApplications()).SelectMany(x => x).Select(y => y.EncapsulateToDb());
+
+                _db.GetCollection<Db_GameApplication>("game_apps").InsertBulk(gameApps);
+
+                foreach (var item in _games)
+                {
+                    _profilesManager.AddProfile("master", item);
+                    _dbProfiles.Add(new DatabaseContext_Profile(item.ProfilesDirectory + "\\master", item.Id));
+                }
+
+                Game currGame = _db.GetCollection<Db_Game>("games").FindOne(x => x.IsCurrent).EncapsulateToSource();
+                Game selGame = _db.GetCollection<Db_Game>("games").FindAll().ElementAt(_gamePicker.SelectedIndex).EncapsulateToSource();
+
+                if (selGame.Id != currGame.Id)
+                {
+                    selGame.ToggleIsCurrentGame();
+                    currGame.ToggleIsCurrentGame();
+                }
+
+                _db.GetCollection<Db_Game>("games").Update(selGame.EncapsulateToDb());
+                _db.GetCollection<Db_Game>("games").Update(currGame.EncapsulateToDb());
+
+
+                _config.State = StatesOfConfiguartion.Ready;
+                _config.Installation_Path = Directory.GetCurrentDirectory();
+                _jsonParser.UpdateJson(_config);
+
+                MainWindow window = new MainWindow(_mutex, _db, _jsonParser,
+                    _config, _namedPipeManager, _dbProfiles, _profilesManager);
+                window.Show();
+
+                Close();
             }
         }
 
         private void IgnoreAllModsButton_Click(object sender, RoutedEventArgs e)
         {
-            gameSeachers.ForEach(x => x.GuiControl.IgnoreMod());
+            _gameSeachers.ForEach(x => x.GuiControl.IgnoreMod());
         }
 
         private void ConfirmAllGamesButton_Click(object sender, RoutedEventArgs e)
         {
-            gameSeachers.Where(x => x.Exists).ToList().ForEach( x =>
+            _gameSeachers.Where(x => x.Exists).ToList().ForEach( x =>
             {
                 x.GuiControl.ConfirmGame();
             });

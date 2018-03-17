@@ -10,7 +10,6 @@ using System.Windows.Media.Imaging;
 
 using EeveexModManager.Classes;
 using EeveexModManager.Interfaces;
-using EeveexModManager.Define;
 using System.Windows.Media;
 
 namespace EeveexModManager.Controls
@@ -24,16 +23,20 @@ namespace EeveexModManager.Controls
         public ConfirmGame_Button AuthorizeButton { get; protected set; }
         public ShapedButton<Rectangle> CancelButton { get; protected set; }
         public TextBox ProgressBar { get; protected set; }
+        public StackPanel PickerStackPanel { get; protected set; }
+        public GamePicker_ComboBox GamePicker { get; protected set; }
 
         public StackPanel UpperPanel { get; protected set; }
         public StackPanel ButtonsPanel { get; protected set; }
 
-        public GameDetector_Control(string gameN) : base()
+        public GameDetector_Control(string gameN, GamePicker_ComboBox gPicker, StackPanel stkPanel) : base()
         {
             HorizontalAlignment = HorizontalAlignment.Left;
             VerticalAlignment = VerticalAlignment.Top;
             Orientation = Orientation.Horizontal;
             GameName = gameN;
+            PickerStackPanel = stkPanel;
+            GamePicker = gPicker;
 
             InitializeGui();
         }
@@ -117,7 +120,6 @@ namespace EeveexModManager.Controls
             if (Searcher.Search || Searcher.Exists)
             {
                 Searcher.Search = false;
-                Searcher.Confirmed = false;
 
                 CancelButton.State_ToDisabled();
                 AuthorizeButton.State_ToDisabled();
@@ -171,7 +173,22 @@ namespace EeveexModManager.Controls
                 VerticalAlignment = VerticalAlignment.Center,
             });
 
-            Searcher.Confirmed = true;
+
+            if (GamePicker.Items.Count == 0)
+            {
+                PickerStackPanel.Children.Add(new TextBlock()
+                {
+                    Text = "Pick a Game:",
+                    FontSize = 25,
+                    Width = 160,
+                    Margin = new Thickness(0,0,0,10),
+                    HorizontalAlignment = HorizontalAlignment.Left
+                });
+                GamePicker.Margin = new Thickness(0);
+                PickerStackPanel.Children.Add(GamePicker);
+            }
+            Searcher.ConfirmGame();
+            GamePicker.AddGame(Searcher.AssociatedGame);
         }
 
         private void ConfirmGameButton_Click(object sender, RoutedEventArgs e)

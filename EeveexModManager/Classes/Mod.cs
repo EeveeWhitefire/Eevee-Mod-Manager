@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using EeveexModManager.Interfaces;
 using EeveexModManager.Classes.DatabaseClasses;
-using EeveexModManager.Define;
+using System.IO;
 
 namespace EeveexModManager.Classes
 {
@@ -25,13 +25,16 @@ namespace EeveexModManager.Classes
         public bool IsOnline { get; protected set; } = false;
         public string Author { get; protected set; } = "Unknown";
         public string FullSourceUri { get; protected set; } = "Unknown";
+        public int Priority { get; set; }
 
         public GameListEnum GameId { get;}
         public ModCategories ModCategory { get;}
 
         public string FileId { get; set; }
 
-        public Mod(string n, string fileN, bool active, bool installed, string source, string modDir, string dlDir, GameListEnum gameId, ModCategories category, string fileId, 
+        public List<ModFile> FileTree;
+
+        public Mod(string n, string fileN, bool active, bool installed, string source, string modDir, string dlDir, GameListEnum gameId, ModCategories category, string fileId, int priority,
             string version = Defined.DEFAULTMODVERSION, string id = Defined.DEFAULTMODID, string author = Defined.DEFAULTMODAUTHOR, string srcUri = Defined.DEFAULTSOURCEURI,
             bool isOn = false)
         {
@@ -50,7 +53,16 @@ namespace EeveexModManager.Classes
             Id = id;
             Author = author;
             FullSourceUri = srcUri;
+            Priority = priority;
+
+            FileTree = new List<ModFile>();
+            Assistant.GetAllFilesInDir(ModDirectory).ForEach(x =>
+            {
+               FileTree.Add(new ModFile(this, x));
+            });
         }
+
+
 
         public void ToggleIsActive()
         {
@@ -74,7 +86,8 @@ namespace EeveexModManager.Classes
                 ModFileName = ModFileName,
                 Id = Id,
                 Author = Author,
-                FullSourceUri = FullSourceUri
+                FullSourceUri = FullSourceUri,
+                Priority = Priority
             };
         }
     }

@@ -39,8 +39,12 @@ namespace EeveexModManager
         string appGuid = "c0a76b5a-12ab-45c5-b9d9-d693faa6e7b9";
         private Service_JsonParser _jsonParser;
         private Json_Config _config;
-        private DatabaseContext _db;
+        private DatabaseContext_Main _db;
+        private List<DatabaseContext_Profile> _dbProfiles;
         private NamedPipeManager _namedPipeManager;
+        private ProfilesManager _profilesManager;
+
+        private string[] RequiredDirectories;
 
         Mutex mutex;
 
@@ -61,25 +65,12 @@ namespace EeveexModManager
             {
             }
         }
-
-        void Init()
-        {
-            foreach (var game in _db.GetCollection<Db_Game>("games").FindAll())
-            {
-                if (!Directory.Exists(game.ModsDirectory))
-                    Directory.CreateDirectory(game.ModsDirectory);
-                if (!Directory.Exists(game.DownloadsDirectory))
-                    Directory.CreateDirectory(game.DownloadsDirectory);
-                if (!Directory.Exists(game.ProfilesDirectory))
-                    Directory.CreateDirectory(game.ProfilesDirectory);
-            }
-        }
-
-
+        
         [STAThread]
         void App_Startup(object sender, StartupEventArgs e)
         {
             NexusUrl modArg = null;
+            _dbProfiles = new List<DatabaseContext_Profile>();
             bool isMainProcess = false;
 
             mutex = new Mutex(false, "Global\\" + appGuid);
@@ -155,27 +146,44 @@ namespace EeveexModManager
                         _jsonParser.UpdateJson(_config);
                     }
                 }
+                RequiredDirectories = new string[] { _config.AppData_Path };
+                foreach (var item in RequiredDirectories)
+                {
+                    if (!Directory.Exists(item))
+                        Directory.CreateDirectory(item);
+                }
 
+                _db = new DatabaseContext_Main(_config);// Strong Type Class
+                foreach (var game in _db.GetCollection<Db_Game>("games").FindAll())
+                {
+                    if (!Directory.Exists(game.ModsDirectory))
+                        Directory.CreateDirectory(game.ModsDirectory);
+                    if (!Directory.Exists(game.DownloadsDirectory))
+                        Directory.CreateDirectory(game.DownloadsDirectory);
+                    if (!Directory.Exists(game.ProfilesDirectory))
+                        Directory.CreateDirectory(game.ProfilesDirectory);
+                }
+                _profilesManager = new ProfilesManager(_db, _config);
 
-                _db = new DatabaseContext(_config);// Strong Type Class
-
-                Init();
+                foreach (var item in _db.GetCollection<Db_UserProfile>("profiles").FindAll())
+                {
+                    _dbProfiles.Add(new DatabaseContext_Profile(item.ProfileDirectory, item.GameId));
+                }
 
                 if (_config.State == StatesOfConfiguartion.FirstTime || _db.GetCollection<Db_Game>("games").FindAll().Count() < 1)
                 {
-                    _db.FirstTimeSetup(mutex, _jsonParser, _config, _namedPipeManager);
-                    return;
-                }
-                else if(_config.State == StatesOfConfiguartion.OnPickingCurrentGame || _db.GetCollection<Db_Game>("games").Find(x => x.IsCurrent).Count() < 1)
-                {
-                    GamePickerWindow window = new GamePickerWindow(mutex, _db, _jsonParser, _config, _namedPipeManager);
-                    window.Show();
+                    _db.FirstTimeSetup(mutex, _jsonParser, _config, _namedPipeManager, _dbProfiles, _profilesManager);
+                    foreach (var item in _dbProfiles)
+                    {
+                        item.FirstTimeSetup();
+                    }
                     return;
                 }
                 else if(_config.State == StatesOfConfiguartion.Ready)
                 {
                     // Create main application window, starting minimized if specified
-                    MainWindow mainWindow = new MainWindow(mutex, _db, _jsonParser, _config, _namedPipeManager);
+                    MainWindow mainWindow = new MainWindow(mutex, _db, _jsonParser, _config, 
+                        _namedPipeManager, _dbProfiles, _profilesManager);
                     if (startMinimized)
                     {
                         mainWindow.WindowState = WindowState.Minimized;

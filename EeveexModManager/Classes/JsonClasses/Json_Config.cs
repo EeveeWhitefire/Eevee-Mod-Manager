@@ -14,5 +14,6 @@ namespace EeveexModManager.Classes.JsonClasses
         public StatesOfConfiguartion State { get; set; }  = StatesOfConfiguartion.FirstTime;
         public bool Nxm_Handled { get; set; } = false;
         public string Installation_Path { get; set; } = Directory.GetCurrentDirectory();
+        public string AppData_Path { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\EVX";
     }
 }

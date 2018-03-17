@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 
 using EeveexModManager.Classes;
 using EeveexModManager.Classes.DatabaseClasses;
+using System.IO;
 
 namespace EeveexModManager.Windows
 {
@@ -23,11 +24,10 @@ namespace EeveexModManager.Windows
     /// </summary>
     public partial class GameApplicationAdderWindow : Window
     {
-        private DatabaseContext _db;
+        private DatabaseContext_Main _db;
         private Game currGame;
         private Action<GameApplication> OnAppAdded;
-        string exePath;
-        public GameApplicationAdderWindow(DatabaseContext db, Game game, Action<GameApplication> onappadded)
+        public GameApplicationAdderWindow(DatabaseContext_Main db, Game game, Action<GameApplication> onappadded)
         {
             InitializeComponent();
             _db = db;
@@ -44,23 +44,29 @@ namespace EeveexModManager.Windows
 
             if(dialog.ShowDialog().Value == true)
             {
-                exePath = dialog.FileName;
-                ApplicationNameTBox.Text = dialog.SafeFileName;
+                ExecutablePath_TB.Text = dialog.FileName;
+                ApplicationName_TB.Text = dialog.SafeFileName;
                 DoneButton.IsEnabled = true;
             }
         }
 
         private void DoneButton_Click(object sender, RoutedEventArgs e)
         {
-            if(ApplicationNameTBox.Text != string.Empty)
+            if(ApplicationName_TB.Text != string.Empty)
             {
-                GameApplication application = new GameApplication(ApplicationNameTBox.Text + ".exe", exePath, currGame.Id);
+                if (File.Exists(ExecutablePath_TB.Text))
+                {
+                    GameApplication application = new GameApplication(ApplicationName_TB.Text, ExecutablePath_TB.Text, currGame.Id);
 
-                _db.GetCollection<Db_GameApplication>("game_apps").Insert(application.EncapsulateToDb());
-                OnAppAdded(application);
-                Close();
-
+                    _db.GetCollection<Db_GameApplication>("game_apps").Insert(application.EncapsulateToDb());
+                    OnAppAdded(application);
+                    Close();
+                }
+                else
+                    MessageBox.Show($"Error! File \"{ExecutablePath_TB.Text}\" not found!");
             }
+            else
+                MessageBox.Show($"Error! Application Name cannot be empty!");
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

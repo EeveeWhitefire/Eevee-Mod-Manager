@@ -21,6 +21,10 @@ namespace EeveexModManager.Classes
         public string Name { get; }
         public string ExecutablePath { get;}
         public GameListEnum AssociatedGameId { get; }
+
+        private List<BackupFile> _backups;
+        private List<string> _directoriesToDelete;
+        private List<string> _linksToDelete;
         
         public Process process;
 
@@ -29,11 +33,9 @@ namespace EeveexModManager.Classes
             Name = n;
             ExecutablePath = exe;
             AssociatedGameId = game;
-
-            process = new Process
-            {
-                StartInfo = new ProcessStartInfo(ExecutablePath)
-            };
+            _backups = new List<BackupFile>();
+            _directoriesToDelete = new List<string>();
+            _linksToDelete = new List<string>();
         }
 
 
@@ -58,6 +60,12 @@ namespace EeveexModManager.Classes
                 OnBackup = bk;
             }
 
+            public void Backup()
+            {
+                File.Copy(Source, OnBackup);
+                File.Delete(Source);
+            }
+
             public void MoveBack()
             {
                 File.Copy(OnBackup, Source);
@@ -65,41 +73,60 @@ namespace EeveexModManager.Classes
             }
         }
 
-        List<string> GetAllFilesInDir(string d)
+        public void Launch(Game game, List<Mod> mods)
         {
-            List<string> files = new List<string>();
+            var filesInData = Assistant.GetAllFilesInDir(game.DataPath);
 
-            ProcessDirectory(ref files, d);
+            var intersecting = filesInData.Select(x => x.Replace(game.DataPath + "\\", string.Empty))
+                .Intersect(mods.SelectMany(x => x.FileTree.Select(y => y.RelativePath)));
 
-            return files;
-        }
-        void ProcessDirectory(ref List<string> files, string p)
-        {
-            files.AddRange(Directory.GetFiles(p));
-
-            var dirs = Directory.GetDirectories(p);
-            foreach (var item in dirs)
+            foreach (var inter in intersecting)
             {
-                ProcessDirectory(ref files, item);
+                _backups.Add(new BackupFile(game.DataPath + "\\" + inter, game.BackupsDirectory + "\\" + inter));
             }
-        }
 
-        public void Launch(Game game)
-        {
-            string mods_full = Directory.GetCurrentDirectory() + '\\' + game.ModsDirectory;
-            string prof_full = Directory.GetCurrentDirectory() + '\\' + game.ProfilesDirectory;
-            string vfs_full = Directory.GetCurrentDirectory() + "\\launchvfs.py";
+            _backups.ForEach(x => x.Backup());
 
-            ProcessStartInfo start = new ProcessStartInfo
+            mods.SelectMany( x => x.FileTree).ToList().ForEach(x =>
             {
-                FileName = @"I:\Python37\python.exe",
-                Arguments = $"\"{vfs_full}\" \"{ExecutablePath}\" \"{mods_full}\" \"{prof_full}\" \"{game.DataPath}\"",
-                UseShellExecute = false,
-                RedirectStandardOutput = true
-            };
+                string linkTo = game.DataPath + "\\" + x.RelativePath;
+                string linkFrom = x.FullPath;
 
-            using (Process process = Process.Start(start))
+                string newDirectory = game.DataPath + "\\" + x.RelativeDirectory;
+
+                if (!Directory.Exists(newDirectory))
+                {
+                    Directory.CreateDirectory(newDirectory);
+                    _directoriesToDelete.Add(newDirectory);
+                }
+
+                _linksToDelete.Add(linkTo);
+
+                CreateHardLink(linkTo, linkFrom, IntPtr.Zero);
+            });
+            
+
+            using (Process process = Process.Start(new ProcessStartInfo(ExecutablePath)))
             {
+                process.WaitForExit();
+
+                _linksToDelete.ForEach(x =>
+                {
+                   File.Delete(x);
+                });
+                _linksToDelete.Clear();
+
+                _directoriesToDelete.ForEach(x =>
+                {
+                   Directory.Delete(x);
+                });
+                _directoriesToDelete.Clear();
+
+                _backups.ForEach(x =>
+                {
+                   x.MoveBack();
+                });
+                _backups.Clear();
             }
         }
 

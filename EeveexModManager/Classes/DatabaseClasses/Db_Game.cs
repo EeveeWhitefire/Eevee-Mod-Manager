@@ -25,6 +25,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
         public string ModsDirectory { get; set; }
         public string DownloadsDirectory { get; set; }
         public string ProfilesDirectory { get; set; }
+        public string BackupsDirectory { get; set; }
 
         public GameListEnum Id { get; set; }
 

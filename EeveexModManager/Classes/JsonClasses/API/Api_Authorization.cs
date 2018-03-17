@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace EeveexModManager.Classes.JsonClasses.API
 {
-    public class Api_ModDownloadInfo
+    class Api_Authorization
     {
-        public string URI { get; set; }
-        public string name { get; set; }
-        public string short_name { get; set; }
+        public string appid { get; set; }
+        public string id { get; set; }
     }
 }

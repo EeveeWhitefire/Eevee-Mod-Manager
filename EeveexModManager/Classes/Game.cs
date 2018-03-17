@@ -25,7 +25,8 @@ namespace EeveexModManager.Classes
         public string Name_Registry { get; protected set; }
         public string ModsDirectory { get; protected set; }
         public string DownloadsDirectory { get; protected set; }
-        public string ProfilesDirectory { get; }
+        public string ProfilesDirectory { get; protected set; }
+        public string BackupsDirectory { get; protected set; }
 
         public GameListEnum Id { get; }
         public bool IsCurrent { get; protected set; } = false;
@@ -234,9 +235,10 @@ namespace EeveexModManager.Classes
             Id = id;
             Name_Registry = nReg;
             Name = n;
-            ModsDirectory = @"Mods\" + Name.Replace(':', '-');
-            DownloadsDirectory = @"Downloads\" + Name.Replace(':', '-');
-            ProfilesDirectory = @"Profiles\" + Name.Replace(':', '-');
+            ModsDirectory = InstallationPath[0] + ":\\EVX\\Mods\\" + id.ToString();
+            DownloadsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\EVX\\Downloads\\" + id.ToString();
+            ProfilesDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\EVX\\Profiles\\" + id.ToString();
+            BackupsDirectory = InstallationPath[0] + ":\\EVX\\Backups\\" + id.ToString();
         }
         /// <summary>
         /// Full Constructor
@@ -255,6 +257,14 @@ namespace EeveexModManager.Classes
             IsCurrent = isCurr;
         }
 
+        public void SetDirectories(string prof, string mods, string dls, string bak)
+        {
+            ProfilesDirectory = prof;
+            ModsDirectory = mods;
+            DownloadsDirectory = dls;
+            BackupsDirectory = bak;
+        }
+
         public virtual Db_Game EncapsulateToDb()
         {
             return new Db_Game()
@@ -270,7 +280,8 @@ namespace EeveexModManager.Classes
                 Name_Registry = Name_Registry,
                 ModsDirectory = ModsDirectory,
                 DownloadsDirectory = DownloadsDirectory,
-                ProfilesDirectory = ProfilesDirectory
+                ProfilesDirectory = ProfilesDirectory,
+                BackupsDirectory = BackupsDirectory
             };
         }
     }

@@ -178,6 +178,7 @@
     </Reference>
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -196,10 +197,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\AccountHandler.cs" />
     <Compile Include="Classes\Cryptographer.cs" />
+    <Compile Include="Classes\DatabaseClasses\DatabaseContext_Profile.cs" />
     <Compile Include="Classes\DatabaseClasses\Db_GameApplication.cs" />
     <Compile Include="Classes\DatabaseClasses\Db_Mod.cs" />
     <Compile Include="Classes\DatabaseClasses\Db_Game.cs" />
+    <Compile Include="Classes\DatabaseClasses\Db_UserProfile.cs" />
     <Compile Include="Classes\Download.cs" />
     <Compile Include="Classes\DownloadManager.cs" />
     <Compile Include="Classes\Game.cs" />
@@ -207,19 +211,24 @@
     <Compile Include="Classes\GameSearcher.cs" />
     <Compile Include="Classes\IconExtractor.cs" />
     <Compile Include="Classes\IconUtil.cs" />
+    <Compile Include="Classes\JsonClasses\API\Api_Authorization.cs" />
     <Compile Include="Classes\JsonClasses\API\Api_ModDownloadInfo.cs" />
     <Compile Include="Classes\JsonClasses\API\Api_ModFileInfo.cs" />
     <Compile Include="Classes\JsonClasses\API\Api_ModInfo.cs" />
+    <Compile Include="Classes\JsonClasses\API\Api_UserInfo.cs" />
     <Compile Include="Classes\JsonClasses\Json_AccountInfo.cs" />
     <Compile Include="Classes\JsonClasses\Json_Config.cs" />
     <Compile Include="Classes\Mod.cs" />
     <Compile Include="Classes\ModArchiveFile.cs" />
+    <Compile Include="Classes\ModFile.cs" />
     <Compile Include="Classes\ModManager.cs" />
     <Compile Include="Classes\NamedPipeManager.cs" />
     <Compile Include="Classes\NativeMethods.cs" />
     <Compile Include="Classes\NxmHandler.cs" />
     <Compile Include="Classes\PipeStreamString_In.cs" />
     <Compile Include="Classes\PipeStreamString_Out.cs" />
+    <Compile Include="Classes\ProfilesManager.cs" />
+    <Compile Include="Classes\UserProfile.cs" />
     <Compile Include="Controls\ApplicationPicker_ComboBox.cs" />
     <Compile Include="Controls\ApplicationPicker_Control.cs" />
     <Compile Include="Controls\CircularButton.cs" />
@@ -231,6 +240,7 @@
     <Compile Include="Controls\Mod_Control.cs" />
     <Compile Include="Controls\ShapedButton.cs" />
     <Compile Include="Controls\SquareButton.cs" />
+    <Compile Include="Controls\UserProfile_Control.cs" />
     <Compile Include="Defined.cs" />
     <Compile Include="Interfaces\IDownload.cs" />
     <Compile Include="Interfaces\IGame.cs" />
@@ -238,19 +248,20 @@
     <Compile Include="Interfaces\IGameSearcher.cs" />
     <Compile Include="Interfaces\IMod.cs" />
     <Compile Include="Interfaces\INamedPipe.cs" />
+    <Compile Include="Interfaces\IUserProfile.cs" />
     <Compile Include="Nexus\NexusUrl.cs" />
     <Compile Include="Services\Service_JsonParser.cs" />
-    <Compile Include="Windows\AccountLoginWindow.xaml.cs">
-      <DependentUpon>AccountLoginWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Windows\AvailableGamesWindow.xaml.cs">
       <DependentUpon>AvailableGamesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\GameApplicationAdderWindow.xaml.cs">
       <DependentUpon>GameApplicationAdderWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\GamePickerWindow.xaml.cs">
-      <DependentUpon>GamePickerWindow.xaml</DependentUpon>
+    <Compile Include="Windows\GameConfigurationWindow.xaml.cs">
+      <DependentUpon>GameConfigurationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -260,15 +271,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Classes\DatabaseClasses\DatabaseContext.cs" />
+    <Compile Include="Classes\DatabaseClasses\DatabaseContext_Main.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Windows\AccountLoginWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Windows\AvailableGamesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -277,7 +284,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\GamePickerWindow.xaml">
+    <Page Include="Windows\GameConfigurationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -374,9 +385,6 @@
     <Content Include="7z.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="launchvfs.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Resource Include="Resources\Icon - The Witcher 3 Wild Hunt.png" />
     <Resource Include="Resources\Icon - Dragon Age Origins.png" />
   </ItemGroup>
@@ -386,7 +394,7 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>mkdir "DLLs" "Downloads" "Profiles" "Mods" "Data"
+    <PostBuildEvent>mkdir "DLLs"
 for /r "$(TargetDir)" %25%25x in (*.dll) do move "%25%25x" "$(TargetDir)DLLs"
 for /r "$(TargetDir)" %25%25x in (*.xml) do move "%25%25x" "$(TargetDir)DLLs"
 mt.exe -manifest "App.manifest" -outputresource:"$(TargetPath)";#1

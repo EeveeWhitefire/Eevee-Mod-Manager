@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
@@ -27,94 +30,110 @@ using EeveexModManager.Controls;
 using System.Security.Principal;
 using System.Security.AccessControl;
 using System.Threading;
-using System.Windows.Threading;
 
 namespace EeveexModManager.Classes
 {
     public class ModManager
     {
-        private DatabaseContext _db;
+        private DatabaseContext_Profile _db;
         private HttpClient httpClient;
 
-        private TreeView Mods_TreeView { get; }
-        private TreeView Downloads_TreeView { get; }
-
-        public string CookieSid { get; protected set; } = null;
-        public bool CanAccessApi { get; protected set; } = false;
+        private ListView Mods_View { get; }
+        private ListView Downloads_View { get; }
+        public List<Mod_Control> ModControls { get; protected set; }
+        private AccountHandler _accountHandler;
 
         public DownloadManager DownloadsManager { get; protected set; }
 
-        public ModManager(DatabaseContext db)
+        public ModManager(DatabaseContext_Profile db)
         {
             httpClient = new HttpClient();
             _db = db;
         }
 
-        public ModManager(DatabaseContext db, TreeView modsTreeView, TreeView downloadsTreeView) : this(db)
+
+        public ModManager(DatabaseContext_Profile db, ListView modsTreeView, ListView downloadsTreeView) : 
+            this(db)
         {
             httpClient = new HttpClient();
             DownloadsManager = new DownloadManager(downloadsTreeView, AddModToGUI);
 
-            Downloads_TreeView = downloadsTreeView;
-            Mods_TreeView = modsTreeView;
+
+            Downloads_View = downloadsTreeView;
+            Mods_View = modsTreeView;
+            ModControls = new List<Mod_Control>();
+            Mods_View.ItemsSource = ModControls;
         }
 
-        public void UpdateCookieSid(string newCookieSid)
+        public void UpdateMod(Mod m)
         {
-            CookieSid = newCookieSid;
-            ToggleCanAccessApi();
+            _db.GetCollection<Db_Mod>("mods").Update(m.EncapsulateToDb());
         }
 
-        public void ToggleCanAccessApi()
+        public void RemoveMod(string fileId, int index)
         {
-            CanAccessApi = !CanAccessApi;
+            _db.GetCollection<Db_Mod>("mods").Delete(x => x.FileId == fileId);
+            ModControls.RemoveAt(index);
+            Mods_View.Items.Refresh();
+        }
+
+        public void ChangeProfile(DatabaseContext_Profile db)
+        {
+            _db = db;
+            ModControls.Clear();
+            _db.GetCollection<Db_Mod>("mods").FindAll().ToList().ForEach(x =>
+            {
+                ModControls.Add(new Mod_Control(x.EncapsulateToSource(), _db));
+            });
+        }
+        public void SetAccountHandler(AccountHandler ah)
+        {
+            _accountHandler = ah;
         }
 
         public void AddModToGUI(Mod m)
         {
             _db.GetCollection<Db_Mod>("mods").Insert(m.EncapsulateToDb());
-            Mods_TreeView.Items.Add(new Mod_Control(m, _db));
+            ModControls.Add(new Mod_Control(m, _db));
+            Mods_View.Items.Refresh();
         }
-
-        [STAThread]
-        public void CreateMod(Game CurrentGame, ModArchiveFile archive)
+        
+        public void CreateMod(Game CurrentGame, ModArchiveFile archive) //offline
         {
-            /*OpenFileDialog dialog = new OpenFileDialog
+            OpenFileDialog dialog = new OpenFileDialog
             {
                 Filter = "Archive Files|*.rar;*.zip;*.7z;"
-            };*/
+            };
             int modIndex = _db.GetCollection<Db_Mod>("mods").Count();
-
-
+            
             Mod newMod = new Mod($"Offline Mod #{modIndex}", archive.FileName, false, true, archive.FullNewPath, archive.ModDirectory, archive.DownloadDirectory,
-                CurrentGame.Id, ModCategories.Unknown, $"off-{modIndex}");
+                CurrentGame.Id, ModCategories.Unknown, $"off-{modIndex}", ModControls.Count);
 
             archive.Extract();
             AddModToGUI(newMod);
         }
-
-        
-        public async Task CreateMod(Game CurrentGame, NexusUrl nexusUrl)
+        public async Task CreateMod(Game CurrentGame, NexusUrl nexusUrl) //online
         {
-            if (!_db.GetCollection<Db_Mod>("mods").FindAll().Select(x => x.FileId).Contains(nexusUrl.FileId))
+            if (!_db.GetCollection<Db_Mod>("mods").FindAll().Select(x => x.FileId).Contains(nexusUrl.FileId) && _accountHandler.isLoggedIn)
             {
-                string API_DownloadLinkSource = $"http://nmm.nexusmods.com/{CurrentGame.Name_API}/Files/download/{nexusUrl.FileId}/?game_id={(int)CurrentGame.Id}";
-                string API_ModInfoSource = $"http://nmm.nexusmods.com/{CurrentGame.Name_API}/Mods/{nexusUrl.ModId}/?game_id={(int)CurrentGame.Id}";
-                string API_ModFileInfoSource = $"http://nmm.nexusmods.com/{CurrentGame.Name_API}/Files/{nexusUrl.FileId}/?game_id={(int)CurrentGame.Id}";
+                string API_DownloadLinkSource = $"{Defined.NEXUSAPI_BASE}/games/{CurrentGame.Name_API}/mods/{nexusUrl.ModId}/files/{nexusUrl.FileId}/download_link";
+                string API_ModInfoSource = $"{Defined.NEXUSAPI_BASE}/games/{CurrentGame.Name_API}/mods/{nexusUrl.ModId}";
+                string API_ModFileInfoSource = $"{Defined.NEXUSAPI_BASE}/games/{CurrentGame.Name_API}/mods/{nexusUrl.ModId}/files/{nexusUrl.FileId}";
 
-                httpClient.BaseAddress = new Uri("http://localhost:9000/");
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+                httpClient.DefaultRequestHeaders.Add("APIKEY", _accountHandler.token);
                 httpClient.DefaultRequestHeaders.Add("User-Agent", "Nexus Client v0.63.14");
-                if (CanAccessApi)
-                    httpClient.DefaultRequestHeaders.Add("Cookie", $"sid={CookieSid}");
 
-                string res1 = (await (await httpClient.GetAsync(API_DownloadLinkSource)).Content.ReadAsStringAsync()).Remove(0, 1);
-                res1 = res1.Remove(res1.Length - 1, 1); //removing first and last '[' ']' cus i don't see any reason for it to be a list
 
-                string res2 = (await (await httpClient.GetAsync(API_ModInfoSource)).Content.ReadAsStringAsync()); //gitting mod info
+                string res1 = await (await httpClient.GetAsync(API_DownloadLinkSource)).Content.ReadAsStringAsync();
+                res1 = res1.Replace("[", string.Empty).Replace("]", string.Empty); //removing first and last '[' ']' cus i don't see any reason for it to be a list
 
-                string res3 = (await (await httpClient.GetAsync(API_ModFileInfoSource)).Content.ReadAsStringAsync()); //gitting mod's file info
+                string res2 = await (await httpClient.GetAsync(API_ModInfoSource)).Content.ReadAsStringAsync();
+                res2 = res2.Replace("[", string.Empty).Replace("]", string.Empty);
+
+                string res3 = await (await httpClient.GetAsync(API_ModFileInfoSource)).Content.ReadAsStringAsync();
+                res3 = res3.Replace("[", string.Empty).Replace("]", string.Empty);
+
+                GC.Collect();
 
                 var result_downloadInfo = JsonConvert.DeserializeObject<Api_ModDownloadInfo>(res1);
                 var result_modInfo = JsonConvert.DeserializeObject<Api_ModInfo>(res2);
@@ -127,29 +146,34 @@ namespace EeveexModManager.Classes
                 }
 
                 string DownloadTo = $@"{ModDownloadTo}\{ result_fileInfo.name.Split('-').LastOrDefault().Trim(' ')}";
-                string DownloadAs = DownloadTo + $@"\{result_fileInfo.uri}";
+                string DownloadAs = DownloadTo + $@"\{result_fileInfo.file_name}";
                 string InstallTo = $@"{CurrentGame.ModsDirectory}\{result_modInfo.name} [{result_fileInfo.name}]";
                 if (!Directory.Exists(DownloadTo))
-                {
                     Directory.CreateDirectory(DownloadTo);
-                }
+                if (!Directory.Exists(InstallTo))
+                    Directory.CreateDirectory(InstallTo);
 
                 if (File.Exists(DownloadAs))
                     File.Delete(DownloadAs);
 
                 Mod newMod = new Mod(result_modInfo.name, result_fileInfo.name, false, true, DownloadAs, InstallTo, DownloadTo,
-                    CurrentGame.Id, (ModCategories)result_modInfo.category_id, nexusUrl.FileId, result_modInfo.version, nexusUrl.ModId,
+                    CurrentGame.Id, (ModCategories)result_modInfo.category_id, nexusUrl.FileId, ModControls.Count, result_modInfo.version, nexusUrl.ModId,
                     result_modInfo.author, nexusUrl.SourceUrl.ToString(), true);
 
                 await Task.Run(() =>
-                Downloads_TreeView.Dispatcher.Invoke(() =>
+                Downloads_View.Dispatcher.Invoke(() =>
                 {
                     DownloadsManager.AddDownload(new Uri(result_downloadInfo.URI), DownloadAs, DownloadTo, InstallTo, result_modInfo.name, result_fileInfo.name, newMod);
                 }, DispatcherPriority.ApplicationIdle));
 
-                httpClient.Dispose();
-                httpClient = new HttpClient();
+                GC.Collect();
             }
+        }
+
+        //for testing purpose only, accept any dodgy certificate... 
+        public static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
         }
     }
 }

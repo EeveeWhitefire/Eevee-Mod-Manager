@@ -1,0 +1,15 @@
+﻿<Window x:Class="EeveexModManager.Windows.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EeveexModManager.Windows"
+        mc:Ignorable="d"
+        Title="Settings" Height="300" Width="300" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
+    <Grid>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
+            <CheckBox Name="AssociationWithNXM_CheckBox" Margin="10,0" VerticalAlignment="Center"/>
+            <Button Content="Associate NXM" HorizontalAlignment="Right" FontSize="30" VerticalAlignment="Center" Click="Association_Button_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

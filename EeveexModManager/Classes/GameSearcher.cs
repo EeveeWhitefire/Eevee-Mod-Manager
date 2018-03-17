@@ -24,10 +24,12 @@ namespace EeveexModManager.Classes
         public string InstallationPath { get; protected set; }
         public string ExecutablePath { get; protected set; }
 
+        public Game AssociatedGame { get; protected set; }
+
         TextBox SearchTextBox { get; }
         
         public bool Exists { get; protected set; } = false;
-        public bool Confirmed { get; set; } = false;
+        public bool Confirmed { get; protected set; } = false;
         public bool Search { get; set; } = true;
 
         public GameDetector_Control GuiControl { get; protected set; }
@@ -67,6 +69,12 @@ namespace EeveexModManager.Classes
                 });
             }
 
+        }
+
+        public void ConfirmGame()
+        {
+            Confirmed = true;
+            AssociatedGame = Game.CreateByName(Name, InstallationPath, RegistryName);
         }
 
         public void StartSearch()

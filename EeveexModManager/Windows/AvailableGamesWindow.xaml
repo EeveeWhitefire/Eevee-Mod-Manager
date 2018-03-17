@@ -6,25 +6,17 @@
         xmlns:local="clr-namespace:EeveexModManager.Windows"
         xmlns:controls="clr-namespace:EeveexModManager.Controls"
         mc:Ignorable="d"
-        Title="Please choose the games you'd like to mod:" Height="650" Width="1300" ResizeMode="NoResize">
-    <Window.Resources>
-        <ResourceDictionary>
-            <BitmapImage x:Key="icon_skyrim" UriSource="/EeveexModManager;component/Resources/Icon - TESV Skyrim.png" />
-            <BitmapImage x:Key="icon_skyrimSe" UriSource="/EeveexModManager;component/Resources/Icon - TESV Skyrim Special Edition.png" />
-            <BitmapImage x:Key="icon_falloutNV" UriSource="/EeveexModManager;component/Resources/Icon - Fallout New Vegas.png" />
-            <BitmapImage x:Key="icon_fallout4" UriSource="/EeveexModManager;component/Resources/Icon - Fallout 4.png" />
-            <BitmapImage x:Key="button_redX" UriSource="/EeveexModManager;component/Resources/Button_RedX.png" />
-            <BitmapImage x:Key="button_greenCheck" UriSource="/EeveexModManager;component/Resources/Button_GreenCheckMark.png" />
-        </ResourceDictionary>
-    </Window.Resources>
+        Title="Please choose the games you'd like to mod:" Height="650" Width="1550" ResizeMode="NoResize">
 
     <Grid>
-        <StackPanel Orientation="Horizontal" Name="GameSearchers_StackPanel">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Name="GamePicker_StkPanel"/>
+        <StackPanel Orientation="Horizontal" Name="GameSearchers_StackPanel" Grid.ColumnSpan="2">
             <StackPanel Orientation="Vertical" Margin="5, 5" VerticalAlignment="Top" HorizontalAlignment="Left"/>
             <!--Left Stack panel-->
-            <StackPanel Orientation="Vertical" Margin="5, 5" VerticalAlignment="Top" HorizontalAlignment="Left"/> <!--Right Stack panel-->
+            <StackPanel Orientation="Vertical" Margin="5, 5" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            <!--Right Stack panel-->
         </StackPanel>
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Margin="10" VerticalAlignment="Bottom">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom">
             <Button Content="Back" Margin="0,0,0,10" Height="40" FontSize="25" Click="GetBackToMainWindow_Click" Visibility="Hidden" Name="BackToMain_Button"/>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                 <Button Content="Restart Scans" Margin="0,0,20,0" Width="100" Height="50" Click="RestartScansButton_Click" FontSize="16"/>

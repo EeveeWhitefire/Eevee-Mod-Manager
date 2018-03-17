@@ -24,6 +24,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
         public bool IsOnline { get; set; }
         public string Author { get; set; }
         public string FullSourceUri { get; set; }
+        public int Priority { get; set; }
 
         public GameListEnum GameId { get; set; }
         public ModCategories ModCategory { get; set; }
@@ -33,7 +34,8 @@ namespace EeveexModManager.Classes.DatabaseClasses
         
         public Mod EncapsulateToSource()
         {
-            return new Mod(Name, ModFileName, Active, Installed, SourceArchive, ModDirectory, DownloadDirectory, GameId, ModCategory, FileId, Version, Id, Author, FullSourceUri, IsOnline);
+            return new Mod(Name, ModFileName, Active, Installed, SourceArchive, ModDirectory, DownloadDirectory, GameId, ModCategory, 
+                FileId, Priority, Version, Id, Author, FullSourceUri, IsOnline);
         }
     }
 }

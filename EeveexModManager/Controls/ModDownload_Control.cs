@@ -15,118 +15,117 @@ using EeveexModManager.Classes;
 
 namespace EeveexModManager.Controls
 {
-    public class ModDownload_Control : StackPanel
+    public class ModDownload_Control
     {
-        public TreeView AssociatedDownloadsView { get; }
+        public ListView AssociatedView { get; }
         public Download AssociatedDownload { get; }
         public Action<Mod> AddToGUI { get; }
 
         private Mod AssoicatedMod { get; }
 
-        private TextBlock DownloadInfo;
-        private TextBlock CurrentNumberOfBytes;
-        private TextBlock NumberOfBytesInTotal;
-        private TextBlock DownloadedPercentage;
-        private TextBlock State;
-        private Button CancelDownloadButton;
+        //Formatted
+        public string DownloadName { get; set; }
+        public string CurrentNumberOfBytes { get; set; }
+        public string NumberOfBytesInTotal { get; set; }
+        public string DownloadedPercentage { get; set; }
+        public string ModId { get; set; }
+        public string State { get; set; }
+        public string Speed { get; set; }
+        public string AverageSpeed { get; set; }
 
-        public ModDownload_Control(TreeView parent, Download dl, Action<Mod> addToGui, Mod m) : base()
+        public ModDownload_Control(ListView parent, Download dl, Action<Mod> addToGui, Mod m) : base()
         {
-            AssociatedDownloadsView = parent;
+            AssociatedView = parent;
             AssociatedDownload = dl;
             AddToGUI = addToGui;
             AssoicatedMod = m;
 
-            Orientation = Orientation.Horizontal;
-            Thickness ListMargin = new Thickness(10, 2, 10, 0);
+            DownloadName = $"{AssociatedDownload.ModName} [{AssociatedDownload.ModFileName}]";
+            CurrentNumberOfBytes = "0 KB";
+            NumberOfBytesInTotal = "0 KB";
 
-            DownloadInfo = new TextBlock()
-            {
-                Text = $"{AssociatedDownload.ModName} [{AssociatedDownload.ModFileName}]",
-                Margin = new Thickness(0, 2, 10, 0),
-                VerticalAlignment = VerticalAlignment.Center,
-                Width = 350,
-                FontSize = 15
-            };
-            CurrentNumberOfBytes = new TextBlock()
-            {
-                Text = "Downloaded: 0 KB",
-                Margin = ListMargin,
-                VerticalAlignment = VerticalAlignment.Center,
-                Width = 200,
-                FontSize = 15
-            };
-            NumberOfBytesInTotal = new TextBlock()
-            {
-                Text = "Out of: 0 KB",
-                Margin = ListMargin,
-                VerticalAlignment = VerticalAlignment.Center,
-                Width = 180,
-                FontSize = 15
-            };
-            DownloadedPercentage = new TextBlock()
-            {
-                Text = "Percentage: 0 %",
-                Margin = ListMargin,
-                VerticalAlignment = VerticalAlignment.Center,
-                Width = 125,
-                FontSize = 15
-            };
-            State = new TextBlock()
-            {
-                Text = "State: Starting",
-                Margin = ListMargin,
-                VerticalAlignment = VerticalAlignment.Center,
-                Width = 130,
-                FontSize = 15
-            };
-
-
-            CancelDownloadButton = new Button()
-            {
-                Content = "X",
-                Background = Brushes.DarkRed,
-                Foreground = Brushes.White,
-                Margin = ListMargin,
-                VerticalAlignment = VerticalAlignment.Center,
-                Width = 20,
-                Height = 25,
-                FontSize = 15
-            };
-            CancelDownloadButton.Click += new RoutedEventHandler(CancelDownloadButton_Click);
-
-            Children.Add(CancelDownloadButton);
-            Children.Add(DownloadInfo);
-            Children.Add(CurrentNumberOfBytes);
-            Children.Add(NumberOfBytesInTotal);
-            Children.Add(DownloadedPercentage);
-            Children.Add(State);
+            DownloadedPercentage = "0 %";
+            State = "Starting";
         }
 
-        public void UpdateProgress(DownloadProgressChangedEventArgs e)
+        public void UpdateProgress()
         {
-            CurrentNumberOfBytes.Text = $"Downloaded: {e.BytesReceived / 1000} KB";
-            NumberOfBytesInTotal.Text = $"Out of: {e.TotalBytesToReceive / 1000} KB";
-            DownloadedPercentage.Text = $"Percentage: {e.ProgressPercentage} %";
-            State.Text = "State: Downloading";
-        }
+            AssociatedDownload.CalculateDownloadSpeed();
 
-        public void DownloadFinished(AsyncCompletedEventArgs e)
-        {
-            if (e.Error != null)
+            CurrentNumberOfBytes = $"{AssociatedDownload.DownloadedSize / 1000} KB";
+            NumberOfBytesInTotal = $"{AssociatedDownload.FileSize / 1000} KB";
+            DownloadedPercentage = $"{AssociatedDownload.ProgressPercentage} %";
+            Speed = $"{AssociatedDownload.DownloadSpeed} KB\\s";
+            AverageSpeed = $"{AssociatedDownload.AverageDownloadSpeed} KB\\s";
+            switch (AssociatedDownload.DownloadState)
             {
-                AssociatedDownload.StartDownload();
+                case Interfaces.DownloadStates.PreStart:
+                    State = "Started";
+                    break;
+                case Interfaces.DownloadStates.InProgress:
+                    State = "Downloading";
+                    break;
+                case Interfaces.DownloadStates.Paused:
+                    State = "Paused";
+                    break;
+                case Interfaces.DownloadStates.Finished:
+                    State = "Complete!";
+                    break;
+                case Interfaces.DownloadStates.Canceled:
+                    State = "Canceled";
+                    break;
+                default:
+                    break;
             }
-            else if(!e.Cancelled)
+            Task.Run( () => AssociatedView.Dispatcher.Invoke(() => AssociatedView.Items.Refresh()));
+        }
+
+        public void CancelDownload()
+        {
+            Task.Run(() =>
             {
-                if (DownloadedPercentage.Text.Contains("100"))
+               AssociatedDownload.Cancel();
+
+               FileInfo fileInfo = new FileInfo(AssociatedDownload.DownloadTo);
+               while (IsFileLocked(fileInfo))
+               {
+                   Task.Delay(1000);
+               }
+               if (Directory.Exists(AssociatedDownload.DownloadAt))
+                   Directory.Delete(AssociatedDownload.DownloadAt, true);
+            });
+        }
+
+        public void PauseDownload()
+        {
+            Task.Run(() =>
+            {
+                AssociatedDownload.Pause();
+            });
+        }
+
+        public void ResumeDownload()
+        {
+            Task.Run(() =>
+            {
+                AssociatedDownload.Resume();
+            });
+        }
+
+        public void RestartDownload()
+        {
+            Task.Run(() =>
+            {
+                AssociatedDownload.Restart();
+            });
+        }
+
+        public void InstallMod()
+        {
+            try
+            {
+                Task.Run(() =>
                 {
-                    State.Text = "State: Done";
-                    CancelDownloadButton.IsEnabled = false;
-                    CancelDownloadButton.Background = Brushes.Gray;
-
-                    AddToGUI(AssoicatedMod);
-
                     ModArchiveFile archive = new ModArchiveFile(AssociatedDownload.DownloadTo, AssociatedDownload.InstallAt);
                     SecurityIdentifier sid = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
                     NTAccount act = sid.Translate(typeof(NTAccount)) as NTAccount;
@@ -137,27 +136,18 @@ namespace EeveexModManager.Controls
                     File.SetAccessControl(AssociatedDownload.DownloadTo, sec);
 
                     archive.Extract();
-                }
-                AssociatedDownload.Client.CancelAsync();
-                AssociatedDownload.Client.Dispose();
+                    AssociatedView.Dispatcher.Invoke(() =>
+                    {
+                        State = "Installed!";
+                        AssociatedView.Items.Refresh();
+                        AddToGUI(AssoicatedMod);
+                    });
+                });
             }
-        }
-
-        private void CancelDownloadButton_Click(object sender, RoutedEventArgs e)
-        {
-            AssociatedDownload.DisposeOfClient();
-            State.Text = "State: Canceled";
-            CancelDownloadButton.IsEnabled = false;
-            CancelDownloadButton.Background = Brushes.Gray;
-
-            FileInfo fileInfo = new FileInfo(AssociatedDownload.DownloadTo);
-            while(IsFileLocked(fileInfo))
+            catch (Exception e)
             {
-                Task.Delay(1000);
             }
-            if (Directory.Exists(AssociatedDownload.DownloadAt))
-                Directory.Delete(AssociatedDownload.DownloadAt, true);
-
+            
         }
 
         bool IsFileLocked(FileInfo file)
@@ -191,3 +181,5 @@ namespace EeveexModManager.Controls
         }
     }
 }
+
+

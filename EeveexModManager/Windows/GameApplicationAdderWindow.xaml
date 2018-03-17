@@ -5,13 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EeveexModManager.Windows"
         mc:Ignorable="d"
-        Title="GameApplicationAdderWindow" Height="150" Width="300">
+        Title="Add Game Application" Height="250" Width="450" ResizeMode="NoResize">
     <Grid>
         <StackPanel Orientation="Vertical" Margin="10">
-            <Button Content="Choose exe" Click="ChooseExeButton_Click"/>
-            <TextBox Name="ApplicationNameTBox"/>
-            <Button Content="Done" Name="DoneButton" Click="DoneButton_Click" IsEnabled="False"/>
-            <Button Content="Cancel" Click="CancelButton_Click"/>
+            <TextBlock Text="Select an Executable:" Margin="0,0,0,10"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBox Name="ExecutablePath_TB" Width="360" Height="20"/>
+                <Button Content="*" Click="ChooseExeButton_Click" Width="25"/>
+            </StackPanel>
+            <TextBlock Text="Application Name:" Margin="0,10"/>
+            <TextBox Name="ApplicationName_TB" Width="360" HorizontalAlignment="Left" Height="20" FontSize="14"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10">
+            <Button Content="Done" Name="DoneButton" Click="DoneButton_Click" IsEnabled="False" Width="120" Height="50" FontSize="35" Margin="0,0,10,0"/>
+            <Button Content="Cancel" Click="CancelButton_Click"  Width="120" Height="50" FontSize="35"/>
         </StackPanel>
     </Grid>
 </Window>

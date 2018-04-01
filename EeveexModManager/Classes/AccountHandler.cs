@@ -14,7 +14,7 @@ using EeveexModManager.Classes.JsonClasses;
 using System.Windows;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using EeveexModManager.Classes.JsonClasses.API;
+using EeveexModManager.Classes.NexusClasses.API;
 
 namespace EeveexModManager.Classes
 {

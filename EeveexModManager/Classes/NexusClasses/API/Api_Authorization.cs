@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EeveexModManager.Classes.JsonClasses.API
+namespace EeveexModManager.Classes.NexusClasses.API
 {
     class Api_Authorization
     {

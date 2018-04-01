@@ -39,7 +39,7 @@ namespace EeveexModManager.Windows
         private Json_Config _config;
         private NamedPipeManager _namedPipeManager;
         private Mutex _mutex;
-        private GamePicker_ComboBox _gamePicker;
+        private List<Border> GameDetectorControlBorders;
 
         private int GamesConfigured = 0;
 
@@ -56,18 +56,13 @@ namespace EeveexModManager.Windows
             _namedPipeManager = npm;
             _dbProfiles = profiles;
             _profilesManager = profMng;
-            _gamePicker = new GamePicker_ComboBox(80, 25)
-            {
-                HorizontalAlignment = HorizontalAlignment.Right,
-                Margin = new Thickness(20, 10, 0, 0),
-                VerticalAlignment = VerticalAlignment.Top,
-                Width = 450,
-                Height = 80,
-                SelectedIndex = 0
-            };
+
+            _gameSeachers = new List<GameSearcher>();
+            _games = new List<Game>();
 
             InitializeComponent();
-            StartSearches();
+            GameDetectorControlBorders = (GameSearchers_StackPanel.Children as IEnumerable<StackPanel>)
+                .SelectMany(x => x.Children as IEnumerable<Border>).ToList();
 
             if(getBackButton)
             {
@@ -92,48 +87,10 @@ namespace EeveexModManager.Windows
 
         const int GamesPerTab = 4;
 
-        void StartSearches()
-        {
-           int counter = 0;
-            string[] gameNames = new string[]
-                {"TESV : Skyrim Special Edition", "TESV : Skyrim", "Fallout 4", "Fallout : New Vegas",
+        string[] gameNames = new string[]
+             {"TESV : Skyrim Special Edition", "TESV : Skyrim", "Fallout 4", "Fallout : New Vegas",
                      "Fallout 3", "Dragon Age Origins", "Dragon Age II", "The Witcher 3 : Wild Hunt"};
 
-            _gameSeachers = new List<GameSearcher>();
-            _games = new List<Game>();
-
-            foreach (StackPanel item in GameSearchers_StackPanel.Children)
-            {
-                var names = gameNames.Skip(counter);
-                counter = 0;
-                foreach (var x in names)
-                {
-                    Border border = new Border()
-                    {
-                        BorderBrush = Brushes.Gainsboro,
-                        BorderThickness = new Thickness(2),
-                        Margin = new Thickness(0, 0, 0, 5),
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Top
-                    };
-
-                    GameDetector_Control currDetectorControl = new GameDetector_Control(x, _gamePicker, GamePicker_StkPanel);
-
-                    _gameSeachers.Add(new GameSearcher(x, currDetectorControl));
-                    currDetectorControl.Searcher = _gameSeachers.LastOrDefault();
-                    currDetectorControl.Dispatcher.BeginInvoke((Action)( () => currDetectorControl.Searcher.StartSearch()), DispatcherPriority.Background);
-
-                    border.Child = currDetectorControl;
-
-                    item.Children.Add(border);
-                    counter++;
-                    if (counter >= GamesPerTab)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
         private void RestartScansButton_Click(object sender, RoutedEventArgs e)
         {
             if(_gameSeachers.Where( x => x.Search).Count() > 0)
@@ -162,11 +119,6 @@ namespace EeveexModManager.Windows
         {
             if (_gameSeachers.Where( x => x.Confirmed).Count() > 0)
             {
-                _games = _gameSeachers.Where(x => x.Confirmed)
-                    .Select(x => x.AssociatedGame).ToList();
-
-                _games.ElementAt(_gamePicker.SelectedIndex).ToggleIsCurrentGame();
-
                 InitGames(_games);
             }
             else
@@ -195,20 +147,7 @@ namespace EeveexModManager.Windows
                     _profilesManager.AddProfile("master", item);
                     _dbProfiles.Add(new DatabaseContext_Profile(item.ProfilesDirectory + "\\master", item.Id));
                 }
-
-                Game currGame = _db.GetCollection<Db_Game>("games").FindOne(x => x.IsCurrent).EncapsulateToSource();
-                Game selGame = _db.GetCollection<Db_Game>("games").FindAll().ElementAt(_gamePicker.SelectedIndex).EncapsulateToSource();
-
-                if (selGame.Id != currGame.Id)
-                {
-                    selGame.ToggleIsCurrentGame();
-                    currGame.ToggleIsCurrentGame();
-                }
-
-                _db.GetCollection<Db_Game>("games").Update(selGame.EncapsulateToDb());
-                _db.GetCollection<Db_Game>("games").Update(currGame.EncapsulateToDb());
-
-
+                
                 _config.State = StatesOfConfiguartion.Ready;
                 _config.Installation_Path = Directory.GetCurrentDirectory();
                 _jsonParser.UpdateJson(_config);
@@ -232,6 +171,27 @@ namespace EeveexModManager.Windows
             {
                 x.GuiControl.ConfirmGame();
             });
+        }
+
+        private void AddGameDetectionButton_Click(object sender, RoutedEventArgs e)
+        {
+            Border parent = (sender as Button).Parent as Border;
+
+            int indexOfBorder = GameDetectorControlBorders.IndexOf(parent);
+            if(indexOfBorder < GameDetectorControlBorders.Count - 1)
+            {
+                GameDetectorControlBorders.ElementAt(indexOfBorder + 1).Visibility = Visibility.Visible;
+            }
+
+
+
+            GameDetector_Control currDetectorControl = new GameDetector_Control("test");
+
+            _gameSeachers.Add(new GameSearcher("test", currDetectorControl, _games));
+            currDetectorControl.Searcher = _gameSeachers.LastOrDefault();
+            currDetectorControl.Dispatcher.BeginInvoke((Action)(() => currDetectorControl.Searcher.StartSearch()), DispatcherPriority.Background);
+
+            parent.Child = currDetectorControl;
         }
     }
 }

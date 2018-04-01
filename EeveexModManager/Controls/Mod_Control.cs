@@ -14,6 +14,7 @@ namespace EeveexModManager.Controls
     {
         public string ModState { get; set; }
         public string ModName { get; set; }
+        public string FileName { get; set; }
         public string ModAuthor { get; set; }
         public string ModVersion { get; set; }
         public string ModId { get; set; }
@@ -30,7 +31,8 @@ namespace EeveexModManager.Controls
 
         public void UpdateProperties()
         {
-            ModName = AssociatedMod.Name + $" [{AssociatedMod.ModFileName}]";
+            ModName = AssociatedMod.Name;
+            FileName = AssociatedMod.ModFileName;
             ModAuthor = AssociatedMod.Author;
             ModVersion = AssociatedMod.Version;
             ModId = AssociatedMod.Id;

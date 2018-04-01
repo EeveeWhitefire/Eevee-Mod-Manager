@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
-namespace EeveexModManager.Classes.JsonClasses.API
+namespace EeveexModManager.Classes.NexusClasses.API
 {
     public class Api_ModInfo
     {

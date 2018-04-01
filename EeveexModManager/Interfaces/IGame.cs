@@ -10,9 +10,13 @@ namespace EeveexModManager.Interfaces
     {
         SkyrimSE = 1704,
         Skyrim,
+        Oblivion,
+        Witcher3,
         FalloutNV = 130,
         Fallout4,
-        MGSVTPP
+        Fallout3,
+        DragonAge2,
+        DragonAgeOrigins
     }
 
     public interface IGame

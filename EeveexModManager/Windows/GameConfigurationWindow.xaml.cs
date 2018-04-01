@@ -55,7 +55,7 @@ namespace EeveexModManager.Windows
             var hwnd = new WindowInteropHelper(this).Handle;
             SetWindowLong(hwnd, GWL_STYLE, GetWindowLong(hwnd, GWL_STYLE) & ~WS_SYSMENU); //no close button, bitch
 
-            GameImage.Source = new BitmapImage(new Uri($"pack://application:,,,/EeveexModManager;component/Resources/Icon - {AssociatedGame.Name.Replace(" : ", " ")}.png", UriKind.Absolute));
+            GameImage.Source = Assistant.LoadImageFromResources("Icon - " + AssociatedGame.Id.ToString() + ".png");
 
             ProfilesDirectory_TB.Text = g.ProfilesDirectory;
             ModsDirectory_TB.Text = g.ModsDirectory;

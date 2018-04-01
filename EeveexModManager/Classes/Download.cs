@@ -171,12 +171,6 @@ namespace EeveexModManager.Classes
 
         public void Stop()
         {
-            // Close the response stream and cache, stop the thread
-            if (binaryReader?.BaseStream != null)
-            {
-                binaryReader.BaseStream.Close();
-            }
-            binaryReader?.BaseStream?.Flush();
             binaryReader?.BaseStream?.Dispose();
             binaryReader?.Dispose();
             binaryReader = null;
@@ -204,8 +198,7 @@ namespace EeveexModManager.Classes
         {
             if (DownloadState == DownloadStates.Canceled || DownloadState == DownloadStates.Finished)
             {
-                Stop();
-                GC.Collect();
+                ResetProperties();
                 if (File.Exists(DownloadTo))
                 {
                     File.Delete(DownloadTo);

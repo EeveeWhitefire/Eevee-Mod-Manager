@@ -25,8 +25,7 @@ namespace EeveexModManager.Classes
         public string ExecutablePath { get; protected set; }
 
         public Game AssociatedGame { get; protected set; }
-
-        TextBox SearchTextBox { get; }
+        public List<Game> ConfirmedGames { get; protected set; }
         
         public bool Exists { get; protected set; } = false;
         public bool Confirmed { get; protected set; } = false;
@@ -34,11 +33,11 @@ namespace EeveexModManager.Classes
 
         public GameDetector_Control GuiControl { get; protected set; }
 
-        public GameSearcher(string n, GameDetector_Control control)
+        public GameSearcher(string n, GameDetector_Control control, List<Game> games)
         {
             Name = n;
-            SearchTextBox = control.ProgressBar;
             GuiControl = control;
+            ConfirmedGames = games;
         }
 
         public const int GameStateTextSize = 20;
@@ -55,7 +54,6 @@ namespace EeveexModManager.Classes
         public void StopSearch()
         {
             Search = false;
-            SearchTextBox.Background = Brushes.Gray;
             if (!Exists)
             {
                 GuiControl.CancelButton.State_ToDisabled();
@@ -75,6 +73,7 @@ namespace EeveexModManager.Classes
         {
             Confirmed = true;
             AssociatedGame = Game.CreateByName(Name, InstallationPath, RegistryName);
+            ConfirmedGames.Add(AssociatedGame);
         }
 
         public void StartSearch()

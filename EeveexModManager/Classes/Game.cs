@@ -14,7 +14,7 @@ namespace EeveexModManager.Classes
 {
     public class Game : IGame
     {
-        #region Fields
+        #region Properties
         public string DataPath { get; }
         public string InstallationPath { get; }
         public string ExecutablePath { get; }
@@ -36,6 +36,32 @@ namespace EeveexModManager.Classes
         static string GetExecutablePath(string n, string path)
         {
             return ProcessDirectory(path, n);
+        }
+        public static GameListEnum GetGameId(string n)
+        {
+            switch (n)
+            {
+                case "TESV : Skyrim Special Edition":
+                    return GameListEnum.SkyrimSE;
+                case "TESV : Skyrim":
+                    return GameListEnum.Skyrim;
+                case "TESIV : Oblivion":
+                    return GameListEnum.Oblivion;
+                case "Fallout : New Vegas":
+                    return GameListEnum.FalloutNV;
+                case "Fallout 4":
+                    return GameListEnum.Fallout4;
+                case "Fallout 3":
+                    return GameListEnum.Fallout3;
+                case "Dragon Age II":
+                    return GameListEnum.DragonAge2;
+                case "Dragon Age Origins":
+                    return GameListEnum.DragonAgeOrigins;
+                case "The Witcher 3 : Wild Hunt":
+                    return GameListEnum.Witcher3;
+                default:
+                    return GameListEnum.Witcher3;
+            }
         }
         public static string[] GetRegistryName(string n)
         {

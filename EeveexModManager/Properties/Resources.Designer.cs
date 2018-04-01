@@ -123,9 +123,19 @@ namespace EeveexModManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap icon_dragonage {
+        public static System.Drawing.Bitmap gamedetectionaddition_button {
             get {
-                object obj = ResourceManager.GetObject("icon_dragonage", resourceCulture);
+                object obj = ResourceManager.GetObject("gamedetectionaddition_button", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap icon {
+            get {
+                object obj = ResourceManager.GetObject("icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -136,6 +146,16 @@ namespace EeveexModManager.Properties {
         public static System.Drawing.Bitmap icon_dragonage2 {
             get {
                 object obj = ResourceManager.GetObject("icon_dragonage2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap icon_dragonageorigins {
+            get {
+                object obj = ResourceManager.GetObject("icon_dragonageorigins", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -203,9 +223,59 @@ namespace EeveexModManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap icon_thewitcher3 {
+        public static System.Drawing.Bitmap icon_witcher3 {
             get {
-                object obj = ResourceManager.GetObject("icon_thewitcher3", resourceCulture);
+                object obj = ResourceManager.GetObject("icon_witcher3", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap launchbutton {
+            get {
+                object obj = ResourceManager.GetObject("launchbutton", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap loginbutton_false {
+            get {
+                object obj = ResourceManager.GetObject("loginbutton_false", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap loginbutton_true {
+            get {
+                object obj = ResourceManager.GetObject("loginbutton_true", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap nexusmods_logo {
+            get {
+                object obj = ResourceManager.GetObject("nexusmods_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap thumbnail {
+            get {
+                object obj = ResourceManager.GetObject("thumbnail", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

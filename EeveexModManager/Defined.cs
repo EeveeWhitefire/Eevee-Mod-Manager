@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace EeveexModManager
 {
@@ -37,6 +38,10 @@ namespace EeveexModManager
             {
                 ProcessDirectory(ref files, item);
             }
+        }
+        public static BitmapImage LoadImageFromResources(string filename)
+        {
+            return new BitmapImage(new Uri($"pack://application:,,,/EeveexModManager;component/Resources/{filename}", UriKind.Absolute));
         }
     }
 }

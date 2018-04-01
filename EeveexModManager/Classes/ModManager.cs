@@ -23,7 +23,7 @@ using Newtonsoft.Json;
 using SevenZip;
 
 using EeveexModManager.Classes.DatabaseClasses;
-using EeveexModManager.Classes.JsonClasses.API;
+using EeveexModManager.Classes.NexusClasses.API;
 using EeveexModManager.Interfaces;
 using EeveexModManager.Nexus;
 using EeveexModManager.Controls;
@@ -98,7 +98,7 @@ namespace EeveexModManager.Classes
             Mods_View.Items.Refresh();
         }
         
-        public void CreateMod(Game CurrentGame, ModArchiveFile archive) //offline
+        public void CreateModFromArchive(Game CurrentGame, ModArchiveFile archive) //offline
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
@@ -148,6 +148,7 @@ namespace EeveexModManager.Classes
                 string DownloadTo = $@"{ModDownloadTo}\{ result_fileInfo.name.Split('-').LastOrDefault().Trim(' ')}";
                 string DownloadAs = DownloadTo + $@"\{result_fileInfo.file_name}";
                 string InstallTo = $@"{CurrentGame.ModsDirectory}\{result_modInfo.name} [{result_fileInfo.name}]";
+
                 if (!Directory.Exists(DownloadTo))
                     Directory.CreateDirectory(DownloadTo);
                 if (!Directory.Exists(InstallTo))

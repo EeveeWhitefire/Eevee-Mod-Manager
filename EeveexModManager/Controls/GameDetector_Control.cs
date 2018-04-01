@@ -22,21 +22,16 @@ namespace EeveexModManager.Controls
 
         public ConfirmGame_Button AuthorizeButton { get; protected set; }
         public ShapedButton<Rectangle> CancelButton { get; protected set; }
-        public TextBox ProgressBar { get; protected set; }
-        public StackPanel PickerStackPanel { get; protected set; }
-        public GamePicker_ComboBox GamePicker { get; protected set; }
 
         public StackPanel UpperPanel { get; protected set; }
         public StackPanel ButtonsPanel { get; protected set; }
 
-        public GameDetector_Control(string gameN, GamePicker_ComboBox gPicker, StackPanel stkPanel) : base()
+        public GameDetector_Control(string gameN) : base()
         {
             HorizontalAlignment = HorizontalAlignment.Left;
             VerticalAlignment = VerticalAlignment.Top;
             Orientation = Orientation.Horizontal;
             GameName = gameN;
-            PickerStackPanel = stkPanel;
-            GamePicker = gPicker;
 
             InitializeGui();
         }
@@ -59,16 +54,14 @@ namespace EeveexModManager.Controls
                 Margin = new Thickness(0,0,0,10)
             });
 
-            ProgressBar = new TextBox()
+            UpperPanel.Children.Add(new TextBox()
             {
                 IsReadOnly = true,
                 IsEnabled = false,
+                Background = Brushes.Gray,
                 Height = 25,
                 Margin = new Thickness(0, 0, 0, 10)
-            };
-
-
-            UpperPanel.Children.Add(ProgressBar);
+            });
 
             ButtonsPanel = new StackPanel()
             {
@@ -95,16 +88,15 @@ namespace EeveexModManager.Controls
             ResetGUI();
 
             UpperPanel.Children.Add(ButtonsPanel);
-            
-            Image icon = new Image()
+
+            Children.Add(new Image()
             {
                 Width = 140,
-                Source = new BitmapImage(new Uri($"pack://application:,,,/EeveexModManager;component/Resources/Icon - {GameName.Replace(" : ", " ")}.png", UriKind.Absolute)),
+                Source = Assistant.LoadImageFromResources("Icon - " + Game.GetGameId(GameName) + ".png"),
                 Height = 140,
-                Margin = new Thickness(0,0,10,0),
+                Margin = new Thickness(0, 0, 10, 0),
                 VerticalAlignment = VerticalAlignment.Top
-            };
-            Children.Add(icon);
+            });
             Children.Add(UpperPanel);
 
         }
@@ -173,22 +165,10 @@ namespace EeveexModManager.Controls
                 VerticalAlignment = VerticalAlignment.Center,
             });
 
-
-            if (GamePicker.Items.Count == 0)
+            if(Searcher.ConfirmedGames.Count < 1)
             {
-                PickerStackPanel.Children.Add(new TextBlock()
-                {
-                    Text = "Pick a Game:",
-                    FontSize = 25,
-                    Width = 160,
-                    Margin = new Thickness(0,0,0,10),
-                    HorizontalAlignment = HorizontalAlignment.Left
-                });
-                GamePicker.Margin = new Thickness(0);
-                PickerStackPanel.Children.Add(GamePicker);
+                Searcher.AssociatedGame.ToggleIsCurrentGame();
             }
-            Searcher.ConfirmGame();
-            GamePicker.AddGame(Searcher.AssociatedGame);
         }
 
         private void ConfirmGameButton_Click(object sender, RoutedEventArgs e)

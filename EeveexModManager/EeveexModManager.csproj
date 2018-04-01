@@ -81,6 +81,9 @@
   <PropertyGroup>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>App.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="LiteDB, Version=4.1.1.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
       <HintPath>..\packages\LiteDB.4.1.1\lib\net40\LiteDB.dll</HintPath>
@@ -211,11 +214,11 @@
     <Compile Include="Classes\GameSearcher.cs" />
     <Compile Include="Classes\IconExtractor.cs" />
     <Compile Include="Classes\IconUtil.cs" />
-    <Compile Include="Classes\JsonClasses\API\Api_Authorization.cs" />
-    <Compile Include="Classes\JsonClasses\API\Api_ModDownloadInfo.cs" />
-    <Compile Include="Classes\JsonClasses\API\Api_ModFileInfo.cs" />
-    <Compile Include="Classes\JsonClasses\API\Api_ModInfo.cs" />
-    <Compile Include="Classes\JsonClasses\API\Api_UserInfo.cs" />
+    <Compile Include="Classes\NexusClasses\API\Api_Authorization.cs" />
+    <Compile Include="Classes\NexusClasses\API\Api_ModDownloadInfo.cs" />
+    <Compile Include="Classes\NexusClasses\API\Api_ModFileInfo.cs" />
+    <Compile Include="Classes\NexusClasses\API\Api_ModInfo.cs" />
+    <Compile Include="Classes\NexusClasses\API\Api_UserInfo.cs" />
     <Compile Include="Classes\JsonClasses\Json_AccountInfo.cs" />
     <Compile Include="Classes\JsonClasses\Json_Config.cs" />
     <Compile Include="Classes\Mod.cs" />
@@ -249,7 +252,7 @@
     <Compile Include="Interfaces\IMod.cs" />
     <Compile Include="Interfaces\INamedPipe.cs" />
     <Compile Include="Interfaces\IUserProfile.cs" />
-    <Compile Include="Nexus\NexusUrl.cs" />
+    <Compile Include="Classes\NexusClasses\NexusUrl.cs" />
     <Compile Include="Services\Service_JsonParser.cs" />
     <Compile Include="Windows\AvailableGamesWindow.xaml.cs">
       <DependentUpon>AvailableGamesWindow.xaml</DependentUpon>
@@ -337,21 +340,6 @@
     <Resource Include="Resources\Button_RedX.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Icon - TESV Skyrim.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Icon - Fallout 4.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Icon - Fallout New Vegas.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Icon - TESV Skyrim Special Edition.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Icon - Fallout 3.png" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.1">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.7.1 %28x86 and x64%29</ProductName>
@@ -376,17 +364,25 @@
     <Resource Include="Resources\Button_RedX_Disabled.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Icon - Dragon Age II.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Icon - TESIV Oblivion.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="7z.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\Icon - The Witcher 3 Wild Hunt.png" />
-    <Resource Include="Resources\Icon - Dragon Age Origins.png" />
+    <Resource Include="Resources\gamedetectionaddition_button.png" />
+    <Resource Include="Resources\Icon - Witcher3.png" />
+    <Resource Include="Resources\Icon - SkyrimSE.png" />
+    <Resource Include="Resources\Icon - Skyrim.png" />
+    <Resource Include="Resources\Icon - Oblivion.png" />
+    <Resource Include="Resources\Icon - FalloutNV.png" />
+    <Resource Include="Resources\Icon - Fallout4.png" />
+    <Resource Include="Resources\Icon - Fallout3.png" />
+    <Resource Include="Resources\Icon - DragonAgeOrigins.png" />
+    <Resource Include="Resources\Icon - DragonAge2.png" />
+    <Resource Include="Resources\loginbutton_true.png" />
+    <Resource Include="Resources\loginbutton_false.png" />
+    <Resource Include="Resources\nexusmods_logo.png" />
+    <Resource Include="Resources\launchbutton.png" />
+    <Resource Include="Resources\thumbnail.png" />
+    <Resource Include="Resources\icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

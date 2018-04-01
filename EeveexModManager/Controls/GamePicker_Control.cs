@@ -30,7 +30,7 @@ namespace EeveexModManager.Controls
             Image icon = new Image()
             {
                 Width = imageSize,
-                Source = new BitmapImage(new Uri($"pack://application:,,,/EeveexModManager;component/Resources/Icon - {AssociatedGame.Name.Replace(" : ", " ")}.png", UriKind.Absolute)),
+                Source = Assistant.LoadImageFromResources("Icon - " + AssociatedGame.Id.ToString() + ".png"),
                 Height = imageSize,
                 Margin = new Thickness(0, 0, 10, 0),
                 VerticalAlignment = VerticalAlignment.Top

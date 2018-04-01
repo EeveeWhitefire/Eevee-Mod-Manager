@@ -108,6 +108,7 @@ namespace EeveexModManager
                });
             }
             GC.Collect();
+            
         }
 
         private void ProfileSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -220,9 +221,9 @@ namespace EeveexModManager
             ModList_View.Dispatcher.Invoke(() =>
             {
                IsLoggedIn = true;
-               LogInButton.Content = "Logout";
+               (LogInButton.Content as Image).Source = Assistant.LoadImageFromResources($"loginbutton_{IsLoggedIn}.png");
                LoginState_TextBox.Text = $"Logged in! Welcome {username}!";
-               LoginState_TextBox.Foreground = Brushes.Green;
+               LoginState_TextBox.Foreground = Brushes.LightGreen;
             });
         }
         private void WhenLogsOut()
@@ -230,7 +231,7 @@ namespace EeveexModManager
             ModList_View.Dispatcher.Invoke(() =>
             {
                 IsLoggedIn = false;
-                LogInButton.Content = "Login";
+                (LogInButton.Content as Image).Source = Assistant.LoadImageFromResources($"loginbutton_{IsLoggedIn}.png");
                 LoginState_TextBox.Text = "Not logged in.";
                 LoginState_TextBox.Foreground = Brushes.Red;
                 if (File.Exists(_config.AppData_Path + "\\token"))
@@ -318,6 +319,13 @@ namespace EeveexModManager
 
         #region Mod Right Click Menu Events
 
+        private void ModList_View_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            FrameworkElement fe = e.Source as FrameworkElement;
+            if (ModList_View.SelectedItems.Count < 1)
+                fe.ContextMenu = null;
+        }
+
         private void Mod_OpenInExplorer_Click(object sender, RoutedEventArgs e)
         {
             if (ModList_View.SelectedItems.Count == 1)
@@ -358,13 +366,15 @@ namespace EeveexModManager
 
         private void Downloads_View_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
+            FrameworkElement fe = e.Source as FrameworkElement;
             if (Downloads_View.SelectedItems.Count == 1)
             {
                 var dl = Downloads_View.SelectedItem as ModDownload_Control;
 
-                FrameworkElement fe = e.Source as FrameworkElement;
                 fe.ContextMenu = BuildDownloadContextMenu(dl.AssociatedDownload);
             }
+            else
+                fe.ContextMenu = null;
 
         }
 
@@ -411,5 +421,6 @@ namespace EeveexModManager
                 dlControl.ResumeDownload();
         }
         #endregion
+
     }
 }

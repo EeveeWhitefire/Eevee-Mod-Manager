@@ -6,20 +6,37 @@
         xmlns:local="clr-namespace:EeveexModManager"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="EeveexModManager.MainWindow"
         mc:Ignorable="d"
-        Title="Eeveex Mod Manager" Height="730" ResizeMode="NoResize" Width="1600">
-    <Grid Name="MainGrid" Background="LightGray">
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,10,0,0">
+        Title="Eeveex Mod Manager" Height="730" Width="1550" ResizeMode="CanResizeWithGrip" MinWidth="1380" MinHeight="730">
+
+    <Grid Name="MainGrid" Background="#FF373737" Width="{Binding ActualWidth, ElementName=MainViewBox}" Height="{Binding ActualHeight, ElementName=MainViewBox}">
+        <Grid.Resources>
+            <BitmapImage x:Key="EeveexThumbnailBMP" x:Name="hmm" UriSource="pack://application:,,,/Resources/thumbnail.png" />
+            <BitmapImage x:Key="LaunchButtonBMP" UriSource="pack://application:,,,/Resources/launchbutton.png" />
+            <BitmapImage x:Key="NexusModsLogoBMP" UriSource="pack://application:,,,/Resources/nexusmods_logo.png" />
+            <BitmapImage x:Key="LoginButtonBMP" UriSource="pack://application:,,,/Resources/loginbutton_false.png" />
+            <BitmapImage x:Key="LogoutButtonBMP" UriSource="pack://application:,,,/Resources/loginbutton_true.png" />
+            <Style TargetType="GridViewColumnHeader" >
+                <Setter Property="MinWidth" Value="100" />
+                <Setter Property="MaxWidth" Value="300"/>
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Image Source="{StaticResource EeveexThumbnailBMP}" Height="200" Width="500" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
+        <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,10,0,0">
             <StackPanel Orientation="Horizontal">
-                <ComboBox Name="ProfileSelector" Margin="30,0,10,0" Width="200" HorizontalAlignment="Left">
+                <ComboBox Name="ProfileSelector" Margin="0,0,10,0" Width="200" HorizontalAlignment="Left">
                     <TextBlock Text="&lt;Manage Profiles&gt;"/>
                 </ComboBox>
                 <Button Content="⚙" Click="SettingsButton_Click"/>
             </StackPanel>
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,10, 0 ,0">
-                <TextBlock Text="Mod List:" HorizontalAlignment="Left" FontSize="20" Margin="0,0,0,10"/>
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,10, 0 ,0">
+                <TextBlock Text="Mod List:" HorizontalAlignment="Left" FontSize="20" Margin="0,0,0,10" Foreground="LightGray"/>
                 <StackPanel Orientation="Horizontal" Width="920" >
                 </StackPanel>
-                <ListView Height="350" Width="1000" Name="ModList_View" MouseDoubleClick="ModList_View_MouseDoubleClick">
+                <ListView Height="350" Width="1000" Name="ModList_View" MouseDoubleClick="ModList_View_MouseDoubleClick" ContextMenuOpening="ModList_View_ContextMenuOpening">
                     <ListView.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Open in File Explorer" Click="Mod_OpenInExplorer_Click"/>
@@ -28,45 +45,52 @@
                     </ListView.ContextMenu>
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="State" Width="50" DisplayMemberBinding="{Binding ModState}" />
-                            <GridViewColumn Header="Name" Width="300" DisplayMemberBinding="{Binding ModName}"/>
-                            <GridViewColumn Header="Author" Width="120" DisplayMemberBinding="{Binding ModAuthor}"/>
-                            <GridViewColumn Header="Mod ID" Width="100" DisplayMemberBinding="{Binding ModId}"/>
-                            <GridViewColumn Header="Version" Width="100" DisplayMemberBinding="{Binding ModVersion}"/>
-                            <GridViewColumn Header="Priority" Width="100" DisplayMemberBinding="{Binding Priority}"/>
+                            <GridViewColumn Header="State" Width="Auto" DisplayMemberBinding="{Binding ModState}"/>
+                            <GridViewColumn Header="Name" Width="Auto" DisplayMemberBinding="{Binding FileName}"/>
+                            <GridViewColumn Header="Origin" Width="Auto" DisplayMemberBinding="{Binding ModName}"/>
+                            <GridViewColumn Header="Author" Width="Auto" DisplayMemberBinding="{Binding ModAuthor}"/>
+                            <GridViewColumn Header="Mod ID" Width="Auto" DisplayMemberBinding="{Binding ModId}"/>
+                            <GridViewColumn Header="Version" Width="Auto" DisplayMemberBinding="{Binding ModVersion}"/>
+                            <GridViewColumn Header="Priority" Width="Auto" DisplayMemberBinding="{Binding Priority}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
             </StackPanel>
-            <StackPanel Orientation="Vertical" Margin="30,10, 0, 0">
-                <TextBlock Text="Downloads:" FontSize="20" Margin="0,0,0,10" HorizontalAlignment="Left"/>
-                <ListView Name="Downloads_View" Width="1000" Height="150" HorizontalAlignment="Left" MouseDoubleClick="Downloads_View_MouseDoubleClick" ContextMenuOpening="Downloads_View_ContextMenuOpening">
-                    <ListView.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Cancel"/>
-                            <MenuItem Header="Uninstall Mod" Click="Mod_UninstallButton_Click"/>
-                        </ContextMenu>
-                    </ListView.ContextMenu>
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Name" Width="250" DisplayMemberBinding="{Binding DownloadName}"/>
-                            <GridViewColumn Header="Downloaded" Width="140" DisplayMemberBinding="{Binding CurrentNumberOfBytes}"/>
-                            <GridViewColumn Header="Out of" Width="140" DisplayMemberBinding="{Binding NumberOfBytesInTotal}"/>
-                            <GridViewColumn Header="Percentage" Width="120" DisplayMemberBinding="{Binding DownloadedPercentage}"/>
-                            <GridViewColumn Header="Download Speed" Width="120" DisplayMemberBinding="{Binding Speed}"/>
-                            <GridViewColumn Header="Average Speed" Width="120" DisplayMemberBinding="{Binding AverageSpeed}"/>
-                            <GridViewColumn Header="State" Width="100" DisplayMemberBinding="{Binding State}" />
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+            <TabControl Margin="0,10, 0, 0">
+                <TabItem Header="Downloads">
+                    <ListView Name="Downloads_View" Height="150" HorizontalAlignment="Left" MouseDoubleClick="Downloads_View_MouseDoubleClick" ContextMenuOpening="Downloads_View_ContextMenuOpening">
+                        <ListView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Cancel"/>
+                                <MenuItem Header="Uninstall Mod" Click="Mod_UninstallButton_Click"/>
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Name" Width="Auto" DisplayMemberBinding="{Binding DownloadName}"/>
+                                <GridViewColumn Header="Downloaded" Width="Auto" DisplayMemberBinding="{Binding CurrentNumberOfBytes}"/>
+                                <GridViewColumn Header="Out of" Width="Auto" DisplayMemberBinding="{Binding NumberOfBytesInTotal}"/>
+                                <GridViewColumn Header="Percentage" Width="Auto" DisplayMemberBinding="{Binding DownloadedPercentage}"/>
+                                <GridViewColumn Header="Download Speed" Width="Auto" DisplayMemberBinding="{Binding Speed}"/>
+                                <GridViewColumn Header="Average Speed" Width="Auto" DisplayMemberBinding="{Binding AverageSpeed}"/>
+                                <GridViewColumn Header="State" Width="Auto" DisplayMemberBinding="{Binding State}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </TabItem>
+            </TabControl>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0,20,0,0">
+                <Image Source="{StaticResource NexusModsLogoBMP}" Width="50" Height="50" Margin="0,0,10,0"/>
+                <Button FontSize="30" Margin="0,0,20,0" Click="LogInButton_Click" Foreground="Transparent" BorderBrush="Transparent" Background="Transparent" Name="LogInButton" >
+                    <Image Source="{StaticResource LoginButtonBMP}" Width="160" Height="45"/>
+                </Button>
+                <TextBlock Text="Not logged in." FontSize="25" Foreground="Red" VerticalAlignment="Center" Name="LoginState_TextBox"/>
             </StackPanel>
         </StackPanel>
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,10,0" Name="RightStack" Grid.ColumnSpan="2">
-            <Button Name="ApplicationLaunch_Button" Content="Launch" FontSize="40" Foreground="Green" Height="70" Click="LaunchApplicationButton_Click" Margin="0,0,0,10"/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10">
-            <Button Content="Login" FontSize="30" Margin="0,0,20,0" Click="LogInButton_Click" Name="LogInButton" Width="150" Height="45"/>
-            <TextBlock Text="Not logged in." FontSize="25" Foreground="Red" VerticalAlignment="Center" Name="LoginState_TextBox"/>
+        <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,10,0" Name="RightStack" Grid.ColumnSpan="2">
+            <Button Name="ApplicationLaunch_Button" Foreground="Transparent" Background="Transparent" BorderBrush="Transparent" Click="LaunchApplicationButton_Click" Margin="0,0,0,10">
+                <Image Source="{StaticResource LaunchButtonBMP}" Width="430" Height="70"/>
+            </Button>
         </StackPanel>
     </Grid>
 </Window>

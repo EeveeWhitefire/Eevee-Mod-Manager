@@ -21,6 +21,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using EeveexModManager.Interfaces;
 using System.Diagnostics;
+using System.Windows.Data;
 
 namespace EeveexModManager
 {
@@ -48,6 +49,8 @@ namespace EeveexModManager
         private Mutex _mutex;
         private ModManager _modManager;
         private AccountHandler _accountHandler;
+        private MultiplicationMathConverter _mulConverter;
+        private AdditionMathConverter _addConverter;
         private bool IsLoggedIn = false;
 
         #region Current State Variables
@@ -71,6 +74,9 @@ namespace EeveexModManager
             _currProfileDb = _dbProfiles.FirstOrDefault(x => _currGame.Id == x.GameId);
             _namedPipeManager = npm;
             _profilesManager = profMngr;
+            _mulConverter = new MultiplicationMathConverter();
+            _addConverter = new AdditionMathConverter();
+
 
             _namedPipeManager.ChangeMessageReceivedHandler(HandlePipeMessage);
 
@@ -109,6 +115,45 @@ namespace EeveexModManager
             }
             GC.Collect();
             
+        }
+
+        public void InitGUI()
+        {
+            InitBinds();
+        }
+
+        public void InitBinds()
+        {
+            BindingOperations.SetBinding(LeftStackPanel, WidthProperty, new Binding("ActualWidth")
+            {
+                Converter = _addConverter,
+                ConverterParameter = -520,
+                Source = MainGrid,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            });
+
+            BindingOperations.SetBinding(LeftStackPanel, HeightProperty, new Binding("ActualHeight")
+            {
+                Converter = _addConverter,
+                ConverterParameter = -100,
+                Source = MainGrid,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            });
+
+            BindingOperations.SetBinding(ModList_View, HeightProperty, new Binding("ActualHeight")
+            {
+                Converter = _mulConverter,
+                ConverterParameter = (58.0 + 1.0/3.0)/100.0,
+                Source = LeftStackPanel,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            });
+            BindingOperations.SetBinding(LowerTabControl, HeightProperty, new Binding("ActualHeight")
+            {
+                Converter = _mulConverter,
+                ConverterParameter = 0.25,
+                Source = LeftStackPanel,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            });
         }
 
         private void ProfileSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)

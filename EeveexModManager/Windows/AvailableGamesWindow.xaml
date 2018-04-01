@@ -8,66 +8,59 @@
         mc:Ignorable="d"
         Title="Please choose the games you'd like to mod:" Height="655" Width="1500" ResizeMode="CanResizeWithGrip">
 
-    <Viewbox Stretch="Fill" Name="MainViewBox">
-        <Grid Width="{Binding ActualWidth, ElementName=MainViewBox}" Height="{Binding ActualHeight, ElementName=MainViewBox}">
-            <Grid.Resources>
-                <BitmapImage x:Key="GameAdditionButtonBMP" UriSource="pack://application:,,,/Resources/gamedetectionaddition_button.png" />
-                <Style TargetType="Border" x:Key="GameDetectionBorderStyle">
-                    <!--Set to true to not get any properties from the themes.-->
-                    <Setter Property="OverridesDefaultStyle" Value="True"/>
-                    <Setter Property="VerticalAlignment" Value="Top"/>
-                    <Setter Property="HorizontalAlignment" Value="Left"/>
-                    <Setter Property="Margin" Value="0,0,0,5"/>
-                    <Setter Property="BorderThickness" Value="2"/>
-                    <Setter Property="BorderBrush" Value="Gainsboro"/>
-                    <Setter Property="Visibility" Value="Hidden"/>
-                </Style>
-                <Style TargetType="Button" x:Key="GameAdditionButtonTemplate">
-                    <Setter Property="BorderBrush" Value="Transparent"/>
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="Foreground" Value="Transparent"/>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type Button}">
-                                <Image Source="{StaticResource GameAdditionButtonBMP}"/>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </Grid.Resources>
-            <StackPanel Orientation="Horizontal" Name="GameSearchers_StackPanel">
-                <StackPanel Orientation="Vertical" Margin="5, 5, 5, 0" VerticalAlignment="Top" HorizontalAlignment="Left">
-                    <Border Style="{StaticResource GameDetectionBorderStyle}" Visibility="Visible">
-                        <Button Style="{StaticResource GameAdditionButtonTemplate}" Click="AddGameDetectionButton_Click"/>
-                    </Border>
-                    <Border VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,5" BorderThickness="2" BorderBrush="Gainsboro" Visibility="Hidden">
-                        <Button Background="Transparent" Foreground="Transparent" BorderBrush="Transparent">
+    <Grid>
+        <Grid.Resources>
+            <BitmapImage x:Key="GameAdditionButtonBMP" UriSource="pack://application:,,,/Resources/gamedetectionaddition_button.png" />
+            <Style TargetType="Border" x:Key="GameDetectionBorderStyle">
+                <!--Set to true to not get any properties from the themes.-->
+                <Setter Property="OverridesDefaultStyle" Value="True"/>
+                <Setter Property="VerticalAlignment" Value="Top"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="Margin" Value="0,0,0,5"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="BorderBrush" Value="Gainsboro"/>
+                <Setter Property="Visibility" Value="Hidden"/>
+                <Setter Property="Width" Value="514"/>
+            </Style>
+            <Style TargetType="Button" x:Key="GameAdditionButtonTemplate">
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="Transparent"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
                             <Image Source="{StaticResource GameAdditionButtonBMP}"/>
-                        </Button>
-                    </Border>
-                    <Border VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,5" BorderThickness="2" BorderBrush="Gainsboro" Visibility="Hidden">
-                        <Button Background="Transparent" Foreground="Transparent" BorderBrush="Transparent">
-                            <Image Source="{StaticResource GameAdditionButtonBMP}"/>
-                        </Button>
-                    </Border>
-                    <Border VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,5" BorderThickness="2" BorderBrush="Gainsboro" Visibility="Hidden">
-                        <Button Background="Transparent" Foreground="Transparent" BorderBrush="Transparent">
-                            <Image Source="{StaticResource GameAdditionButtonBMP}"/>
-                        </Button>
-                    </Border>
-                </StackPanel>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Grid.Resources>
+        <StackPanel Orientation="Horizontal" Name="GameSearchers_StackPanel">
+            <StackPanel Orientation="Vertical" Margin="5, 5, 5, 0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <Border Style="{StaticResource GameDetectionBorderStyle}" Visibility="Visible">
+                    <Button Style="{StaticResource GameAdditionButtonTemplate}" Click="AddGameDetectionButton_Click"/>
+                </Border>
+                <Border Style="{StaticResource GameDetectionBorderStyle}">
+                    <Button Style="{StaticResource GameAdditionButtonTemplate}" Click="AddGameDetectionButton_Click"/>
+                </Border>
+                <Border Style="{StaticResource GameDetectionBorderStyle}">
+                    <Button Style="{StaticResource GameAdditionButtonTemplate}" Click="AddGameDetectionButton_Click"/>
+                </Border>
+                <Border Style="{StaticResource GameDetectionBorderStyle}">
+                    <Button Style="{StaticResource GameAdditionButtonTemplate}" Click="AddGameDetectionButton_Click"/>
+                </Border>
             </StackPanel>
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10">
-                <Button Content="Back" Margin="0,0,0,10" Height="40" FontSize="25" Click="GetBackToMainWindow_Click" Visibility="Hidden" Name="BackToMain_Button"/>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                    <Button Content="Restart Scans" Margin="0,0,20,0" Width="100" Height="50" Click="RestartScansButton_Click" FontSize="16"/>
-                    <Button Content="Ignore All" Width="100" Height="50" Click="IgnoreAllModsButton_Click" FontSize="16"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Button Content="Confirm" Margin="0,0,20,0"  Width="100" Height="50" Click="ConfirmGamesButton_Click" FontSize="16" Name="Confirm_Button"/>
-                    <Button Content="Confirm All" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="100" Height="50" Click="ConfirmAllGamesButton_Click" FontSize="16"/>
-                </StackPanel>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10">
+            <Button Content="Back" Margin="0,0,0,10" Height="40" FontSize="25" Click="GetBackToMainWindow_Click" Visibility="Hidden" Name="BackToMain_Button"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <Button Content="Restart Scans" Margin="0,0,20,0" Width="100" Height="50" Click="RestartScansButton_Click" FontSize="16"/>
+                <Button Content="Ignore All" Width="100" Height="50" Click="IgnoreAllModsButton_Click" FontSize="16"/>
             </StackPanel>
-        </Grid>
-    </Viewbox>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Confirm" Margin="0,0,20,0"  Width="100" Height="50" Click="ConfirmGamesButton_Click" FontSize="16" Name="Confirm_Button"/>
+                <Button Content="Confirm All" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="100" Height="50" Click="ConfirmAllGamesButton_Click" FontSize="16"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
 </Window>

@@ -61,8 +61,8 @@ namespace EeveexModManager.Windows
             _games = new List<Game>();
 
             InitializeComponent();
-            GameDetectorControlBorders = (GameSearchers_StackPanel.Children as IEnumerable<StackPanel>)
-                .SelectMany(x => x.Children as IEnumerable<Border>).ToList();
+            GameDetectorControlBorders = (GameSearchers_StackPanel.Children.Cast<StackPanel>())
+                .SelectMany(x => x.Children.Cast<Border>()).ToList();
 
             if(getBackButton)
             {
@@ -123,7 +123,7 @@ namespace EeveexModManager.Windows
             }
             else
             {
-                MessageBox.Show("Error! No _games were found! Please click on the \"Restart Scans\" button to retry!");
+                MessageBox.Show("Error! No games were found! Please click on the \"Restart Scans\" button to retry!");
             }
         }
 

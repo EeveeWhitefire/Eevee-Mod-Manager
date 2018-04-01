@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using System.Windows.Media.Imaging;
 
 namespace EeveexModManager
@@ -20,7 +22,6 @@ namespace EeveexModManager
 
     public class Assistant
     {
-
         public static List<string> GetAllFilesInDir(string d)
         {
             List<string> files = new List<string>();
@@ -42,6 +43,37 @@ namespace EeveexModManager
         public static BitmapImage LoadImageFromResources(string filename)
         {
             return new BitmapImage(new Uri($"pack://application:,,,/EeveexModManager;component/Resources/{filename}", UriKind.Absolute));
+        }
+    }
+    public class MultiplicationMathConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            double v = (double)value;
+            double percentage = System.Convert.ToDouble(parameter);
+            int res = (int)((double)percentage * v);
+            return res;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class AdditionMathConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            double a = (double)value;
+            double b = System.Convert.ToDouble(parameter);
+            int res = (int)(a + b);
+            return res;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

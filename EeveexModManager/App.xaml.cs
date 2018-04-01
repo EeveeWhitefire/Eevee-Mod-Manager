@@ -189,6 +189,7 @@ namespace EeveexModManager
                         mainWindow.WindowState = WindowState.Minimized;
                     }
                     mainWindow.Show();
+                    mainWindow.InitGUI();
                 }
             }
         }

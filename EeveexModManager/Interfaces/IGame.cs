@@ -24,17 +24,12 @@ namespace EeveexModManager.Interfaces
         string DataPath { get; }
         string InstallationPath { get; }
         string ExecutablePath { get; }
-
-        string Name { get; }
-        string Name_Nexus { get; }
-        string Name_API { get; }
         string Name_Registry { get; }
+
         string ModsDirectory { get; }
         string DownloadsDirectory { get; }
         string ProfilesDirectory { get; }
         string BackupsDirectory { get; }
-
-        GameListEnum Id { get; }
         bool IsCurrent { get; }
     }
 }

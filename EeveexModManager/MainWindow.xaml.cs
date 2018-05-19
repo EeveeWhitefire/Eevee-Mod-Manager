@@ -86,6 +86,8 @@ namespace EeveexModManager
                 _accountHandler = new AccountHandler(_config, WhenLogsIn);
                 _modManager.SetAccountHandler(_accountHandler);
             });
+            
+            _db.GetCollection<Db_Game>("games").Delete(x => !File.Exists(x.ExecutablePath));
 
             _gamePicker = new GamePicker_ComboBox(_db.GetCollection<Db_Game>("games").FindAll(), 75, 25, RerunGameDetection, SetGame)
             {
@@ -98,8 +100,10 @@ namespace EeveexModManager
             ProfileSelector.SelectionChanged += ProfileSelector_SelectionChanged;
             _gamePicker.SelectedIndex = _db.GetCollection<Db_Game>("games").FindAll().ToList().FindIndex(x => x.IsCurrent) + 1;
 
-            RightStack.Children.Add(_appPicker);
-            RightStack.Children.Add(_gamePicker);
+            if(_appPicker != null)
+                RightStack.Children.Add(_appPicker);
+            if (_gamePicker != null)
+                RightStack.Children.Add(_gamePicker);
 
 
             if (!_namedPipeManager.IsRunning)
@@ -124,6 +128,8 @@ namespace EeveexModManager
 
         public void InitBinds()
         {
+            //MainGrid.SizeChanged += MainGrid_SizeChanged;
+            
             BindingOperations.SetBinding(LeftStackPanel, WidthProperty, new Binding("ActualWidth")
             {
                 Converter = _addConverter,
@@ -131,7 +137,6 @@ namespace EeveexModManager
                 Source = MainGrid,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             });
-
             BindingOperations.SetBinding(LeftStackPanel, HeightProperty, new Binding("ActualHeight")
             {
                 Converter = _addConverter,
@@ -139,6 +144,7 @@ namespace EeveexModManager
                 Source = MainGrid,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             });
+
 
             BindingOperations.SetBinding(ModList_View, HeightProperty, new Binding("ActualHeight")
             {
@@ -154,6 +160,32 @@ namespace EeveexModManager
                 Source = LeftStackPanel,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             });
+        }
+
+        
+        private void MainGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+        {/*
+            double diff;
+            if (e.HeightChanged)
+            {
+                diff = e.NewSize.Height - e.PreviousSize.Height;
+                if (Math.Abs(diff) > 20)
+                {
+                    LeftStackPanel.Height += diff;
+                    ModList_View.Height += (double)(diff / 2.0);
+                    LowerTabControl.Height += (double)(diff / 2.0);
+                }
+            }
+            else if (e.WidthChanged)
+            {
+                diff = e.NewSize.Width - e.PreviousSize.Width;
+                if (Math.Abs(diff) > 20)
+                {
+                    LeftStackPanel.Width += diff;
+                    ModList_View.Width += (double)(diff / 2.0);
+                    LowerTabControl.Width += (double)(diff / 2.0);
+                }
+            }*/
         }
 
         private void ProfileSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)

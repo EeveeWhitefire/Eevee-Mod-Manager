@@ -16,8 +16,7 @@ namespace EeveexModManager.Controls
 {
     public class GameDetector_Control : StackPanel
     {
-
-        public string GameName { get; protected set; }
+        public IGameDefault GameDefault { get; protected set; }
         public GameSearcher Searcher { get; set; }
 
         public ConfirmGame_Button AuthorizeButton { get; protected set; }
@@ -26,12 +25,12 @@ namespace EeveexModManager.Controls
         public StackPanel UpperPanel { get; protected set; }
         public StackPanel ButtonsPanel { get; protected set; }
 
-        public GameDetector_Control(string gameN) : base()
+        public GameDetector_Control(IGameDefault game) : base()
         {
             HorizontalAlignment = HorizontalAlignment.Left;
             VerticalAlignment = VerticalAlignment.Top;
             Orientation = Orientation.Horizontal;
-            GameName = gameN;
+            GameDefault = game;
 
             InitializeGui();
         }
@@ -49,7 +48,7 @@ namespace EeveexModManager.Controls
             
             UpperPanel.Children.Add(new TextBlock()
             {
-                Text = GameName,
+                Text = GameDefault.Name,
                 FontSize = 20,
                 Margin = new Thickness(0,0,0,10)
             });
@@ -69,7 +68,7 @@ namespace EeveexModManager.Controls
                 HorizontalAlignment = HorizontalAlignment.Left
             };
 
-            AuthorizeButton = new ConfirmGame_Button(GameName, Defined.MODPICKINGBUTTON_SIZE, Defined.MODPICKINGBUTTON_SIZE);
+            AuthorizeButton = new ConfirmGame_Button(GameDefault.Name, Defined.MODPICKINGBUTTON_SIZE, Defined.MODPICKINGBUTTON_SIZE);
 
             AuthorizeButton.Click += new RoutedEventHandler(ConfirmGameButton_Click);
 
@@ -92,7 +91,7 @@ namespace EeveexModManager.Controls
             Children.Add(new Image()
             {
                 Width = 140,
-                Source = Assistant.LoadImageFromResources("Icon - " + Game.GetGameId(GameName) + ".png"),
+                Source = Assistant.LoadImageFromResources("Icon - " + GameDefault.Id.ToString() + ".png"),
                 Height = 140,
                 Margin = new Thickness(0, 0, 10, 0),
                 VerticalAlignment = VerticalAlignment.Top

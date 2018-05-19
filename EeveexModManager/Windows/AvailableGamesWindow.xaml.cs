@@ -20,7 +20,8 @@ using EeveexModManager.Classes.DatabaseClasses;
 using EeveexModManager.Classes.JsonClasses;
 using EeveexModManager.Controls;
 using EeveexModManager.Services;
-
+using EeveexModManager.Interfaces;
+using EeveexModManager.Classes.GameDefaults;
 
 
 namespace EeveexModManager.Windows
@@ -40,6 +41,7 @@ namespace EeveexModManager.Windows
         private NamedPipeManager _namedPipeManager;
         private Mutex _mutex;
         private List<Border> GameDetectorControlBorders;
+        private IEnumerable<IGameDefault> _gameDefaults = GameDefaultValues.GetGamesDefault();
 
         private int GamesConfigured = 0;
 
@@ -86,10 +88,6 @@ namespace EeveexModManager.Windows
         }
 
         const int GamesPerTab = 4;
-
-        string[] gameNames = new string[]
-             {"TESV : Skyrim Special Edition", "TESV : Skyrim", "Fallout 4", "Fallout : New Vegas",
-                     "Fallout 3", "Dragon Age Origins", "Dragon Age II", "The Witcher 3 : Wild Hunt"};
 
         private void RestartScansButton_Click(object sender, RoutedEventArgs e)
         {
@@ -175,23 +173,39 @@ namespace EeveexModManager.Windows
 
         private void AddGameDetectionButton_Click(object sender, RoutedEventArgs e)
         {
-            Border parent = (sender as Button).Parent as Border;
-
-            int indexOfBorder = GameDetectorControlBorders.IndexOf(parent);
-            if(indexOfBorder < GameDetectorControlBorders.Count - 1)
+            if (_gameDefaults.Count() > 0)
             {
-                GameDetectorControlBorders.ElementAt(indexOfBorder + 1).Visibility = Visibility.Visible;
+                Border parent = (sender as Button).Parent as Border;
+                GameDetectionAdderWindow window = new GameDetectionAdderWindow(_gameDefaults,
+                    parent, ConfirmGameDetection);
+                window.Show();
             }
+        }
 
+        private void ConfirmGameDetection(IGameDefault g, Border parent)
+        {
+            parent.Dispatcher.Invoke(() =>
+            {
+                (_gameDefaults as IList<IGameDefault>).Remove(g);
 
+                if (_gameDefaults.Count() > 0)
+                {
+                    int indexOfBorder = GameDetectorControlBorders.IndexOf(parent);
+                    if (indexOfBorder < GameDetectorControlBorders.Count - 1)
+                    {
+                        GameDetectorControlBorders.ElementAt(indexOfBorder + 1).Visibility = Visibility.Visible;
+                    }
+                }
+                GameDetector_Control currDetectorControl = new GameDetector_Control(g);
 
-            GameDetector_Control currDetectorControl = new GameDetector_Control("test");
+                _gameSeachers.Add(new GameSearcher(g, currDetectorControl, _games));
+                currDetectorControl.Searcher = _gameSeachers.LastOrDefault();
+                currDetectorControl.Dispatcher.BeginInvoke((Action)(() => currDetectorControl.Searcher.StartSearch()), DispatcherPriority.Background);
 
-            _gameSeachers.Add(new GameSearcher("test", currDetectorControl, _games));
-            currDetectorControl.Searcher = _gameSeachers.LastOrDefault();
-            currDetectorControl.Dispatcher.BeginInvoke((Action)(() => currDetectorControl.Searcher.StartSearch()), DispatcherPriority.Background);
+                parent.Child = currDetectorControl;
+            });
 
-            parent.Child = currDetectorControl;
+            GC.Collect();
         }
     }
 }

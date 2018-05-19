@@ -27,14 +27,7 @@ namespace EeveexModManager.Controls
             AssociatedGame = game;
             TextSize = fontSize;
 
-            Image icon = new Image()
-            {
-                Width = imageSize,
-                Source = Assistant.LoadImageFromResources("Icon - " + AssociatedGame.Id.ToString() + ".png"),
-                Height = imageSize,
-                Margin = new Thickness(0, 0, 10, 0),
-                VerticalAlignment = VerticalAlignment.Top
-            };
+            Image icon = Assistant.LoadGameImage(game.Id.ToString(), imageSize);
 
             stkPanel = new StackPanel()
             {

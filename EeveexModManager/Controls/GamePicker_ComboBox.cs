@@ -45,9 +45,24 @@ namespace EeveexModManager.Controls
             AddGames(games);
         }
 
+        public GamePicker_ComboBox(IEnumerable<Game> games, double imageSize, double fontSize, Action OnUtility = null, Action<Game> onValueChange = null) :
+            this(imageSize, fontSize, OnUtility, onValueChange)
+        {
+            AddGames(games);
+        }
+
         public void AddGames(IEnumerable<Db_Game> games)
         {
             Games.AddRange(games.ToList());
+            foreach (var game in Games.Select(x => x.EncapsulateToSource()))
+            {
+                Items.Add(new GamePicker_Control(game, _imageSize, _fontSize));
+            }
+            //SelectedIndex = Games.FindIndex(x => x.IsCurrent) + 1;
+        }
+        public void AddGames(IEnumerable<Game> games)
+        {
+            Games.AddRange(games.Select( x => x.EncapsulateToDb()).ToList());
             foreach (var game in Games.Select(x => x.EncapsulateToSource()))
             {
                 Items.Add(new GamePicker_Control(game, _imageSize, _fontSize));

@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
+using System.Windows.Controls;
+using System.Windows;
 
 namespace EeveexModManager
 {
@@ -40,12 +42,38 @@ namespace EeveexModManager
                 ProcessDirectory(ref files, item);
             }
         }
+
+        public static Image LoadGameImage(string id, double size)
+            => new Image()
+            {
+                Width = size,
+                Source = LoadImageFromResources("Icon - " + id + ".png"),
+                Height = size,
+                Margin = new Thickness(0, 0, 10, 0),
+                VerticalAlignment = VerticalAlignment.Top
+            };
+
         public static BitmapImage LoadImageFromResources(string filename)
         {
             return new BitmapImage(new Uri($"pack://application:,,,/EeveexModManager;component/Resources/{filename}", UriKind.Absolute));
         }
     }
     public class MultiplicationMathConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            double v = (double)value;
+            double percentage = System.Convert.ToDouble(parameter);
+            int res = (int)((double)percentage * v);
+            return res;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class INeedANameMathConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

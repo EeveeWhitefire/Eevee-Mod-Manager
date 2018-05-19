@@ -6,13 +6,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using EeveexModManager.Classes.DatabaseClasses;
-using EeveexModManager.Interfaces;
+
 using Microsoft.Win32;
 
+using EeveexModManager.Classes.DatabaseClasses;
+using EeveexModManager.Interfaces;
 namespace EeveexModManager.Classes
 {
-    public class Game : IGame
+    public class Game : IGame, IGameDefault
     {
         #region Properties
         public string DataPath { get; }
@@ -23,10 +24,12 @@ namespace EeveexModManager.Classes
         public string Name_Nexus { get; protected set; }
         public string Name_API { get; }
         public string Name_Registry { get; protected set; }
+        public string[] Registry_Names { get; protected set; } = null;
         public string ModsDirectory { get; protected set; }
         public string DownloadsDirectory { get; protected set; }
         public string ProfilesDirectory { get; protected set; }
         public string BackupsDirectory { get; protected set; }
+        public string ExecutableName { get; } = null;
 
         public GameListEnum Id { get; }
         public bool IsCurrent { get; protected set; } = false;
@@ -37,102 +40,30 @@ namespace EeveexModManager.Classes
         {
             return ProcessDirectory(path, n);
         }
-        public static GameListEnum GetGameId(string n)
+        public static string GetDataPath(GameListEnum id, string path)
         {
-            switch (n)
+            switch (id)
             {
-                case "TESV : Skyrim Special Edition":
-                    return GameListEnum.SkyrimSE;
-                case "TESV : Skyrim":
-                    return GameListEnum.Skyrim;
-                case "TESIV : Oblivion":
-                    return GameListEnum.Oblivion;
-                case "Fallout : New Vegas":
-                    return GameListEnum.FalloutNV;
-                case "Fallout 4":
-                    return GameListEnum.Fallout4;
-                case "Fallout 3":
-                    return GameListEnum.Fallout3;
-                case "Dragon Age II":
-                    return GameListEnum.DragonAge2;
-                case "Dragon Age Origins":
-                    return GameListEnum.DragonAgeOrigins;
-                case "The Witcher 3 : Wild Hunt":
-                    return GameListEnum.Witcher3;
+                case GameListEnum.SkyrimSE:
+                    return path + @"\Data";
+                case GameListEnum.Skyrim:
+                    return path + @"\Data";
+                case GameListEnum.Oblivion:
+                    return path + @"\Data";
+                case GameListEnum.Witcher3:
+                    return path + @"\Data";
+                case GameListEnum.FalloutNV:
+                    return path + @"\Data";
+                case GameListEnum.Fallout4:
+                    return path + @"\Data";
+                case GameListEnum.Fallout3:
+                    return path + @"\Data";
+                case GameListEnum.DragonAge2:
+                    return path + @"\Data";
+                case GameListEnum.DragonAgeOrigins:
+                    return path + @"\Data";
                 default:
-                    return GameListEnum.Witcher3;
-            }
-        }
-        public static string[] GetRegistryName(string n)
-        {
-            switch (n)
-            {
-                case "TESV : Skyrim Special Edition":
-                    return new string[] { "The Elder Scrolls V: Skyrim Special Edition" };
-                case "TESV : Skyrim":
-                    return new string[] { "TSEV Skyrim LE", "The Elder Scrolls V: Skyrim" };
-                case "Fallout : New Vegas":
-                    return new string[] { "Fallout: New Vegas" };
-                case "Fallout 4":
-                    return new string[] { "Fallout 4" };
-                case "Fallout 3":
-                    return new string[] { "Fallout3" };
-                case "Dragon Age II":
-                    return new string[] { "Dragon Age II" };
-                case "Dragon Age Origins":
-                    return new string[] { "Dragon Age Origins" };
-                case "The Witcher 3 : Wild Hunt":
-                    return new string[] { "The Witcher 3" };
-                default:
-                    return new string[] { };
-            }
-        }
-        public static string GetDataPath(string n, string path)
-        {
-            switch (n)
-            {
-                case "TESV : Skyrim Special Edition":
                     return path + @"\Data";
-                case "TESV : Skyrim":
-                    return path + @"\Data";
-                case "Fallout : New Vegas":
-                    return path + @"\Data";
-                case "Fallout 4":
-                    return path + @"\Data";
-                case "Fallout 3":
-                    return path + @"\Data";
-                case "Dragon Age II":
-                    return string.Empty;
-                case "Dragon Age Origins":
-                    return string.Empty;
-                case "The Witcher 3 : Wild Hunt":
-                    return string.Empty;
-                default:
-                    return string.Empty;
-            }
-        }
-        public static string GetNexusName(string n)
-        {
-            switch (n)
-            {
-                case "TESV : Skyrim Special Edition":
-                    return "skyrimse";
-                case "TESV : Skyrim":
-                    return "skyrim";
-                case "Fallout : New Vegas":
-                    return "falloutnv";
-                case "Fallout 4":
-                    return string.Empty;
-                case "Fallout 3":
-                    return string.Empty;
-                case "Dragon Age II":
-                    return "dragonage2";
-                case "Dragon Age Origins":
-                    return "dragonage";
-                case "The Witcher 3 : Wild Hunt":
-                    return "witcher3";
-                default:
-                    return string.Empty;
             }
         }
         static string ProcessDirectory(string p, string n)
@@ -211,30 +142,8 @@ namespace EeveexModManager.Classes
         /// <param name="iPath">Where the game is installed</param>
         /// <param name="regN">The name of the game in the registry</param>
         /// <returns></returns>
-        public static Game CreateByName(string n, string iPath, string regN)
-        {
-            switch (n)
-            {
-                case "TESV : Skyrim Special Edition":
-                    return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("SkyrimSE.exe", iPath), n, GetNexusName(n), "skyrimspecialedition", regN, GameListEnum.SkyrimSE);
-                case "TESV : Skyrim":
-                    return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("Skyrim.exe", iPath), n, GetNexusName(n), "skyrim", regN, GameListEnum.Skyrim);
-                case "Fallout : New Vegas":
-                    return new Game(iPath, GetDataPath(n, iPath), GetExecutablePath("FalloutNV.exe", iPath), n, GetNexusName(n), "newvegas", regN, GameListEnum.FalloutNV);
-                case "Fallout 4":
-                    return null;
-                case "Fallout 3":
-                    return null;
-                case "Dragon Age II":
-                    return null;
-                case "Dragon Age Origins":
-                    return null;
-                case "The Witcher 3 : Wild Hunt":
-                    return null;
-                default:
-                    return null;
-            }
-        }
+        public static Game CreateByName(string iPath, string regN, IGameDefault def)
+            => new Game(iPath, def, regN);
 
         public void ToggleIsCurrentGame()
         {
@@ -251,21 +160,36 @@ namespace EeveexModManager.Classes
         /// <param name="nApi">Name of the game in Nexus Mods' API</param>
         /// <param name="nReg">Display name of the game in the registry (under Uninstall)</param>
         /// <param name="id">Nexus Mods' generated ID for the game</param>
-        public Game(string iPath, string dPath, string exePath, string n, string nNxm, string nApi, string nReg, GameListEnum id)
+        public Game(string iPath, string dPath, string ePath, string n, 
+            string nApi, string nNxm, string nReg, GameListEnum id)
         {
+            Name = n;
             InstallationPath = iPath;
             DataPath = dPath;
-            ExecutablePath = exePath;
+            ExecutablePath = ePath;
             Name_API = nApi;
             Name_Nexus = nNxm;
             Id = id;
             Name_Registry = nReg;
-            Name = n;
-            ModsDirectory = InstallationPath[0] + ":\\EVX\\Mods\\" + id.ToString();
-            DownloadsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\EVX\\Downloads\\" + id.ToString();
-            ProfilesDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\EVX\\Profiles\\" + id.ToString();
-            BackupsDirectory = InstallationPath[0] + ":\\EVX\\Backups\\" + id.ToString();
+
+            string idAsString = Id.ToString();
+
+            ModsDirectory = InstallationPath[0] + ":\\EVX\\Mods\\" + idAsString;
+            DownloadsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\EVX\\Downloads\\" + idAsString;
+            ProfilesDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\EVX\\Profiles\\" + idAsString;
+            BackupsDirectory = InstallationPath[0] + ":\\EVX\\Backups\\" + idAsString;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="iPath">Installation Path</param>
+        /// <param name="def">Default settings of the game</param>
+        /// <param name="regN">Registry name of the game</param>
+        public Game(string iPath, IGameDefault def, string regN) : 
+            this(iPath, GetDataPath(def.Id, iPath), GetExecutablePath(def.ExecutableName, iPath), 
+                def.Name, def.Name_API, def.Name_Nexus, regN, def.Id)
+        { }
         /// <summary>
         /// Full Constructor
         /// </summary>
@@ -277,8 +201,9 @@ namespace EeveexModManager.Classes
         /// <param name="nReg">Display name of the game in the registry (under Uninstall)</param>
         /// <param name="id">Nexus Mods' generated ID for the game</param>
         /// <param name="isCurr">Whether this game is the current one</param>
-        public Game(string iPath, string dPath, string exePath, string n, string nNxm, string nApi, string nReg, GameListEnum id, bool isCurr) : 
-            this(iPath, dPath, exePath, n, nNxm, nApi, nReg, id)
+        public Game(string iPath, string dPath, string exePath, 
+            IGameDefault def, string nReg, bool isCurr) : 
+            this(iPath, dPath, exePath, def.Name, def.Name_API, def.Name_Nexus, nReg, def.Id)
         {
             IsCurrent = isCurr;
         }

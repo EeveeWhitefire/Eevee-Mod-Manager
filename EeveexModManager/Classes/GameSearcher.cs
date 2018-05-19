@@ -8,17 +8,18 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using System.Threading;
+using System.Windows;
 
 using Microsoft.Win32;
 
 using EeveexModManager.Controls;
-using System.Windows;
+using EeveexModManager.Interfaces;
 
 namespace EeveexModManager.Classes
 {
     public class GameSearcher
     {
-        public string Name { get; protected set; }
+        public IGameDefault GameDefault { get; protected set; }
 
         public string RegistryName { get; protected set; }
         public string InstallationPath { get; protected set; }
@@ -33,9 +34,9 @@ namespace EeveexModManager.Classes
 
         public GameDetector_Control GuiControl { get; protected set; }
 
-        public GameSearcher(string n, GameDetector_Control control, List<Game> games)
+        public GameSearcher(IGameDefault def, GameDetector_Control control, List<Game> games)
         {
-            Name = n;
+            GameDefault = def;
             GuiControl = control;
             ConfirmedGames = games;
         }
@@ -72,7 +73,7 @@ namespace EeveexModManager.Classes
         public void ConfirmGame()
         {
             Confirmed = true;
-            AssociatedGame = Game.CreateByName(Name, InstallationPath, RegistryName);
+            AssociatedGame = Game.CreateByName(InstallationPath, RegistryName, GameDefault);
             ConfirmedGames.Add(AssociatedGame);
         }
 
@@ -98,7 +99,7 @@ namespace EeveexModManager.Classes
         public bool GameIsInstalled()
         {
             RegistryKey parentKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
-            foreach (var item in Game.GetRegistryName(Name))
+            foreach (var item in GameDefault.Registry_Names)
             {
                 if (Search)
                 {

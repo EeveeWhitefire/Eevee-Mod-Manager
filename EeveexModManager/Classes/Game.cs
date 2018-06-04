@@ -68,7 +68,6 @@ namespace EeveexModManager.Classes
         }
         static string ProcessDirectory(string p, string n)
         {
-            bool found = false;
             foreach (var item in Directory.GetFiles(p))
             {
                 if (item.EndsWith(n))
@@ -77,19 +76,7 @@ namespace EeveexModManager.Classes
                 }
             }
 
-            if (!found)
-            {
-                var dirs = Directory.GetDirectories(p);
-                foreach (var item in dirs)
-                {
-                    return ProcessDirectory(p, n);
-                }
-                return string.Empty;
-            }
-            else
-            {
-                return string.Empty;
-            }
+            return string.Empty;
         }
 
         public List<GameApplication> AutoDetectApplications()
@@ -107,6 +94,10 @@ namespace EeveexModManager.Classes
                     };
                     break;
                 case "TESV : Skyrim":
+                    names = new List<string>()
+                    {
+                        "skse_loader.exe", "TESV.exe", "SkyrimLauncher.exe"
+                    };
                     break;
                 case "Fallout : New Vegas":
                     names = new List<string>()

@@ -32,6 +32,7 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows;
 
 namespace EeveexModManager.Classes
 {
@@ -93,14 +94,22 @@ namespace EeveexModManager.Classes
         /// <remarks>Always returns new copy of the Icon. It should be disposed by the user.</remarks>
         public Icon GetIcon(int index)
         {
-            if (index < 0 || Count <= index)
-                throw new ArgumentOutOfRangeException("index");
-
-            // Create an Icon from the .ico file in memory.
-
-            using (var ms = new MemoryStream(iconData[index]))
+            try
             {
-                return new Icon(ms);
+                if (index < 0 || Count <= index)
+                    throw new ArgumentOutOfRangeException("index");
+
+                // Create an Icon from the .ico file in memory.
+
+                using (var ms = new MemoryStream(iconData[index]))
+                {
+                    return new Icon(ms);
+                }
+            }
+            catch (Exception e)
+            {
+                Stream iconStream = Application.GetResourceStream(new Uri("pack://application:,,,/EeveexModManager;component/Resources/application_icon.ico")).Stream;
+                return new System.Drawing.Icon(iconStream);
             }
         }
 
@@ -153,7 +162,7 @@ namespace EeveexModManager.Classes
 
                 var tmpData = new List<byte[]>();
 
-                ENUMRESNAMEPROC callback = (h, t, name, l) =>
+                bool callback(IntPtr h, IntPtr t, IntPtr name, IntPtr l)
                 {
                     // Refer to the following URL for the data structures used here:
                     // http://msdn.microsoft.com/en-us/library/ms997538.aspx
@@ -204,7 +213,7 @@ namespace EeveexModManager.Classes
                     }
 
                     return true;
-                };
+                }
                 NativeMethods.EnumResourceNames(hModule, RT_GROUP_ICON, callback, IntPtr.Zero);
 
                 iconData = tmpData.ToArray();

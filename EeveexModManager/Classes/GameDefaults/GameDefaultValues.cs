@@ -68,7 +68,7 @@ namespace EeveexModManager.Classes.GameDefaults
             public string Name { get; } = "TESV : Skyrim";
             public string Name_Nexus { get; } = "skyrim";
             public string Name_API { get; } = "skyrim";
-            public string ExecutableName { get; } = "Skyrim.exe";
+            public string ExecutableName { get; } = "TESV.exe";
             public string[] Registry_Names { get; } = new string[]
             { "TSEV Skyrim LE", "The Elder Scrolls V: Skyrim" };
         }

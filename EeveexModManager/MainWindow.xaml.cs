@@ -53,6 +53,8 @@ namespace EeveexModManager
         private AdditionMathConverter _addConverter;
         private bool IsLoggedIn = false;
 
+        private const string DEFAULT_MODS_VIEW_SEARCHER_MESSAGE = "Enter mod name here...";
+
         #region Current State Variables
         private Game _currGame;
         private UserProfile _currProfile;
@@ -499,5 +501,39 @@ namespace EeveexModManager
         }
         #endregion
 
+        private void ModsView_Searcher_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                var textbox = sender as TextBox;
+                if (textbox.Text.Length == 0)
+                {
+                    textbox.Text = DEFAULT_MODS_VIEW_SEARCHER_MESSAGE;
+                    textbox.Foreground = Brushes.Gray;
+                    _modManager.ModControls.ForEach(x => x.Visibility = Visibility.Visible);
+                }
+                else
+                {
+                    textbox.Foreground = Brushes.Black;
+                    _modManager.ModControls.ForEach(x =>
+                    {
+                        if (!x.FileName.ToLower().Contains(textbox.Text.ToLower()))
+                            x.Visibility = Visibility.Hidden;
+                        else
+                            x.Visibility = Visibility.Visible;
+                    });
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        private void ModsView_Searcher_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var textbox = sender as TextBox;
+            if (textbox.Text == DEFAULT_MODS_VIEW_SEARCHER_MESSAGE)
+                textbox.Text = string.Empty;
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 using EeveexModManager.Classes;
@@ -10,7 +11,7 @@ using EeveexModManager.Classes.DatabaseClasses;
 
 namespace EeveexModManager.Controls
 {
-    public class Mod_Control
+    public class Mod_Control : Control
     {
         public string ModState { get; set; }
         public string ModName { get; set; }

@@ -26,15 +26,16 @@ namespace EeveexModManager.Controls
             System.Drawing.Icon[] splitIcons = IconUtil.Split(_iconExtractor.GetIcon(0));
             ImageSource imageSource;
 
-            System.Drawing.Bitmap bitmap = IconUtil.ToBitmap(splitIcons[3]);
+            System.Drawing.Bitmap bitmap;
             try
             {
-                int c = 2;
-                while (bitmap.Size.Width < 256 && c >= 0)
+                int c = 0;
+                do
                 {
                     bitmap = IconUtil.ToBitmap(splitIcons[c]);
                     c++;
                 }
+                while (bitmap.Size.Width < 256 && c >= 0 && c < splitIcons.Length);
             }
             catch (Exception)
             {

@@ -118,8 +118,6 @@ namespace EeveexModManager
                         t.SetApartmentState(ApartmentState.STA);
                         t.Start();*/
                     }
-                    else
-                        MessageBox.Show("hmm");
                 }
                 catch (Exception ee)
                 {

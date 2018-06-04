@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:EeveexModManager"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="EeveexModManager.MainWindow"
         mc:Ignorable="d"
-        Title="Eeveex Mod Manager" Height="730" Width="1550" ResizeMode="CanResizeWithGrip" MinWidth="1380" MinHeight="730" x:Name="window">
+        Title="Eeveex Mod Manager" Height="750" Width="1550" ResizeMode="CanResizeWithGrip" MinWidth="1380" MinHeight="730" x:Name="window">
 
     <Window.Resources>
         <local:AdditionMathConverter x:Key="addConverter"/>
@@ -34,32 +34,41 @@
                 <Button Content="⚙" Click="SettingsButton_Click"/>
             </StackPanel>
             <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,10, 0 ,0" Width="{Binding ActualWidth, ElementName=LeftStackPanel}">
-                <TextBlock Text="Mod List:" HorizontalAlignment="Left" FontSize="20" Margin="0,0,0,10" Foreground="LightGray"/>
-                <ListView Height="350" Name="ModList_View" MouseDoubleClick="ModList_View_MouseDoubleClick" ContextMenuOpening="ModList_View_ContextMenuOpening" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <ListView.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Open in File Explorer" Click="Mod_OpenInExplorer_Click"/>
-                            <MenuItem Header="Uninstall Mod" Click="Mod_UninstallButton_Click"/>
-                        </ContextMenu>
-                    </ListView.ContextMenu>
-                    <ListView.Resources>
-                        <Style TargetType="GridViewColumnHeader" >
-                            <Setter Property="MinWidth" Value="60" />
-                            <Setter Property="MaxWidth" Value="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.4, ElementName=ModList_View}"/>
-                        </Style>
-                    </ListView.Resources>
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="State" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.06, ElementName=ModList_View}" DisplayMemberBinding="{Binding ModState}"/>
-                            <GridViewColumn Header="Name" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.2, ElementName=ModList_View}" DisplayMemberBinding="{Binding FileName}"/>
-                            <GridViewColumn Header="Origin" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.2, ElementName=ModList_View}" DisplayMemberBinding="{Binding ModName}"/>
-                            <GridViewColumn Header="Author" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.15, ElementName=ModList_View}" DisplayMemberBinding="{Binding ModAuthor}"/>
-                            <GridViewColumn Header="Mod ID" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.15, ElementName=ModList_View}" DisplayMemberBinding="{Binding ModId}"/>
-                            <GridViewColumn Header="Version" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.14, ElementName=ModList_View}" DisplayMemberBinding="{Binding ModVersion}"/>
-                            <GridViewColumn Header="Priority" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.1, ElementName=ModList_View}" DisplayMemberBinding="{Binding Priority}"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                <TabControl Margin="0,20, 0, 0" Name="UpperTabControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <TabItem Header="Mods">
+                        <Grid>
+                            <StackPanel Orientation="Vertical">
+                                <ListView Height="350" Name="ModList_View" MouseDoubleClick="ModList_View_MouseDoubleClick" 
+                                          ContextMenuOpening="ModList_View_ContextMenuOpening" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,10">
+                                    <ListView.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Open in File Explorer" Click="Mod_OpenInExplorer_Click"/>
+                                            <MenuItem Header="Uninstall Mod" Click="Mod_UninstallButton_Click"/>
+                                        </ContextMenu>
+                                    </ListView.ContextMenu>
+                                    <ListView.Resources>
+                                        <Style TargetType="GridViewColumnHeader" >
+                                            <Setter Property="MinWidth" Value="60" />
+                                            <Setter Property="MaxWidth" Value="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.4, ElementName=ModList_View}"/>
+                                        </Style>
+                                    </ListView.Resources>
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="State" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.06, ElementName=ModList_View}" DisplayMemberBinding="{Binding ModState}"/>
+                                            <GridViewColumn Header="Name" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.2, ElementName=ModList_View}" DisplayMemberBinding="{Binding FileName}"/>
+                                            <GridViewColumn Header="Origin" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.2, ElementName=ModList_View}" DisplayMemberBinding="{Binding ModName}"/>
+                                            <GridViewColumn Header="Author" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.15, ElementName=ModList_View}" DisplayMemberBinding="{Binding ModAuthor}"/>
+                                            <GridViewColumn Header="Mod ID" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.15, ElementName=ModList_View}" DisplayMemberBinding="{Binding ModId}"/>
+                                            <GridViewColumn Header="Version" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.14, ElementName=ModList_View}" DisplayMemberBinding="{Binding ModVersion}"/>
+                                            <GridViewColumn Header="Priority" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.1, ElementName=ModList_View}" DisplayMemberBinding="{Binding Priority}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <TextBox Text="Enter mod name here..." TextChanged="ModsView_Searcher_TextChanged" Foreground="Gray" MouseUp="ModsView_Searcher_MouseDown"></TextBox>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
             </StackPanel>
             <TabControl Margin="0,20, 0, 0" Name="LowerTabControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="150">
                 <TabItem Header="Downloads">

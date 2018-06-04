@@ -164,7 +164,9 @@ namespace EeveexModManager.Controls
                 VerticalAlignment = VerticalAlignment.Center,
             });
 
-            if(Searcher.ConfirmedGames.Count < 1)
+            Searcher.ConfirmGame();
+
+            if (Searcher.ConfirmedGames.Count == 1)
             {
                 Searcher.AssociatedGame.ToggleIsCurrentGame();
             }

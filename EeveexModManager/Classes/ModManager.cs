@@ -133,8 +133,6 @@ namespace EeveexModManager.Classes
                 string res3 = await (await httpClient.GetAsync(API_ModFileInfoSource)).Content.ReadAsStringAsync();
                 res3 = res3.Replace("[", string.Empty).Replace("]", string.Empty);
 
-                GC.Collect();
-
                 var result_downloadInfo = JsonConvert.DeserializeObject<Api_ModDownloadInfo>(res1);
                 var result_modInfo = JsonConvert.DeserializeObject<Api_ModInfo>(res2);
                 var result_fileInfo = JsonConvert.DeserializeObject<Api_ModFileInfo>(res3);
@@ -166,8 +164,6 @@ namespace EeveexModManager.Classes
                 {
                     DownloadsManager.AddDownload(new Uri(result_downloadInfo.URI), DownloadAs, DownloadTo, InstallTo, result_modInfo.name, result_fileInfo.name, newMod);
                 }, DispatcherPriority.ApplicationIdle));
-
-                GC.Collect();
             }
         }
 

@@ -20,6 +20,12 @@ namespace EeveexModManager
         public const string DEFAULTMODAUTHOR = "Unknown";
         public const string DEFAULTSOURCEURI = "Unknown";
         public const string NEXUSAPI_BASE = @"https://api.nexusmods.com/v1";
+        public const string NAMED_PIPE_CLIENT_EXECUTABLE = "named-pipe-client.exe";
+        public const string NAMED_PIPE_NAME = "EeveexModManager";
+    }
+
+    public static class ExtensionMethods
+    {
     }
 
     public class Assistant

@@ -23,6 +23,7 @@ namespace EeveexModManager.Classes
         public string Name { get; }
         public string Name_Nexus { get; protected set; }
         public string Name_API { get; }
+        public string RelativeDataPath { get; }
         public string Name_Registry { get; protected set; }
         public string[] Registry_Names { get; protected set; } = null;
         public string ModsDirectory { get; protected set; }
@@ -30,6 +31,7 @@ namespace EeveexModManager.Classes
         public string ProfilesDirectory { get; protected set; }
         public string BackupsDirectory { get; protected set; }
         public string ExecutableName { get; } = null;
+        public Dictionary<string, string> KnownExecutables { get; }
 
         public GameListEnum Id { get; }
         public bool IsCurrent { get; protected set; } = false;
@@ -39,32 +41,6 @@ namespace EeveexModManager.Classes
         static string GetExecutablePath(string n, string path)
         {
             return ProcessDirectory(path, n);
-        }
-        public static string GetDataPath(GameListEnum id, string path)
-        {
-            switch (id)
-            {
-                case GameListEnum.SkyrimSE:
-                    return path + @"\Data";
-                case GameListEnum.Skyrim:
-                    return path + @"\Data";
-                case GameListEnum.Oblivion:
-                    return path + @"\Data";
-                case GameListEnum.Witcher3:
-                    return path + @"\Data";
-                case GameListEnum.FalloutNV:
-                    return path + @"\Data";
-                case GameListEnum.Fallout4:
-                    return path + @"\Data";
-                case GameListEnum.Fallout3:
-                    return path + @"\Data";
-                case GameListEnum.DragonAge2:
-                    return path + @"\Data";
-                case GameListEnum.DragonAgeOrigins:
-                    return path + @"\Data";
-                default:
-                    return path + @"\Data";
-            }
         }
         static string ProcessDirectory(string p, string n)
         {
@@ -82,45 +58,13 @@ namespace EeveexModManager.Classes
         public List<GameApplication> AutoDetectApplications()
         {
             List<GameApplication> apps = new List<GameApplication>();
-            List<string> names = new List<string>();
-            IEnumerable<KeyValuePair<string, string>> exes;
 
-            switch (Name)
+            var inf = Directory.EnumerateFiles(InstallationPath, "*.*", SearchOption.AllDirectories)
+                .Select(x => new KeyValuePair<string, string>(new FileInfo(x).Name, x));
+
+            foreach (var file in inf.Where(s => KnownExecutables.Values.Contains(s.Key)))
             {
-                case "TESV : Skyrim Special Edition":
-                    names = new List<string>()
-                    {
-                        "SKSE.exe", "SkyrimSE.exe", "SkyrimSELauncher.exe"
-                    };
-                    break;
-                case "TESV : Skyrim":
-                    names = new List<string>()
-                    {
-                        "skse_loader.exe", "TESV.exe", "SkyrimLauncher.exe"
-                    };
-                    break;
-                case "Fallout : New Vegas":
-                    names = new List<string>()
-                    {
-                        "FalloutNV.exe", "FalloutNVLauncher.exe"
-                    };
-                    break;
-                case "Fallout 4":
-                    break;
-                case "Fallout 3":
-                    break;
-                case "Dragon Age II":
-                    break;
-                default:
-                    break;
-            }
-
-            exes = Directory.EnumerateFiles(InstallationPath, "*.*", SearchOption.AllDirectories)
-                .Where(s => names.Any(s.Contains)).Select(x => new KeyValuePair<string, string>(x.Split('\\').Last(), x));
-
-            foreach (var item in exes)
-            {
-                apps.Add(new GameApplication(item.Key, item.Value, Id));
+                apps.Add(new GameApplication(KnownExecutables.FirstOrDefault(y => y.Value == file.Key).Key, file.Value, Id));
             }
 
             return apps;
@@ -152,7 +96,7 @@ namespace EeveexModManager.Classes
         /// <param name="nReg">Display name of the game in the registry (under Uninstall)</param>
         /// <param name="id">Nexus Mods' generated ID for the game</param>
         public Game(string iPath, string dPath, string ePath, string n, 
-            string nApi, string nNxm, string nReg, GameListEnum id)
+            string nApi, string nNxm, string nReg, GameListEnum id, Dictionary<string,string> exes)
         {
             Name = n;
             InstallationPath = iPath;
@@ -162,6 +106,7 @@ namespace EeveexModManager.Classes
             Name_Nexus = nNxm;
             Id = id;
             Name_Registry = nReg;
+            KnownExecutables = exes;
 
             string idAsString = Id.ToString();
 
@@ -178,8 +123,8 @@ namespace EeveexModManager.Classes
         /// <param name="def">Default settings of the game</param>
         /// <param name="regN">Registry name of the game</param>
         public Game(string iPath, IGameDefault def, string regN) : 
-            this(iPath, GetDataPath(def.Id, iPath), GetExecutablePath(def.ExecutableName, iPath), 
-                def.Name, def.Name_API, def.Name_Nexus, regN, def.Id)
+            this(iPath, $"{iPath}{def.RelativeDataPath}", GetExecutablePath(def.ExecutableName, iPath), 
+                def.Name, def.Name_API, def.Name_Nexus, regN, def.Id, def.KnownExecutables)
         { }
         /// <summary>
         /// Full Constructor
@@ -194,7 +139,7 @@ namespace EeveexModManager.Classes
         /// <param name="isCurr">Whether this game is the current one</param>
         public Game(string iPath, string dPath, string exePath, 
             IGameDefault def, string nReg, bool isCurr) : 
-            this(iPath, dPath, exePath, def.Name, def.Name_API, def.Name_Nexus, nReg, def.Id)
+            this(iPath, dPath, exePath, def.Name, def.Name_API, def.Name_Nexus, nReg, def.Id, def.KnownExecutables)
         {
             IsCurrent = isCurr;
         }

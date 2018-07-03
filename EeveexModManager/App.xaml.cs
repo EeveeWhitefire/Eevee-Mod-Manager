@@ -20,7 +20,7 @@ using EeveexModManager.Classes.DatabaseClasses;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using LiteDB;
-
+using System.Diagnostics;
 
 public enum StatesOfConfiguartion
 {
@@ -82,7 +82,6 @@ namespace EeveexModManager
             {
                 isMainProcess = false;
             }
-            _namedPipeManager = new NamedPipeManager("EeveexModManager", isMainProcess);
 
 
             // Application is running
@@ -113,21 +112,22 @@ namespace EeveexModManager
                 {
                     if (modArg != null)
                     {
-                        Task.Run(() => _namedPipeManager.Send_NamedPipe(modArg.SourceUrl));
-                        /*Thread t = new Thread(() =>);
-                        t.SetApartmentState(ApartmentState.STA);
-                        t.Start();*/
+                        ProcessStartInfo info = new ProcessStartInfo(Defined.NAMED_PIPE_CLIENT_EXECUTABLE)
+                        {
+                            Arguments = modArg.ToString(),
+                            CreateNoWindow = true
+                        };
                     }
                 }
-                catch (Exception ee)
+                catch (Exception)
                 {
-                    MessageBox.Show(ee.ToString());
                 }
                 mutex.ReleaseMutex();
                 mutex.Close();
             }
             else
             {
+                _namedPipeManager = new NamedPipeManager(Defined.NAMED_PIPE_NAME);
                 _jsonParser = new Service_JsonParser();
 
                 if (!File.Exists("config.json"))

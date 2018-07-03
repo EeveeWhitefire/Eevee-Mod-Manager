@@ -150,45 +150,14 @@ namespace EeveexModManager
 
             BindingOperations.SetBinding(ModList_View, HeightProperty, new Binding("ActualHeight")
             {
-                Converter = _mulConverter,
-                ConverterParameter = (58.0 + 1.0/3.0)/100.0,
-                Source = LeftStackPanel,
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            });
-            BindingOperations.SetBinding(LowerTabControl, HeightProperty, new Binding("ActualHeight")
-            {
-                Converter = _mulConverter,
-                ConverterParameter = 0.25,
+                Converter = _addConverter,
+                ConverterParameter = -288,
                 Source = LeftStackPanel,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             });
         }
 
         
-        private void MainGrid_SizeChanged(object sender, SizeChangedEventArgs e)
-        {/*
-            double diff;
-            if (e.HeightChanged)
-            {
-                diff = e.NewSize.Height - e.PreviousSize.Height;
-                if (Math.Abs(diff) > 20)
-                {
-                    LeftStackPanel.Height += diff;
-                    ModList_View.Height += (double)(diff / 2.0);
-                    LowerTabControl.Height += (double)(diff / 2.0);
-                }
-            }
-            else if (e.WidthChanged)
-            {
-                diff = e.NewSize.Width - e.PreviousSize.Width;
-                if (Math.Abs(diff) > 20)
-                {
-                    LeftStackPanel.Width += diff;
-                    ModList_View.Width += (double)(diff / 2.0);
-                    LowerTabControl.Width += (double)(diff / 2.0);
-                }
-            }*/
-        }
 
         private void ProfileSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

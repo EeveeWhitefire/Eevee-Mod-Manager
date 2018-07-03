@@ -20,29 +20,21 @@ namespace EeveexModManager.Classes
         public string Name { get; }
 
         private NamedPipeServerStream NamedPipeStream_Server;
-        private NamedPipeClientStream NamedPipeStream_Client;
         private PipeSecurity pipeSecurity;
 
         private Action<string> MessageReceivedHandler;
 
         public bool IsRunning = false;
 
-        public NamedPipeManager(string n, bool isServer)
+        public NamedPipeManager(string n)
         {
             Name = n;
-            if (!isServer)
-            {
-                NamedPipeStream_Client = new NamedPipeClientStream(".", Name, PipeDirection.InOut, PipeOptions.Asynchronous);
-            }
-            else
-            {
-                SecurityIdentifier sid = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
-                PipeAccessRule psRule = new PipeAccessRule(sid, PipeAccessRights.ReadWrite, AccessControlType.Allow);
-                pipeSecurity = new PipeSecurity();
-                pipeSecurity.AddAccessRule(psRule);
-                
-                NamedPipeStream_Server = new NamedPipeServerStream(Name, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous, 512, 512, pipeSecurity);
-            }
+            SecurityIdentifier sid = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
+            PipeAccessRule psRule = new PipeAccessRule(sid, PipeAccessRights.ReadWrite, AccessControlType.Allow);
+            pipeSecurity = new PipeSecurity();
+            pipeSecurity.AddAccessRule(psRule);
+
+            NamedPipeStream_Server = new NamedPipeServerStream(Name, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous, 512, 512, pipeSecurity);
         }
 
         public void CloseConnections()
@@ -50,16 +42,8 @@ namespace EeveexModManager.Classes
             IsRunning = false;
             try
             {
-                if(NamedPipeStream_Client != null)
-                {
-                    NamedPipeStream_Client.Dispose();
-                    NamedPipeStream_Client.Close();
-                }
-                else
-                {
-                    NamedPipeStream_Server.Dispose();
-                    NamedPipeStream_Server.Close();
-                }
+                NamedPipeStream_Server.Dispose();
+                NamedPipeStream_Server.Close();
             }
             catch (Exception e)
             {
@@ -70,26 +54,6 @@ namespace EeveexModManager.Classes
         public void ChangeMessageReceivedHandler(Action<string> handler)
         {
             MessageReceivedHandler = handler;
-        }
-        
-
-        public void Send_NamedPipe(object data)
-        {
-            try
-            {
-                NamedPipeStream_Client.Connect(2000);
-
-                PipeStreamString_Out streamStr = new PipeStreamString_Out(NamedPipeStream_Client);
-
-                streamStr.WriteString(data.ToString());
-                Task.Delay(10);
-                CloseConnections();
-                Environment.Exit(0);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.ToString());
-            }
         }
 
         public void Listen_NamedPipe(Dispatcher d)

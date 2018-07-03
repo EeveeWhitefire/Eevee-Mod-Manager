@@ -23,11 +23,13 @@ namespace EeveexModManager.Classes.DatabaseClasses
         public string Name { get; set; }
         public string Name_API { get; set; }
         public string Name_Registry { get; set; }
+        public string RelativeDataPath { get; set; }
         public string[] Registry_Names { get; protected set; } = null;
         public string ModsDirectory { get; set; }
         public string DownloadsDirectory { get; set; }
         public string ProfilesDirectory { get; set; }
         public string BackupsDirectory { get; set; }
+        public Dictionary<string, string> KnownExecutables { get; set; }
 
         public GameListEnum Id { get; set; }
 

@@ -12,7 +12,9 @@ namespace EeveexModManager.Interfaces
         string Name { get; }
         string Name_Nexus { get; }
         string Name_API { get; }
+        string RelativeDataPath { get; }
         string[] Registry_Names { get; }
         string ExecutableName { get; }
+        Dictionary<string, string> KnownExecutables { get; }
     }
 }

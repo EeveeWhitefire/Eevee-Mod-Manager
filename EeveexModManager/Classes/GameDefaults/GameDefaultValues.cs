@@ -58,8 +58,17 @@ namespace EeveexModManager.Classes.GameDefaults
             public string Name_Nexus { get; } = "skyrimse";
             public string Name_API { get; } = "skyrimspecialedition";
             public string ExecutableName { get; } = "SkyrimSE.exe";
+            public string RelativeDataPath { get; } = "Data";
             public string[] Registry_Names { get; } = new string[]
             { "The Elder Scrolls V: Skyrim Special Edition" };
+            public Dictionary<string, string> KnownExecutables { get; } = new Dictionary<string, string>();
+
+            public Default_SkyrimSE()
+            {
+                KnownExecutables.Add("SkyrimSE", "SkyrimSE.exe");
+                KnownExecutables.Add("SkyrimSELaucher", "SkyrimSELauncher.exe");
+                KnownExecutables.Add("SKSE", "SKSE.exe");
+            }
         }
 
         public class Default_Skyrim : IGameDefault
@@ -68,9 +77,18 @@ namespace EeveexModManager.Classes.GameDefaults
             public string Name { get; } = "TESV : Skyrim";
             public string Name_Nexus { get; } = "skyrim";
             public string Name_API { get; } = "skyrim";
+            public string RelativeDataPath { get; } = "\\Data";
             public string ExecutableName { get; } = "TESV.exe";
             public string[] Registry_Names { get; } = new string[]
             { "TSEV Skyrim LE", "The Elder Scrolls V: Skyrim" };
+            public Dictionary<string, string> KnownExecutables { get; } = new Dictionary<string, string>();
+
+            public Default_Skyrim()
+            {
+                KnownExecutables.Add("Skyrim", "TESV.exe");
+                KnownExecutables.Add("SkyrimLaucher", "SkyrimLauncher.exe");
+                KnownExecutables.Add("SKSE", "skse_loader.exe");
+            }
         }
 
         public class Default_Oblivion : IGameDefault
@@ -79,9 +97,11 @@ namespace EeveexModManager.Classes.GameDefaults
             public string Name { get; } = "TESIV : Oblivion";
             public string Name_Nexus { get; } = "skyrim";
             public string Name_API { get; } = "skyrim";
+            public string RelativeDataPath { get; } = "\\Data";
             public string ExecutableName { get; } = "SkyrimSE.exe";
             public string[] Registry_Names { get; } = new string[]
             { "TSEV Skyrim LE", "The Elder Scrolls V: Skyrim" };
+            public Dictionary<string, string> KnownExecutables { get; } = new Dictionary<string, string>();
         }
 
         public class Default_FalloutNV : IGameDefault
@@ -90,9 +110,17 @@ namespace EeveexModManager.Classes.GameDefaults
             public string Name { get; } = "Fallout : New Vegas";
             public string Name_Nexus { get; } = "falloutnv";
             public string Name_API { get; } = "newvegas";
+            public string RelativeDataPath { get; } = "\\Data";
             public string ExecutableName { get; } = "FalloutNV.exe";
             public string[] Registry_Names { get; } = new string[] 
             { "Fallout: New Vegas" };
+            public Dictionary<string, string> KnownExecutables { get; } = new Dictionary<string, string>();
+
+            public Default_FalloutNV()
+            {
+                KnownExecutables.Add("FalloutNV", "FalloutNV.exe");
+                KnownExecutables.Add("FalloutNVLauncher", "FalloutNVLauncher.exe");
+            }
         }
 
         public class Default_Witcher3 : IGameDefault
@@ -101,9 +129,11 @@ namespace EeveexModManager.Classes.GameDefaults
             public string Name { get; } = "The Witcher 3 : Wild Hunt";
             public string Name_Nexus { get; } = "witcher3";
             public string Name_API { get; } = "newvegas";
+            public string RelativeDataPath { get; } = "\\Data";
             public string ExecutableName { get; } = "SkyrimSE.exe";
             public string[] Registry_Names { get; } = new string[] 
             { "The Witcher 3" };
+            public Dictionary<string, string> KnownExecutables { get; } = new Dictionary<string, string>();
         }
         
         public class Default_DragonAgeOrigins : IGameDefault
@@ -112,9 +142,11 @@ namespace EeveexModManager.Classes.GameDefaults
             public string Name { get; } = "Dragon Age Origins";
             public string Name_Nexus { get; } = "dragonage";
             public string Name_API { get; } = "newvegas";
+            public string RelativeDataPath { get; } = "\\Data";
             public string ExecutableName { get; } = "SkyrimSE.exe";
             public string[] Registry_Names { get; } = new string[]
             { "Dragon Age Origins" };
+            public Dictionary<string, string> KnownExecutables { get; } = new Dictionary<string, string>();
         }
 
         public class Default_DragonAge2 : IGameDefault
@@ -123,9 +155,11 @@ namespace EeveexModManager.Classes.GameDefaults
             public string Name { get; } = "Dragon Age II";
             public string Name_Nexus { get; } = "dragonage2";
             public string Name_API { get; } = "newvegas";
+            public string RelativeDataPath { get; } = "\\Data";
             public string ExecutableName { get; } = "SkyrimSE.exe";
             public string[] Registry_Names { get; } = new string[] 
             { "Dragon Age II" };
+            public Dictionary<string, string> KnownExecutables { get; } = new Dictionary<string, string>();
         }
 
         public class Default_Fallout3 : IGameDefault
@@ -134,9 +168,11 @@ namespace EeveexModManager.Classes.GameDefaults
             public string Name { get; } = "Fallout 3";
             public string Name_Nexus { get; } = "dragonage2";
             public string Name_API { get; } = "newvegas";
+            public string RelativeDataPath { get; } = "Data";
             public string ExecutableName { get; } = "SkyrimSE.exe";
             public string[] Registry_Names { get; } = new string[] 
             { "Fallout3" };
+            public Dictionary<string, string> KnownExecutables { get; } = new Dictionary<string, string>();
         }
 
         public class Default_Fallout4 : IGameDefault
@@ -145,9 +181,11 @@ namespace EeveexModManager.Classes.GameDefaults
             public string Name { get; } = "Fallout 4";
             public string Name_Nexus { get; } = "dragonage2";
             public string Name_API { get; } = "newvegas";
+            public string RelativeDataPath { get; } = "\\Data";
             public string ExecutableName { get; } = "SkyrimSE.exe";
             public string[] Registry_Names { get; } = new string[]
             { "Fallout 4" };
+            public Dictionary<string, string> KnownExecutables { get; } = new Dictionary<string, string>();
         }
     }
 }

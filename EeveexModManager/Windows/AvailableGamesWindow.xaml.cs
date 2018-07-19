@@ -37,7 +37,6 @@ namespace EeveexModManager.Windows
         private DatabaseContext_Main _db;
         private ProfilesManager _profilesManager;
         private Service_JsonParser _jsonParser;
-        private Json_Config _config;
         private NamedPipeManager _namedPipeManager;
         private Mutex _mutex;
         private List<Border> GameDetectorControlBorders;
@@ -47,14 +46,13 @@ namespace EeveexModManager.Windows
 
         private WindowsEnum GetBackTo = WindowsEnum.GameDetectionWindow;
 
-        public AvailableGamesWindow(Mutex m, DatabaseContext_Main db, Service_JsonParser jsp, Json_Config cnfg,
+        public AvailableGamesWindow(Mutex m, DatabaseContext_Main db, Service_JsonParser jsp,
             NamedPipeManager npm, List<DatabaseContext_Profile> profiles, ProfilesManager profMng, 
             bool getBackButton = false, WindowsEnum backTo = WindowsEnum.MainWindow)
         {
             _mutex = m;
             _db = db;
             _jsonParser = jsp;
-            _config = cnfg;
             _namedPipeManager = npm;
             _dbProfiles = profiles;
             _profilesManager = profMng;
@@ -79,7 +77,7 @@ namespace EeveexModManager.Windows
             switch (GetBackTo)
             {
                 case WindowsEnum.MainWindow:
-                    MainWindow mainWindow = new MainWindow(_mutex, _db, _jsonParser, _config, 
+                    MainWindow mainWindow = new MainWindow(_mutex, _db, _jsonParser,
                         _namedPipeManager, _dbProfiles, _profilesManager);
                     mainWindow.Show();
                     break;
@@ -145,13 +143,10 @@ namespace EeveexModManager.Windows
                     _profilesManager.AddProfile("master", item);
                     _dbProfiles.Add(new DatabaseContext_Profile(item.ProfilesDirectory + "\\master", item.Id));
                 }
-                
-                _config.State = StatesOfConfiguartion.Ready;
-                _config.Installation_Path = Directory.GetCurrentDirectory();
-                _jsonParser.UpdateJson(_config);
 
-                MainWindow window = new MainWindow(_mutex, _db, _jsonParser,
-                    _config, _namedPipeManager, _dbProfiles, _profilesManager);
+                Defined.Settings.State = StatesOfConfiguration.Ready;
+
+                MainWindow window = new MainWindow(_mutex, _db, _jsonParser, _namedPipeManager, _dbProfiles, _profilesManager);
                 window.Show();
 
                 Close();

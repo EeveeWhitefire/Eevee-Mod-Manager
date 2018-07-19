@@ -99,7 +99,7 @@ namespace EeveexModManager.Windows
         private void QuitButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
-            Environment.Exit(0);
+            Application.Current.Shutdown();
         }
 
         private void PickDownloadsDir_Click(object sender, RoutedEventArgs e)

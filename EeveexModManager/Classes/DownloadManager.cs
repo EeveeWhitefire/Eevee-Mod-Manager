@@ -27,7 +27,7 @@ namespace EeveexModManager.Classes
             ViewControl.ItemsSource = DownloadControls;
         }
 
-        public void AddDownload(Uri from, string As, string At, string installAt, string modN, string modFileN, Mod m)
+        public async Task AddDownload(Uri from, string As, string At, string installAt, string modN, string modFileN, Mod m)
         {
             Download newDl = new Download(from, As, At, installAt, modN, modFileN);
             ModDownload_Control control = new ModDownload_Control(ViewControl, newDl, AddToGUI, m);
@@ -35,9 +35,11 @@ namespace EeveexModManager.Classes
 
             Downloads.Add(newDl);
             DownloadControls.Add(control);
-            ViewControl.Items.Refresh();
-            
-            Task.Run( () => ViewControl.Dispatcher.Invoke(() => newDl.Start(), DispatcherPriority.Background));
+            await ViewControl.Dispatcher.BeginInvoke(DispatcherPriority.Background, (Action)(() =>
+            {
+                ViewControl.Items.Refresh();
+                newDl.Start();
+            }));
         }
     }
 }

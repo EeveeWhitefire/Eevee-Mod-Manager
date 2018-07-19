@@ -101,7 +101,6 @@ namespace EeveexModManager.Classes
                         Finished();
                     }
                     lastBytesSize += bytesSize;
-                    GC.Collect();
                 }
                 catch (Exception)
                 {
@@ -114,7 +113,6 @@ namespace EeveexModManager.Classes
                 File.WriteAllBytes(DownloadTo, totalDownloadBuffer);
                 Stop();
             }
-            GC.Collect();
         }
 
         public void Finished()
@@ -157,7 +155,6 @@ namespace EeveexModManager.Classes
                     downloadBuffer = new byte[FileSize]; //dunno every speed so will limit it to the file size
                     totalDownloadBuffer = new byte[FileSize];
                     Downloading();
-                    GC.Collect();
                 }
                 catch (Exception e)
                 {
@@ -256,7 +253,6 @@ namespace EeveexModManager.Classes
                     DownloadSpeed = 0;
                 _lastIndex = endIndex - startIndex;
                 //AssociatedDownloadControl.AssociatedView.Items.Refresh();
-                GC.Collect();
                 _start = DateTime.UtcNow;
             }
             return Task.CompletedTask;

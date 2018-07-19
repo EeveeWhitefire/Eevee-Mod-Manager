@@ -10,6 +10,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows;
 
+using ApplicationSettings = EeveexModManager.Classes.ApplicationSettings;
+
 namespace EeveexModManager
 {
     public class Defined
@@ -22,6 +24,9 @@ namespace EeveexModManager
         public const string NEXUSAPI_BASE = @"https://api.nexusmods.com/v1";
         public const string NAMED_PIPE_CLIENT_EXECUTABLE = "named-pipe-client.exe";
         public const string NAMED_PIPE_NAME = "EeveexModManager";
+        public const string REGISTRY_KEY_NAME = "Eeveex";
+        public const string DEFAULT_MODS_VIEW_SEARCHER_MESSAGE = "Enter mod name here...";
+        public static ApplicationSettings Settings = new ApplicationSettings();
     }
 
     public static class ExtensionMethods

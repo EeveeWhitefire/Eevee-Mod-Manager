@@ -67,7 +67,7 @@ namespace EeveexModManager.Classes.GameDefaults
             {
                 KnownExecutables.Add("SkyrimSE", "SkyrimSE.exe");
                 KnownExecutables.Add("SkyrimSELaucher", "SkyrimSELauncher.exe");
-                KnownExecutables.Add("SKSE", "SKSE.exe");
+                KnownExecutables.Add("SKSE", "skse64_loader.exe");
             }
         }
 

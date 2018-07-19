@@ -17,7 +17,7 @@ namespace EeveexModManager.Classes
 {
     public class NamedPipeManager : INamedPipe
     {
-        public string Name { get; }
+        public string Name { get; } = Defined.NAMED_PIPE_NAME;
 
         private NamedPipeServerStream NamedPipeStream_Server;
         private PipeSecurity pipeSecurity;
@@ -25,10 +25,10 @@ namespace EeveexModManager.Classes
         private Action<string> MessageReceivedHandler;
 
         public bool IsRunning = false;
+        private const int MAX_MESSAGE_LENGTH = 512;
 
-        public NamedPipeManager(string n)
+        public NamedPipeManager()
         {
-            Name = n;
             SecurityIdentifier sid = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
             PipeAccessRule psRule = new PipeAccessRule(sid, PipeAccessRights.ReadWrite, AccessControlType.Allow);
             pipeSecurity = new PipeSecurity();
@@ -56,28 +56,40 @@ namespace EeveexModManager.Classes
             MessageReceivedHandler = handler;
         }
 
-        public void Listen_NamedPipe(Dispatcher d)
+        public async Task Listen_NamedPipe(Dispatcher d)
         {
-            IsRunning = true;
+            if(!IsRunning) IsRunning = true;
+            bool connectedOrWaiting = false;
 
-            try
+            byte[] buffer = new byte[MAX_MESSAGE_LENGTH];
+
+            if (!connectedOrWaiting)
             {
-                NamedPipeStream_Server.WaitForConnection();
-                if (NamedPipeStream_Server.IsConnected)
+                NamedPipeStream_Server.BeginWaitForConnection(async (a) =>
                 {
+                    if (IsRunning)
+                    {
+                        NamedPipeStream_Server.EndWaitForConnection(a);
+                        await Task.Run(async () => await Listen_NamedPipe(d));
+                        connectedOrWaiting = true;
 
-                    Task.Run(() =>
-                   d.Invoke(() =>
-                   {
-                       PipeStreamString_In streamStr = new PipeStreamString_In(NamedPipeStream_Server);
-                       MessageReceivedHandler(streamStr.ReadString());
-                       NamedPipeStream_Server.Disconnect();
-                   }, DispatcherPriority.Background));
-                }
+                        if (NamedPipeStream_Server.IsConnected)
+                        {
+                            int inCount = NamedPipeStream_Server.Read(buffer, 0, MAX_MESSAGE_LENGTH);
+                            if (inCount > 0)
+                            {
+                                string input = Encoding.UTF8.GetString(buffer, 0, inCount);
+                                await d.BeginInvoke(MessageReceivedHandler, DispatcherPriority.Background, input);
+                            }
+
+                            NamedPipeStream_Server.Disconnect();
+                            connectedOrWaiting = false;
+                            await Task.CompletedTask;
+                        }
+                    }
+                }, null);
             }
-            catch (Exception)
-            {
-            }
+            await Task.CompletedTask;
         }
     }
 }

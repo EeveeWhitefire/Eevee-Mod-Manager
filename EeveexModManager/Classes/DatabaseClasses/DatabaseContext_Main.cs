@@ -15,12 +15,12 @@ namespace EeveexModManager.Classes.DatabaseClasses
 {
     public class DatabaseContext_Main : LiteDatabase
     {
-        public DatabaseContext_Main(Json_Config config) : base(config.AppData_Path + @"\EeveexModManager.db")
+        public DatabaseContext_Main() : base(Defined.Settings.ApplicationDataPath + @"\EeveexModManager.db4")
         {
             GetCollection<Db_Game>("games").EnsureIndex(x => x.Name);
 
             GetCollection<Db_UserProfile>("profiles").EnsureIndex(x => x.ProfileId);
-            GetCollection<Db_GameApplication>("game_apps");
+            GetCollection<Db_GameApplication>("game_apps").EnsureIndex(x => x.Name);
 
         }
 
@@ -29,7 +29,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
             return GetCollection<Db_Game>("games").FindOne(x => x.IsCurrent).EncapsulateToSource();
         }
 
-        public void FirstTimeSetup(Mutex m, Service_JsonParser jsp, Json_Config cnfg, 
+        public void FirstTimeSetup(Mutex m, Service_JsonParser jsp, 
             NamedPipeManager npm, List<DatabaseContext_Profile> profiles, ProfilesManager profileManager)
         {
             if (GetCollection<Game>("games").Count() > 0)
@@ -43,14 +43,13 @@ namespace EeveexModManager.Classes.DatabaseClasses
                 x.Dispose();
             });
             profiles.Clear();
-            GC.Collect();
+
             foreach (var item in GetCollection<Db_UserProfile>("profiles").FindAll())
             {
                 profileManager.DeleteProfile(item.ProfileId);
             }
 
-            AvailableGamesWindow chooseGames = new AvailableGamesWindow(m, this, jsp, cnfg, npm, 
-                profiles, profileManager);
+            AvailableGamesWindow chooseGames = new AvailableGamesWindow(m, this, jsp, npm, profiles, profileManager);
             chooseGames.Show();
         }
     }

@@ -17,17 +17,15 @@ namespace EeveexModManager.Classes
 {
     public class NxmHandler
     {
-        private Json_Config _config;
         private Service_JsonParser _jsonParser;
         private DatabaseContext_Main _db;
 
-        public NxmHandler(Json_Config jsc, Service_JsonParser jsonParser, CheckBox IsAssociated_CheckBox, DatabaseContext_Main db)
+        public NxmHandler(Service_JsonParser jsonParser, CheckBox IsAssociated_CheckBox, DatabaseContext_Main db)
         {
             _jsonParser = jsonParser;
-            _config = jsc;
             _db = db;
 
-            if (IsUrlAssociated("nxm") != _config.Nxm_Handled)
+            if (IsUrlAssociated("nxm") != Defined.Settings.IsNxmHandled)
                 AssociationManagement(IsUrlAssociated("nxm"), IsAssociated_CheckBox, _db.GetCollection<Db_Game>("games").FindAll());
         }
 
@@ -98,7 +96,7 @@ namespace EeveexModManager.Classes
                 //AssociateNxmFile(".nxm", "NXM_File_Handler", Directory.GetCurrentDirectory() + @"\" + "EeveexModManager.exe", "NXM File");
                 foreach (var item in games)
                 {
-                    AssociateNxmUrl($"nxm://{item.Name_Nexus}", "Nexus Url", _config.Installation_Path + @"\" + "EeveexModManager.exe");
+                    AssociateNxmUrl($"nxm://{item.Name_Nexus}", "Nexus Url", Defined.Settings.InstallationPath + @"\" + "EeveexModManager.exe");
                 }
                 cbx.IsChecked = newState;
             }
@@ -111,8 +109,7 @@ namespace EeveexModManager.Classes
                 cbx.IsChecked = newState;
 
             }
-            _config.Nxm_Handled = newState;
-            _jsonParser.UpdateJson(_config);
+            Defined.Settings.IsNxmHandled = newState;
         }
 
     }

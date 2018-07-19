@@ -41,7 +41,6 @@ namespace EeveexModManager
         private DatabaseContext_Main _db;
         private List<DatabaseContext_Profile> _dbProfiles;
         private Service_JsonParser _jsonParser;
-        private Json_Config _config;
         private NamedPipeManager _namedPipeManager;
         private ProfilesManager _profilesManager;
         private GamePicker_ComboBox _gamePicker;
@@ -51,27 +50,21 @@ namespace EeveexModManager
         private AccountHandler _accountHandler;
         private MultiplicationMathConverter _mulConverter;
         private AdditionMathConverter _addConverter;
-        private bool IsLoggedIn = false;
-
-        private const string DEFAULT_MODS_VIEW_SEARCHER_MESSAGE = "Enter mod name here...";
 
         #region Current State Variables
-        private Game _currGame;
+        private Game _currGame { get { return _db.GetCurrentGame(); } }
         private UserProfile _currProfile;
         private DatabaseContext_Profile _currProfileDb;
         #endregion
 
-        public MainWindow(Mutex mutex, DatabaseContext_Main db, Service_JsonParser jsonParser, 
-            Json_Config config, NamedPipeManager npm, List<DatabaseContext_Profile> profiles, 
-            ProfilesManager profMngr)
+        public MainWindow(Mutex mutex, DatabaseContext_Main db, Service_JsonParser jsonParser,
+            NamedPipeManager npm, List<DatabaseContext_Profile> profiles, ProfilesManager profMngr, Nexus.NexusUrl modUri = null)
         {
             InitializeComponent();
 
             _mutex = mutex;
             _jsonParser = jsonParser;
-            _config = config;
             _db = db;
-            _currGame = _db.GetCurrentGame();
             _dbProfiles = profiles;
             _currProfileDb = _dbProfiles.FirstOrDefault(x => _currGame.Id == x.GameId);
             _namedPipeManager = npm;
@@ -85,8 +78,9 @@ namespace EeveexModManager
             _modManager = new ModManager(_currProfileDb, ModList_View, Downloads_View);
             Task.Run( () =>
             {
-                _accountHandler = new AccountHandler(_config, WhenLogsIn);
+                _accountHandler = new AccountHandler(WhenLogsIn);
                 _modManager.SetAccountHandler(_accountHandler);
+                _accountHandler.Init();
             });
             
             _db.GetCollection<Db_Game>("games").Delete(x => !File.Exists(x.ExecutablePath));
@@ -110,28 +104,17 @@ namespace EeveexModManager
 
             if (!_namedPipeManager.IsRunning)
             {
-                _namedPipeManager.IsRunning = true;
-                Task.Run(() =>
-               {
-                   while (_namedPipeManager.IsRunning)
-                   {
-                       _namedPipeManager.Listen_NamedPipe(Dispatcher);
-                   }
-               });
+                Task.Run(async () => await _namedPipeManager.Listen_NamedPipe(Dispatcher));
             }
-            GC.Collect();
-            
+
+            if(modUri != null)
+            {
+                _modManager.CreateMod(_currGame, modUri).GetAwaiter();
+            }
         }
 
         public void InitGUI()
         {
-            InitBinds();
-        }
-
-        public void InitBinds()
-        {
-            //MainGrid.SizeChanged += MainGrid_SizeChanged;
-            
             BindingOperations.SetBinding(LeftStackPanel, WidthProperty, new Binding("ActualWidth")
             {
                 Converter = _addConverter,
@@ -156,9 +139,7 @@ namespace EeveexModManager
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             });
         }
-
         
-
         private void ProfileSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int index = ((ComboBox)sender).SelectedIndex;
@@ -198,7 +179,7 @@ namespace EeveexModManager
 
         void RerunGameDetection()
         {
-            AvailableGamesWindow gameDetectWindow = new AvailableGamesWindow(_mutex, _db, _jsonParser, _config, 
+            AvailableGamesWindow gameDetectWindow = new AvailableGamesWindow(_mutex, _db, _jsonParser,
                 _namedPipeManager, _dbProfiles, _profilesManager, true, WindowsEnum.MainWindow);
             gameDetectWindow.Show();
             Close();
@@ -231,7 +212,6 @@ namespace EeveexModManager
                 _db.GetCollection<Db_Game>("games").Update(game.EncapsulateToDb());
                 _db.GetCollection<Db_Game>("games").Update(_currGame.EncapsulateToDb());
             }
-            _currGame = game;
 
             _appPicker?.Items.Clear();
             var AvailableApplications = _db.GetCollection<Db_GameApplication>("game_apps").FindAll()
@@ -255,9 +235,9 @@ namespace EeveexModManager
         #region Login
         private void LogInButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!IsLoggedIn)
+            if (!_accountHandler.IsLoggedIn)
             {
-                LogInButton.Dispatcher.Invoke(() => _accountHandler.TryToLogIn().GetAwaiter().GetResult());
+                LogInButton.Dispatcher.Invoke(() => _accountHandler.TryLogin().GetAwaiter().GetResult());
             }
             else
             {
@@ -268,8 +248,7 @@ namespace EeveexModManager
         {
             ModList_View.Dispatcher.Invoke(() =>
             {
-               IsLoggedIn = true;
-               (LogInButton.Content as Image).Source = Assistant.LoadImageFromResources($"loginbutton_{IsLoggedIn}.png");
+               (LogInButton.Content as Image).Source = Assistant.LoadImageFromResources($"loginbutton_{_accountHandler.IsLoggedIn}.png");
                LoginState_TextBox.Text = $"Logged in! Welcome {username}!";
                LoginState_TextBox.Foreground = Brushes.LightGreen;
             });
@@ -278,12 +257,12 @@ namespace EeveexModManager
         {
             ModList_View.Dispatcher.Invoke(() =>
             {
-                IsLoggedIn = false;
-                (LogInButton.Content as Image).Source = Assistant.LoadImageFromResources($"loginbutton_{IsLoggedIn}.png");
+                _accountHandler.TryLogout();
+                (LogInButton.Content as Image).Source = Assistant.LoadImageFromResources($"loginbutton_{_accountHandler.IsLoggedIn}.png");
                 LoginState_TextBox.Text = "Not logged in.";
                 LoginState_TextBox.Foreground = Brushes.Red;
-                if (File.Exists(_config.AppData_Path + "\\token"))
-                    File.Delete(_config.AppData_Path + "\\token");
+                if (File.Exists(Defined.Settings.ApplicationDataPath + "\\token"))
+                    File.Delete(Defined.Settings.ApplicationDataPath + "\\token");
             });
         }
         #endregion
@@ -347,7 +326,7 @@ namespace EeveexModManager
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            SettingsWindow window = new SettingsWindow(_config, _db, _jsonParser);
+            SettingsWindow window = new SettingsWindow(_db, _jsonParser);
             window.Show();
         }
 
@@ -477,7 +456,6 @@ namespace EeveexModManager
                 var textbox = sender as TextBox;
                 if (textbox.Text.Length == 0)
                 {
-                    textbox.Text = DEFAULT_MODS_VIEW_SEARCHER_MESSAGE;
                     textbox.Foreground = Brushes.Gray;
                     _modManager.ModControls.ForEach(x => x.Visibility = Visibility.Visible);
                 }
@@ -501,7 +479,7 @@ namespace EeveexModManager
         private void ModsView_Searcher_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             var textbox = sender as TextBox;
-            if (textbox.Text == DEFAULT_MODS_VIEW_SEARCHER_MESSAGE)
+            if (textbox.Text == Defined.DEFAULT_MODS_VIEW_SEARCHER_MESSAGE)
                 textbox.Text = string.Empty;
         }
     }

@@ -25,28 +25,26 @@ namespace EeveexModManager.Windows
     public partial class SettingsWindow : Window
     {
         private DatabaseContext_Main _db;
-        private Json_Config _config;
         private NxmHandler _nxmHandler;
         private Service_JsonParser _jsonParser;
 
-        public SettingsWindow(Json_Config cnfg, DatabaseContext_Main db, Service_JsonParser parser)
+        public SettingsWindow(DatabaseContext_Main db, Service_JsonParser parser)
         {
             _db = db;
-            _config = cnfg;
             InitializeComponent();
-            AssociationWithNXM_CheckBox.IsChecked = _config.Nxm_Handled;
+            AssociationWithNXM_CheckBox.IsChecked = Defined.Settings.IsNxmHandled;
             _jsonParser = parser;
 
-            _nxmHandler = new NxmHandler(_config, _jsonParser, AssociationWithNXM_CheckBox, _db);
+            _nxmHandler = new NxmHandler(_jsonParser, AssociationWithNXM_CheckBox, _db);
         }
 
         ~SettingsWindow()
         {
             try
             {
-                if (_config.Nxm_Handled != AssociationWithNXM_CheckBox.IsChecked)
+                if (Defined.Settings.IsNxmHandled != AssociationWithNXM_CheckBox.IsChecked)
                 {
-                    _nxmHandler.AssociationManagement(_config.Nxm_Handled, AssociationWithNXM_CheckBox, _db.GetCollection<Db_Game>("games").FindAll());
+                    _nxmHandler.AssociationManagement(Defined.Settings.IsNxmHandled, AssociationWithNXM_CheckBox, _db.GetCollection<Db_Game>("games").FindAll());
                 }
             }
             catch (Exception)
@@ -57,7 +55,7 @@ namespace EeveexModManager.Windows
 
         private void Association_Button_Click(object sender, RoutedEventArgs e)
         {
-            _nxmHandler.AssociationManagement(_config.Nxm_Handled, AssociationWithNXM_CheckBox, _db.GetCollection<Db_Game>("games").FindAll());
+            _nxmHandler.AssociationManagement(Defined.Settings.IsNxmHandled, AssociationWithNXM_CheckBox, _db.GetCollection<Db_Game>("games").FindAll());
         }
     }
 }

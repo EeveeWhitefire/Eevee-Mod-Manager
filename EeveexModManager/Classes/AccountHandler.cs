@@ -20,30 +20,31 @@ namespace EeveexModManager.Classes
 {
     public class AccountHandler
     {
-        private Json_Config _config;
         private Action<string> WhenLogsIn = null;
-        public string token { get; protected set; }
-        public string username { get; protected set; }
-        public bool isLoggedIn { get; protected set; }
+        public string Token { get; protected set; }
+        public string Username { get; protected set; }
+        public bool IsLoggedIn { get; protected set; }
 
-        public AccountHandler(Json_Config cnfg, Action<string> action)
+        public AccountHandler(Action<string> action)
         {
-            _config = cnfg;
             WhenLogsIn = action;
-            if (!File.Exists(_config.AppData_Path + "\\token"))
+        }
+        public void Init()
+        {
+            if (!File.Exists(Defined.Settings.ApplicationDataPath + "\\token"))
             {
                 LogIn("Would you like to log in to Nexus?");
             }
             else
             {
-                using (StreamReader r = new StreamReader(_config.AppData_Path + "\\token"))
+                using (StreamReader r = new StreamReader(Defined.Settings.ApplicationDataPath + "\\token"))
                 {
                     string key = r.ReadToEndAsync().GetAwaiter().GetResult();
 
                     if (ValidateKey(key))
                     {
-                        token = key;
-                        WhenLogsIn(username);
+                        Token = key;
+                        WhenLogsIn(Username);
                     }
                     else
                     {
@@ -55,11 +56,10 @@ namespace EeveexModManager.Classes
         
         private void LogIn(string msg)
         {
-            if (MessageBox.Show(msg , "Nexus Login",
+            if (MessageBox.Show(msg, "Nexus Login",
                 MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.No)
             {
-                //do yes stuff
-                Task.Run(() => TryToLogIn().GetAwaiter().GetResult());
+                TryLogin().GetAwaiter().GetResult();
             }
         }
 
@@ -87,9 +87,9 @@ namespace EeveexModManager.Classes
                 try
                 {
                     var user_info = JsonConvert.DeserializeObject<Api_UserInfo>(output);
-                    username = user_info.name;
-                    token = user_info.key;
-                    isLoggedIn = true;
+                    Username = user_info.name;
+                    Token = user_info.key;
+                    IsLoggedIn = true;
                     return true;
                 }
                 catch (Exception e)
@@ -110,7 +110,7 @@ namespace EeveexModManager.Classes
             }
         }
 
-        public async Task TryToLogIn()
+        public async Task TryLogin()
         {
             string randomId = new Random().Next(0, 80000000).ToString();
 
@@ -138,11 +138,11 @@ namespace EeveexModManager.Classes
                             key = key.Replace("\"", string.Empty);
                             if (ValidateKey(key))
                             {
-                                using (StreamWriter w = new StreamWriter(_config.AppData_Path + "\\token"))
+                                using (StreamWriter w = new StreamWriter(Defined.Settings.ApplicationDataPath + "\\token"))
                                 {
                                     await w.WriteAsync(key);
                                 }
-                                await Task.Run( () => WhenLogsIn(username));
+                                WhenLogsIn(Username);
                             }
                         }
                     }
@@ -152,6 +152,10 @@ namespace EeveexModManager.Classes
                     }
                 }
             }
+        }
+        public void TryLogout()
+        {
+            IsLoggedIn = false;
         }
     }
 }

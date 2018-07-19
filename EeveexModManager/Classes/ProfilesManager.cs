@@ -15,12 +15,10 @@ namespace EeveexModManager.Classes
     public class ProfilesManager
     {
         private DatabaseContext_Main _mainDb;
-        private Json_Config _config;
 
-        public ProfilesManager(DatabaseContext_Main db, Json_Config cnfg)
+        public ProfilesManager(DatabaseContext_Main db)
         {
             _mainDb = db;
-            _config = cnfg;
         }
 
         public void DeleteProfile(ulong profileId)

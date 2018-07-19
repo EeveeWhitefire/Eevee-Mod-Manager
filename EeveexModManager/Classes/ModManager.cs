@@ -114,13 +114,13 @@ namespace EeveexModManager.Classes
         }
         public async Task CreateMod(Game CurrentGame, NexusUrl nexusUrl) //online
         {
-            if (!_db.GetCollection<Db_Mod>("mods").FindAll().Select(x => x.FileId).Contains(nexusUrl.FileId) && _accountHandler.isLoggedIn)
+            if (!_db.GetCollection<Db_Mod>("mods").FindAll().Select(x => x.FileId).Contains(nexusUrl.FileId) && _accountHandler.IsLoggedIn)
             {
                 string API_DownloadLinkSource = $"{Defined.NEXUSAPI_BASE}/games/{CurrentGame.Name_API}/mods/{nexusUrl.ModId}/files/{nexusUrl.FileId}/download_link";
                 string API_ModInfoSource = $"{Defined.NEXUSAPI_BASE}/games/{CurrentGame.Name_API}/mods/{nexusUrl.ModId}";
                 string API_ModFileInfoSource = $"{Defined.NEXUSAPI_BASE}/games/{CurrentGame.Name_API}/mods/{nexusUrl.ModId}/files/{nexusUrl.FileId}";
 
-                httpClient.DefaultRequestHeaders.Add("APIKEY", _accountHandler.token);
+                httpClient.DefaultRequestHeaders.Add("APIKEY", _accountHandler.Token);
                 httpClient.DefaultRequestHeaders.Add("User-Agent", "Nexus Client v0.63.14");
 
 
@@ -159,11 +159,7 @@ namespace EeveexModManager.Classes
                     CurrentGame.Id, (ModCategories)result_modInfo.category_id, nexusUrl.FileId, ModControls.Count, result_modInfo.version, nexusUrl.ModId,
                     result_modInfo.author, nexusUrl.SourceUrl.ToString(), true);
 
-                await Task.Run(() =>
-                Downloads_View.Dispatcher.Invoke(() =>
-                {
-                    DownloadsManager.AddDownload(new Uri(result_downloadInfo.URI), DownloadAs, DownloadTo, InstallTo, result_modInfo.name, result_fileInfo.name, newMod);
-                }, DispatcherPriority.ApplicationIdle));
+                await Task.Run(async () => await DownloadsManager.AddDownload(new Uri(result_downloadInfo.URI), DownloadAs, DownloadTo, InstallTo, result_modInfo.name, result_fileInfo.name, newMod));
             }
         }
 

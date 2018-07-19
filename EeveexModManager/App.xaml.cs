@@ -9,7 +9,6 @@ using System.Diagnostics;
 using EeveexModManager.Nexus;
 using EeveexModManager.Classes;
 using EeveexModManager.Services;
-using EeveexModManager.Classes.JsonClasses;
 using EeveexModManager.Classes.DatabaseClasses;
 
 namespace EeveexModManager

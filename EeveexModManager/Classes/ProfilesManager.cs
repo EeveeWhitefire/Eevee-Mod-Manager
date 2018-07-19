@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.IO;
 
 using EeveexModManager.Classes.DatabaseClasses;
-using EeveexModManager.Classes.JsonClasses;
 using EeveexModManager.Interfaces;
 using System.Windows;
 

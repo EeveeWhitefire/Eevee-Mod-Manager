@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using Microsoft.Win32;
 
-using EeveexModManager.Classes.JsonClasses;
 using EeveexModManager.Classes.DatabaseClasses;
 using EeveexModManager.Interfaces;
 using EeveexModManager.Services;

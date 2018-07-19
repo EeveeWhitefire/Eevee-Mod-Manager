@@ -10,7 +10,6 @@ using System.Net;
 
 using Newtonsoft.Json;
 
-using EeveexModManager.Classes.JsonClasses;
 using System.Windows;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;

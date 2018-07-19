@@ -15,7 +15,7 @@ using EeveexModManager.Classes;
 
 namespace EeveexModManager.Controls
 {
-    public class ModDownload_Control
+    public class ModDownload_Control : Control
     {
         public ListView AssociatedView { get; }
         public Download AssociatedDownload { get; }

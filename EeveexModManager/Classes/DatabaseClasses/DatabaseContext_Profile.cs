@@ -7,7 +7,6 @@ using LiteDB;
 using EeveexModManager.Classes;
 using EeveexModManager.Windows;
 using EeveexModManager.Services;
-using EeveexModManager.Classes.JsonClasses;
 using EeveexModManager.Interfaces;
 
 namespace EeveexModManager.Classes.DatabaseClasses

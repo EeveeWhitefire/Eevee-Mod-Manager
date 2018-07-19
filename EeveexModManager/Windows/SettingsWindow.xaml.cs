@@ -14,7 +14,6 @@ using System.Windows.Shapes;
 
 using EeveexModManager.Classes;
 using EeveexModManager.Classes.DatabaseClasses;
-using EeveexModManager.Classes.JsonClasses;
 using EeveexModManager.Services;
 
 namespace EeveexModManager.Windows

@@ -31,6 +31,8 @@ namespace EeveexModManager
 
     public static class ExtensionMethods
     {
+        public static bool IsEmpty(this string str)
+            => str.Length == 0;
     }
 
     public class Assistant

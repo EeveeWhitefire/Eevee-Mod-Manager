@@ -14,7 +14,6 @@ using Newtonsoft.Json;
 using EeveexModManager.Services;
 using EeveexModManager.Classes;
 using EeveexModManager.Classes.DatabaseClasses;
-using EeveexModManager.Classes.JsonClasses;
 using EeveexModManager.Controls;
 using EeveexModManager.Windows;
 using System.Windows.Media;
@@ -134,7 +133,7 @@ namespace EeveexModManager
             BindingOperations.SetBinding(ModList_View, HeightProperty, new Binding("ActualHeight")
             {
                 Converter = _addConverter,
-                ConverterParameter = -288,
+                ConverterParameter = -318,
                 Source = LeftStackPanel,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             });
@@ -449,34 +448,62 @@ namespace EeveexModManager
         }
         #endregion
 
-        private void ModsView_Searcher_TextChanged(object sender, TextChangedEventArgs e)
+        private void ModsView_FilterTxt_TextChanged(object sender, TextChangedEventArgs e)
         {
-            try
+            var textbox = sender as TextBox;
+            if (textbox.Text.IsEmpty())
             {
-                var textbox = sender as TextBox;
-                if (textbox.Text.Length == 0)
-                {
-                    textbox.Foreground = Brushes.Gray;
-                    _modManager.ModControls.ForEach(x => x.Visibility = Visibility.Visible);
-                }
-                else
-                {
-                    textbox.Foreground = Brushes.Black;
-                    _modManager.ModControls.ForEach(x =>
-                    {
-                        if (!x.FileName.ToLower().Contains(textbox.Text.ToLower()))
-                            x.Visibility = Visibility.Hidden;
-                        else
-                            x.Visibility = Visibility.Visible;
-                    });
-                }
+                textbox.Foreground = Brushes.Gray;
+                ModList_View.BorderBrush = Brushes.LightGray;
+                _modManager.ModControls.ForEach(x => x.Visibility = Visibility.Visible);
             }
-            catch (Exception)
+            else
             {
+                textbox.Foreground = Brushes.Black;
+                ModList_View.BorderBrush = Brushes.LightSkyBlue;
+                _modManager.ModControls.ForEach(x =>
+                {
+                    if (x.FileName.ToLower().Contains(textbox.Text.ToLower()) || x.ModName.ToLower().Contains(textbox.Text.ToLower()))
+                        x.Visibility = Visibility.Visible;
+                    else
+                        x.Visibility = Visibility.Hidden;
+                });
             }
+            ModList_View.Items.Refresh();
         }
 
-        private void ModsView_Searcher_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ModsView_FilterTxt_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var textbox = sender as TextBox;
+            if (textbox.Text == Defined.DEFAULT_MODS_VIEW_SEARCHER_MESSAGE)
+                textbox.Text = string.Empty;
+        }
+
+        private void DownloadsView_FilterTxt_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textbox = sender as TextBox;
+            if (textbox.Text.IsEmpty())
+            {
+                textbox.Foreground = Brushes.Gray;
+                Downloads_View.BorderBrush = Brushes.LightGray;
+                _modManager.DownloadsManager.DownloadControls.ForEach(x => x.Visibility = Visibility.Visible);
+            }
+            else
+            {
+                textbox.Foreground = Brushes.Black;
+                Downloads_View.BorderBrush = Brushes.LightSkyBlue;
+                _modManager.DownloadsManager.DownloadControls.ForEach(x =>
+                {
+                    if (x.DownloadName.ToLower().Contains(textbox.Text.ToLower()))
+                        x.Visibility = Visibility.Visible;
+                    else
+                        x.Visibility = Visibility.Hidden;
+                });
+            }
+            Downloads_View.Items.Refresh();
+        }
+
+        private void DownloadsView_FilterTxt_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             var textbox = sender as TextBox;
             if (textbox.Text == Defined.DEFAULT_MODS_VIEW_SEARCHER_MESSAGE)

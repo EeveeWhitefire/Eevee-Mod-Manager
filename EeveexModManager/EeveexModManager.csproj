@@ -240,7 +240,6 @@
     <Compile Include="Classes\NexusClasses\API\Api_ModFileInfo.cs" />
     <Compile Include="Classes\NexusClasses\API\Api_ModInfo.cs" />
     <Compile Include="Classes\NexusClasses\API\Api_UserInfo.cs" />
-    <Compile Include="Classes\JsonClasses\Json_AccountInfo.cs" />
     <Compile Include="Classes\Mod.cs" />
     <Compile Include="Classes\ModArchiveFile.cs" />
     <Compile Include="Classes\ModFile.cs" />

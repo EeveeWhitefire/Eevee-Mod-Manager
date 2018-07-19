@@ -17,7 +17,6 @@ using System.Windows.Threading;
 
 using EeveexModManager.Classes;
 using EeveexModManager.Classes.DatabaseClasses;
-using EeveexModManager.Classes.JsonClasses;
 using EeveexModManager.Controls;
 using EeveexModManager.Services;
 using EeveexModManager.Interfaces;

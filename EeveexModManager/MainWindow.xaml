@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:EeveexModManager"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="EeveexModManager.MainWindow"
         mc:Ignorable="d"
-        Title="Eeveex Mod Manager" Height="750" Width="1550" ResizeMode="CanResizeWithGrip" MinWidth="1380" MinHeight="730" x:Name="window">
+        Title="Eeveex Mod Manager" Height="780" Width="1550" ResizeMode="CanResizeWithGrip" MinWidth="1380" MinHeight="730" x:Name="window">
 
     <Window.Resources>
         <local:AdditionMathConverter x:Key="addConverter"/>
@@ -39,7 +39,7 @@
                         <Grid>
                             <StackPanel Orientation="Vertical">
                                 <ListView Height="350" Name="ModList_View" MouseDoubleClick="ModList_View_MouseDoubleClick" 
-                                          ContextMenuOpening="ModList_View_ContextMenuOpening" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,10">
+                                          ContextMenuOpening="ModList_View_ContextMenuOpening" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,10" BorderBrush="LightGray" BorderThickness="3">
                                     <ListView.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="Open in File Explorer" Click="Mod_OpenInExplorer_Click"/>
@@ -64,40 +64,44 @@
                                         </GridView>
                                     </ListView.View>
                                 </ListView>
-                                <TextBox Text="Enter mod name here..." TextChanged="ModsView_Searcher_TextChanged" Foreground="Gray" MouseUp="ModsView_Searcher_MouseDown"></TextBox>
+                                <TextBox TextChanged="ModsView_FilterTxt_TextChanged" Foreground="Gray" MouseUp="ModsView_FilterTxt_MouseDown"/>
                             </StackPanel>
                         </Grid>
                     </TabItem>
                 </TabControl>
             </StackPanel>
-            <TabControl Margin="0,20, 0, 0" Name="LowerTabControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="150">
+            <TabControl Margin="0,20, 0, 0" Name="LowerTabControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="180">
                 <TabItem Header="Downloads">
                     <Grid Name="DownloadsGrid">
-                        <ListView Name="Downloads_View" Width="{Binding ActualWidth, ElementName=DownloadsGrid}" HorizontalAlignment="Left" MouseDoubleClick="Downloads_View_MouseDoubleClick" ContextMenuOpening="Downloads_View_ContextMenuOpening">
-                            <ListView.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="Cancel"/>
-                                    <MenuItem Header="Uninstall Mod" Click="Mod_UninstallButton_Click"/>
-                                </ContextMenu>
-                            </ListView.ContextMenu>
-                            <ListView.Resources>
-                                <Style TargetType="GridViewColumnHeader" >
-                                    <Setter Property="MinWidth" Value="50" />
-                                    <Setter Property="MaxWidth" Value="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.4, ElementName=Downloads_View}"/>
-                                </Style>
-                            </ListView.Resources>
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Header="Name" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.2, ElementName=Downloads_View}" DisplayMemberBinding="{Binding DownloadName}"/>
-                                    <GridViewColumn Header="Downloaded" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.125, ElementName=Downloads_View}" DisplayMemberBinding="{Binding CurrentNumberOfBytes}"/>
-                                    <GridViewColumn Header="Out of" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.125, ElementName=Downloads_View}" DisplayMemberBinding="{Binding NumberOfBytesInTotal}"/>
-                                    <GridViewColumn Header="Percentage" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.15, ElementName=Downloads_View}" DisplayMemberBinding="{Binding DownloadedPercentage}"/>
-                                    <GridViewColumn Header="Download Speed" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.15, ElementName=Downloads_View}" DisplayMemberBinding="{Binding Speed}"/>
-                                    <GridViewColumn Header="Average Speed" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.15, ElementName=Downloads_View}" DisplayMemberBinding="{Binding AverageSpeed}"/>
-                                    <GridViewColumn Header="State" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.1, ElementName=Downloads_View}" DisplayMemberBinding="{Binding State}" />
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
+                        <StackPanel Orientation="Vertical">
+                            <ListView Name="Downloads_View" Width="{Binding ActualWidth, ElementName=DownloadsGrid}" HorizontalAlignment="Left" 
+                                      MouseDoubleClick="Downloads_View_MouseDoubleClick" ContextMenuOpening="Downloads_View_ContextMenuOpening" Margin="0,0,0,10" Height="124" BorderBrush="LightGray" BorderThickness="3">
+                                <ListView.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Cancel"/>
+                                        <MenuItem Header="Uninstall Mod" Click="Mod_UninstallButton_Click"/>
+                                    </ContextMenu>
+                                </ListView.ContextMenu>
+                                <ListView.Resources>
+                                    <Style TargetType="GridViewColumnHeader" >
+                                        <Setter Property="MinWidth" Value="50" />
+                                        <Setter Property="MaxWidth" Value="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.4, ElementName=Downloads_View}"/>
+                                    </Style>
+                                </ListView.Resources>
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Name" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.2, ElementName=Downloads_View}" DisplayMemberBinding="{Binding DownloadName}"/>
+                                        <GridViewColumn Header="Downloaded" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.125, ElementName=Downloads_View}" DisplayMemberBinding="{Binding CurrentNumberOfBytes}"/>
+                                        <GridViewColumn Header="Out of" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.125, ElementName=Downloads_View}" DisplayMemberBinding="{Binding NumberOfBytesInTotal}"/>
+                                        <GridViewColumn Header="Percentage" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.15, ElementName=Downloads_View}" DisplayMemberBinding="{Binding DownloadedPercentage}"/>
+                                        <GridViewColumn Header="Download Speed" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.15, ElementName=Downloads_View}" DisplayMemberBinding="{Binding Speed}"/>
+                                        <GridViewColumn Header="Average Speed" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.15, ElementName=Downloads_View}" DisplayMemberBinding="{Binding AverageSpeed}"/>
+                                        <GridViewColumn Header="State" Width="{Binding Width, Converter={StaticResource mulConverter}, ConverterParameter=0.1, ElementName=Downloads_View}" DisplayMemberBinding="{Binding State}" />
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                            <TextBox TextChanged="DownloadsView_FilterTxt_TextChanged" Foreground="Gray" MouseUp="DownloadsView_FilterTxt_MouseUp"/>
+                        </StackPanel>
                     </Grid>
                 </TabItem>
             </TabControl>

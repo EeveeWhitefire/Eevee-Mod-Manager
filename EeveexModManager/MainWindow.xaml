@@ -35,6 +35,7 @@
                                 <ListView.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="Open in File Explorer" Click="Mod_OpenInExplorer_Click"/>
+                                        <MenuItem Header="Show in Nexus" Click="Mod_ShowNexus_Click"/>
                                         <MenuItem Header="Uninstall Mod" Click="Mod_UninstallButton_Click"/>
                                     </ContextMenu>
                                 </ListView.ContextMenu>

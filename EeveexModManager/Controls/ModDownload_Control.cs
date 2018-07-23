@@ -19,9 +19,9 @@ namespace EeveexModManager.Controls
     {
         public ListView AssociatedView { get; }
         public Download AssociatedDownload { get; }
-        public Action<Mod> AddToGUI { get; }
+        public Mod AssociatedMod { get; }
 
-        private Mod AssoicatedMod { get; }
+        public Action<Mod> AddToGUI { get; }
 
         //Formatted
         public string DownloadName { get; set; }
@@ -38,7 +38,7 @@ namespace EeveexModManager.Controls
             AssociatedView = parent;
             AssociatedDownload = dl;
             AddToGUI = addToGui;
-            AssoicatedMod = m;
+            AssociatedMod = m;
 
             DownloadName = $"{AssociatedDownload.ModName} [{AssociatedDownload.ModFileName}]";
             CurrentNumberOfBytes = "0 KB";
@@ -140,7 +140,7 @@ namespace EeveexModManager.Controls
                     {
                         State = "Installed!";
                         AssociatedView.Items.Refresh();
-                        AddToGUI(AssoicatedMod);
+                        AddToGUI(AssociatedMod);
                     });
                 });
             }

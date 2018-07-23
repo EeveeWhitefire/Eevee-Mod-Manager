@@ -361,6 +361,22 @@ namespace EeveexModManager
                 _modManager.RemoveMod(control.AssociatedMod.FileId, ModList_View.SelectedIndex);
             }
         }
+
+        private void Mod_ShowNexus_Click(object sender, RoutedEventArgs e)
+        {
+            if (ModList_View.SelectedItems.Count == 1 && e.Source == ModList_View)
+            {
+                var control = ModList_View.SelectedItem as Mod_Control;
+                using (Process p = Process.Start(control.AssociatedMod.GetUrl(_currGame.Name_Nexus)))
+                { }
+            }
+            else if(Downloads_View.SelectedItems.Count == 1 && e.Source == Downloads_View)
+            {
+                var control = Downloads_View.SelectedItem as ModDownload_Control;
+                using (Process p = Process.Start(control.AssociatedMod.GetUrl(_currGame.Name_Nexus)))
+                { }
+            }
+        }
         #endregion
 
         #endregion
@@ -413,6 +429,14 @@ namespace EeveexModManager
                 mia.Click += Downloads_View_RestartOrCancelHandler;
                 theMenu.Items.Add(mia);
             }
+
+            MenuItem showNxmMia = new MenuItem()
+            {
+                Header = "Show in Nexus"
+            };
+            showNxmMia.Click += Mod_ShowNexus_Click;
+            theMenu.Items.Add(showNxmMia);
+
             return theMenu.Items.Count > 0 ? theMenu : null;
         }
 

@@ -69,6 +69,9 @@ namespace EeveexModManager.Classes
             Active = !Active;
         }
 
+        public string GetUrl(string gameName)
+            => $@"https://www.nexusmods.com/{gameName}/mods/{Id}";
+
         public Db_Mod EncapsulateToDb()
         {
             return new Db_Mod()

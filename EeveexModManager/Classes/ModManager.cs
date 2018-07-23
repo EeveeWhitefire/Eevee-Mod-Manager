@@ -36,7 +36,6 @@ namespace EeveexModManager.Classes
     public class ModManager
     {
         private DatabaseContext_Profile _db;
-        private HttpClient httpClient;
 
         private ListView Mods_View { get; }
         private ListView Downloads_View { get; }
@@ -106,7 +105,7 @@ namespace EeveexModManager.Classes
         }
         public async Task CreateMod(Game CurrentGame, NexusUrl nexusUrl) //online
         {
-            if (!_db.GetCollection<Db_Mod>("mods").FindAll().Select(x => x.FileId).Contains(nexusUrl.FileId) && _accountHandler.IsLoggedIn)
+            if (!_db.GetCollection<Db_Mod>("mods").Exists(x => x.FileId == nexusUrl.FileId) && _accountHandler.IsLoggedIn)
             {
                 var result_downloadInfo = await _nexusCommunicator.GetDownloadLinks(CurrentGame.Name_API, nexusUrl.ModId, nexusUrl.FileId);
                 var result_modInfo = await _nexusCommunicator.GetModInfo(CurrentGame.Name_API, nexusUrl.ModId);
@@ -124,6 +123,7 @@ namespace EeveexModManager.Classes
 
                 if (!Directory.Exists(DownloadTo))
                     Directory.CreateDirectory(DownloadTo);
+
                 if (!Directory.Exists(InstallTo))
                     Directory.CreateDirectory(InstallTo);
 

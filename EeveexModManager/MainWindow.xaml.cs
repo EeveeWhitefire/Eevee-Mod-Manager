@@ -8,6 +8,10 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using System.ComponentModel;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Diagnostics;
+using System.Windows.Data;
 
 using Newtonsoft.Json;
 
@@ -16,11 +20,7 @@ using EeveexModManager.Classes;
 using EeveexModManager.Classes.DatabaseClasses;
 using EeveexModManager.Controls;
 using EeveexModManager.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using EeveexModManager.Interfaces;
-using System.Diagnostics;
-using System.Windows.Data;
 
 namespace EeveexModManager
 {

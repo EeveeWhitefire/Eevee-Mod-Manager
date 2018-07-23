@@ -110,10 +110,10 @@ namespace EeveexModManager.Classes
 
             string idAsString = Id.ToString();
 
-            ModsDirectory = InstallationPath[0] + ":\\EVX\\Mods\\" + idAsString;
-            DownloadsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\EVX\\Downloads\\" + idAsString;
-            ProfilesDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\EVX\\Profiles\\" + idAsString;
-            BackupsDirectory = InstallationPath[0] + ":\\EVX\\Backups\\" + idAsString;
+            ModsDirectory = InstallationPath[0] + ":\\EMM\\Mods\\" + idAsString;
+            DownloadsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\EMM\\Downloads\\" + idAsString;
+            ProfilesDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\EMM\\Profiles\\" + idAsString;
+            BackupsDirectory = InstallationPath[0] + ":\\EMM\\Backups\\" + idAsString;
         }
 
         /// <summary>

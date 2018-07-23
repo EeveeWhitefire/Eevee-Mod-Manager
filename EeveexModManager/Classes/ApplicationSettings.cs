@@ -21,7 +21,7 @@ namespace EeveexModManager.Classes
         {
             InstallationPath = InstallationPath ?? Environment.CurrentDirectory;
             Environment.CurrentDirectory = InstallationPath;
-            ApplicationDataPath = ApplicationDataPath ?? $@"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\EVX";
+            ApplicationDataPath = ApplicationDataPath ?? $@"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\EMM";
         }
 
         [UserScopedSetting()]

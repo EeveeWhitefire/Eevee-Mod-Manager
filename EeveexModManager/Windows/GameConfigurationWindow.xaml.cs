@@ -109,7 +109,7 @@ namespace EeveexModManager.Windows
             if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 p = d.SelectedPath;
-                p = p.Length > 3 ? p : p + "EVX\\Downloads\\" + AssociatedGame.Id.ToString();
+                p = p.Length > 3 ? p : p + "EMM\\Downloads\\" + AssociatedGame.Id.ToString();
                 ProfilesDirectory_TB.Text = p;
             }
         }
@@ -121,7 +121,7 @@ namespace EeveexModManager.Windows
             if(d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 p = d.SelectedPath;
-                p = p.Length > 3 ? p : p + "EVX\\Profiles\\" + AssociatedGame.Id.ToString();
+                p = p.Length > 3 ? p : p + "EMM\\Profiles\\" + AssociatedGame.Id.ToString();
                 ProfilesDirectory_TB.Text = p;
             }
         }
@@ -136,7 +136,7 @@ namespace EeveexModManager.Windows
             if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 p = d.SelectedPath;
-                p = p.Length > 3 ? p : p + "EVX\\Mods\\" + AssociatedGame.Id.ToString();
+                p = p.Length > 3 ? p : p + "EMM\\Mods\\" + AssociatedGame.Id.ToString();
             }
 
             while(p[0] != DriveChar)
@@ -145,7 +145,7 @@ namespace EeveexModManager.Windows
                 if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     p = d.SelectedPath;
-                    p = p.Length > 3 ? p : p + "EVX\\Mods\\" + AssociatedGame.Id.ToString();
+                    p = p.Length > 3 ? p : p + "EMM\\Mods\\" + AssociatedGame.Id.ToString();
                 }
             }
             ProfilesDirectory_TB.Text = p;
@@ -161,7 +161,7 @@ namespace EeveexModManager.Windows
             if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 p = d.SelectedPath;
-                p = p.Length > 3 ? p : p + "EVX\\Backups\\" + AssociatedGame.Id.ToString();
+                p = p.Length > 3 ? p : p + "EMM\\Backups\\" + AssociatedGame.Id.ToString();
             }
 
             while (p[0] != DriveChar)
@@ -170,7 +170,7 @@ namespace EeveexModManager.Windows
                 if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     p = d.SelectedPath;
-                    p = p.Length > 3 ? p : p + "EVX\\Backups\\" + AssociatedGame.Id.ToString();
+                    p = p.Length > 3 ? p : p + "EMM\\Backups\\" + AssociatedGame.Id.ToString();
                 }
             }
             ProfilesDirectory_TB.Text = p;

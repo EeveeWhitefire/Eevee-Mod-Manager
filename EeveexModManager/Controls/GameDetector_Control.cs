@@ -99,8 +99,7 @@ namespace EeveexModManager.Controls
             Children.Add(UpperPanel);
 
         }
-
-
+        
         private void IgnoreModButton_Click(object sender, RoutedEventArgs e)
         {
             IgnoreMod();

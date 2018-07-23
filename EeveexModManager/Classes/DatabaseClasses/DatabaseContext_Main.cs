@@ -14,7 +14,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
 {
     public class DatabaseContext_Main : LiteDatabase
     {
-        public DatabaseContext_Main() : base(Defined.Settings.ApplicationDataPath + @"\EeveexModManager.db4")
+        public DatabaseContext_Main() : base(Defined.Settings.ApplicationDataPath + @"\EeveeModManager.db4")
         {
             GetCollection<Db_Game>("games").EnsureIndex(x => x.Name);
 

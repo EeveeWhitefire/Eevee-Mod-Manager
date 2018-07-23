@@ -16,7 +16,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
         public GameListEnum GameId { get; protected set; }
 
         public DatabaseContext_Profile(string profileDir, GameListEnum gameId) : 
-            base(profileDir + $@"\EVX.db4")
+            base(profileDir + $@"\EMM.db4")
         {
             GameId = GameId;
             GetCollection<Db_Mod>("mods").EnsureIndex(x => x.FileId);

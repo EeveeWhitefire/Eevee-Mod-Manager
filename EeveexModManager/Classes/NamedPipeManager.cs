@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO.Pipes;
-
-using EeveexModManager.Interfaces;
 using System.Threading;
 using System.IO;
 using System.Windows;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows.Threading;
+
+using EeveexModManager.Interfaces;
 
 namespace EeveexModManager.Classes
 {

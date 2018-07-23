@@ -74,46 +74,44 @@ namespace EeveexModManager
 
             _namedPipeManager.ChangeMessageReceivedHandler(HandlePipeMessage);
 
-            _modManager = new ModManager(_currProfileDb, ModList_View, Downloads_View);
-            Task.Run( () =>
+            Task.Run(() =>
             {
-                _accountHandler = new AccountHandler(WhenLogsIn);
-                _modManager.SetAccountHandler(_accountHandler);
-                _accountHandler.Init();
+               _accountHandler = new AccountHandler(WhenLogsIn);
+               _accountHandler.Init();
+               _modManager = new ModManager(_currProfileDb, ModList_View, Downloads_View, _accountHandler);
+
+               _db.GetCollection<Db_Game>("games").Delete(x => !File.Exists(x.ExecutablePath));
+
+               _gamePicker = new GamePicker_ComboBox(_db.GetCollection<Db_Game>("games").FindAll(), 75, 25, ReconfigureGames, SetGame)
+               {
+                   HorizontalAlignment = HorizontalAlignment.Right,
+                   Margin = new Thickness(0, 10, 0, 10),
+                   VerticalAlignment = VerticalAlignment.Top,
+                   Width = 430,
+                   Height = 80
+               };
+               ProfileSelector.SelectionChanged += ProfileSelector_SelectionChanged;
+               _gamePicker.SelectedIndex = _db.GetCollection<Db_Game>("games").FindAll().ToList().FindIndex(x => x.IsCurrent) + 1;
+
+                if (modUri != null)
+                {
+                    _modManager.CreateMod(_currGame, modUri).GetAwaiter();
+                }
             });
-            
-            _db.GetCollection<Db_Game>("games").Delete(x => !File.Exists(x.ExecutablePath));
 
-            _gamePicker = new GamePicker_ComboBox(_db.GetCollection<Db_Game>("games").FindAll(), 75, 25, RerunGameDetection, SetGame)
-            {
-                HorizontalAlignment = HorizontalAlignment.Right,
-                Margin = new Thickness(0, 10, 0, 10),
-                VerticalAlignment = VerticalAlignment.Top,
-                Width = 430,
-                Height = 80
-            };
-            ProfileSelector.SelectionChanged += ProfileSelector_SelectionChanged;
-            _gamePicker.SelectedIndex = _db.GetCollection<Db_Game>("games").FindAll().ToList().FindIndex(x => x.IsCurrent) + 1;
-
-            if(_appPicker != null)
+            if (_appPicker != null)
                 RightStack.Children.Add(_appPicker);
             if (_gamePicker != null)
                 RightStack.Children.Add(_gamePicker);
-
 
             if (!_namedPipeManager.IsRunning)
             {
                 Task.Run(async () => await _namedPipeManager.Listen_NamedPipe(Dispatcher));
             }
-
-            if(modUri != null)
-            {
-                _modManager.CreateMod(_currGame, modUri).GetAwaiter();
-            }
         }
 
         public void InitGUI()
-        {
+        {/*
             BindingOperations.SetBinding(LeftStackPanel, WidthProperty, new Binding("ActualWidth")
             {
                 Converter = _addConverter,
@@ -136,7 +134,7 @@ namespace EeveexModManager
                 ConverterParameter = -318,
                 Source = LeftStackPanel,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            });
+            });*/
         }
         
         private void ProfileSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -164,19 +162,8 @@ namespace EeveexModManager
             ModList_View.ItemsSource.GetEnumerator().Reset();
             GC.Collect();
         }
-
-        ~MainWindow() //removing the symlinks / mod files
-        {
-            try
-            {
-            }
-            catch (Exception)
-            {
-            }
-
-        }
-
-        void RerunGameDetection()
+        
+        void ReconfigureGames()
         {
             AvailableGamesWindow gameDetectWindow = new AvailableGamesWindow(_mutex, _db, _jsonParser,
                 _namedPipeManager, _dbProfiles, _profilesManager, true, WindowsEnum.MainWindow);

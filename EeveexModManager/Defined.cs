@@ -26,6 +26,7 @@ namespace EeveexModManager
         public const string NAMED_PIPE_NAME = "EeveexModManager";
         public const string REGISTRY_KEY_NAME = "Eeveex";
         public const string DEFAULT_MODS_VIEW_SEARCHER_MESSAGE = "Enter mod name here...";
+        public const int MAX_GAME_DETECTORS_IN_COLUMN = 4;
         public static ApplicationSettings Settings = new ApplicationSettings();
     }
 

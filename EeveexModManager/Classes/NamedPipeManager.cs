@@ -76,13 +76,13 @@ namespace EeveexModManager.Classes
                         if (NamedPipeStream_Server.IsConnected)
                         {
                             int inCount = NamedPipeStream_Server.Read(buffer, 0, MAX_MESSAGE_LENGTH);
+                            NamedPipeStream_Server.Disconnect();
                             if (inCount > 0)
                             {
                                 string input = Encoding.UTF8.GetString(buffer, 0, inCount);
                                 await d.BeginInvoke(MessageReceivedHandler, DispatcherPriority.Background, input);
                             }
 
-                            NamedPipeStream_Server.Disconnect();
                             connectedOrWaiting = false;
                             await Task.CompletedTask;
                         }

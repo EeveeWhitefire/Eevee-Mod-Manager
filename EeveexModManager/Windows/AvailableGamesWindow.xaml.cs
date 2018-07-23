@@ -38,7 +38,6 @@ namespace EeveexModManager.Windows
         private Service_JsonParser _jsonParser;
         private NamedPipeManager _namedPipeManager;
         private Mutex _mutex;
-        private List<Border> GameDetectorControlBorders;
         private IEnumerable<IGameDefault> _gameDefaults = GameDefaultValues.GetGamesDefault();
 
         private int GamesConfigured = 0;
@@ -60,8 +59,6 @@ namespace EeveexModManager.Windows
             _games = new List<Game>();
 
             InitializeComponent();
-            GameDetectorControlBorders = (GameSearchers_StackPanel.Children.Cast<StackPanel>())
-                .SelectMany(x => x.Children.Cast<Border>()).ToList();
 
             if(getBackButton)
             {
@@ -70,6 +67,7 @@ namespace EeveexModManager.Windows
             }
 
         }
+        
 
         private void GetBackToMainWindow_Click(object sender, RoutedEventArgs e)
         {
@@ -176,30 +174,44 @@ namespace EeveexModManager.Windows
             }
         }
 
-        private void ConfirmGameDetection(IGameDefault g, Border parent)
+        private void ConfirmGameDetection(IGameDefault g, Border border)
         {
-            parent.Dispatcher.Invoke(() =>
+            border.Dispatcher.BeginInvoke((Action)(() =>
             {
                 (_gameDefaults as IList<IGameDefault>).Remove(g);
 
                 if (_gameDefaults.Count() > 0)
                 {
-                    int indexOfBorder = GameDetectorControlBorders.IndexOf(parent);
-                    if (indexOfBorder < GameDetectorControlBorders.Count - 1)
+                    var parentStkPanel = border.Parent as StackPanel;
+                    Border newBorder = new Border()
                     {
-                        GameDetectorControlBorders.ElementAt(indexOfBorder + 1).Visibility = Visibility.Visible;
+                        Style = mainGrid.TryFindResource("GameDetectionBorderStyle") as Style,
+                        Child = new Button()
+                        {
+                            Style = mainGrid.TryFindResource("GameAdditionButtonTemplate") as Style
+                        }
+                    };
+                    if (parentStkPanel.Children.Count < Defined.MAX_GAME_DETECTORS_IN_COLUMN)
+                    {
+                        parentStkPanel.Children.Add(newBorder);
+                    }
+                    else
+                    {
+                        StackPanel newStkPanel = new StackPanel()
+                        {
+                            Style = mainGrid.TryFindResource("GameDetectorsStackPanelStyle") as Style
+                        };
+                        newStkPanel.Children.Add(newBorder);
+                        gameDetectorsParent.Children.Add(newStkPanel);
                     }
                 }
                 GameDetector_Control currDetectorControl = new GameDetector_Control(g);
 
                 _gameSeachers.Add(new GameSearcher(g, currDetectorControl, _games));
                 currDetectorControl.Searcher = _gameSeachers.LastOrDefault();
-                currDetectorControl.Dispatcher.BeginInvoke((Action)(() => currDetectorControl.Searcher.StartSearch()), DispatcherPriority.Background);
-
-                parent.Child = currDetectorControl;
-            });
-
-            GC.Collect();
+                currDetectorControl.Searcher.StartSearch();
+                border.Child = currDetectorControl;
+            }), DispatcherPriority.Background);
         }
     }
 }

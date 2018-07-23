@@ -7,9 +7,15 @@
         mc:Ignorable="d"
         Title="Settings" Height="300" Width="300" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
     <Grid>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
-            <CheckBox Name="AssociationWithNXM_CheckBox" Margin="10,0" VerticalAlignment="Center"/>
-            <Button Content="Associate NXM" HorizontalAlignment="Right" FontSize="30" VerticalAlignment="Center" Click="Association_Button_Click"/>
-        </StackPanel>
+        <TabControl>
+            <TabItem Header="Nexus">
+                <Border BorderBrush="DarkSeaGreen" BorderThickness="2">
+                    <StackPanel Orientation="Horizontal" Margin="7">
+                        <TextBlock Text="Nexus Urls are associated:"/>
+                        <CheckBox Name="AssociationWithNXM_CheckBox" Margin="10,0,0,0"/>
+                    </StackPanel>
+                </Border>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

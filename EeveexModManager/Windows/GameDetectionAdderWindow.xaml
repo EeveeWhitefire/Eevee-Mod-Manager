@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EeveexModManager.Windows"
         mc:Ignorable="d"
-        Title="Please select a game:" Height="250" Width="290" ResizeMode="NoResize">
+        Title="Please select a game:" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <ComboBox Name="availableGames_ComboBox" Width="250" Height="75" Margin="10,10"/>
-            <Button Content="Confirm" Click="ConfirmGameButton_Click" Height="35" FontSize="20" Margin="10,10"/>
-            <Button Content="Cancel" Click="CancelGameButton_Click" Height="35" FontSize="20"  Margin="10,10"/>
+        <StackPanel Orientation="Vertical" Width="300" Margin="10">
+            <ComboBox Name="availableGames_ComboBox" Height="75" Margin="10"/>
+            <Button Content="Confirm" Click="ConfirmGameButton_Click" Height="35" FontSize="20" Margin="10,10,10,10"/>
+            <Button Content="Cancel" Click="CancelGameButton_Click" Height="35" FontSize="20"  Margin="10,0,10,0"/>
         </StackPanel>
     </Grid>
 </Window>

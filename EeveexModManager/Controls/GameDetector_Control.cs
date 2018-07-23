@@ -76,7 +76,7 @@ namespace EeveexModManager.Controls
             {
                 VerticalAlignment = VerticalAlignment.Bottom,
                 HorizontalAlignment = HorizontalAlignment.Left,
-                Margin = new Thickness(10,0,0,10)
+                Margin = new Thickness(0,0,0,10)
             };
             CancelButton.Click += new RoutedEventHandler(IgnoreModButton_Click);
 

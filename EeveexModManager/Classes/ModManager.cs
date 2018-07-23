@@ -42,21 +42,17 @@ namespace EeveexModManager.Classes
         private ListView Downloads_View { get; }
         public List<Mod_Control> ModControls { get; protected set; }
         private AccountHandler _accountHandler;
+        private NexusCommunicationManager _nexusCommunicator;
 
         public DownloadManager DownloadsManager { get; protected set; }
 
-        public ModManager(DatabaseContext_Profile db)
+        public ModManager(DatabaseContext_Profile db, ListView modsTreeView, ListView downloadsTreeView,
+            AccountHandler ah)
         {
-            httpClient = new HttpClient();
             _db = db;
-        }
-
-
-        public ModManager(DatabaseContext_Profile db, ListView modsTreeView, ListView downloadsTreeView) : 
-            this(db)
-        {
-            httpClient = new HttpClient();
+            _accountHandler = ah;
             DownloadsManager = new DownloadManager(downloadsTreeView, AddModToGUI);
+            _nexusCommunicator = new NexusCommunicationManager(_accountHandler.Token);
 
 
             Downloads_View = downloadsTreeView;
@@ -86,10 +82,6 @@ namespace EeveexModManager.Classes
                 ModControls.Add(new Mod_Control(x.EncapsulateToSource(), _db));
             });
         }
-        public void SetAccountHandler(AccountHandler ah)
-        {
-            _accountHandler = ah;
-        }
 
         public void AddModToGUI(Mod m)
         {
@@ -116,26 +108,9 @@ namespace EeveexModManager.Classes
         {
             if (!_db.GetCollection<Db_Mod>("mods").FindAll().Select(x => x.FileId).Contains(nexusUrl.FileId) && _accountHandler.IsLoggedIn)
             {
-                string API_DownloadLinkSource = $"{Defined.NEXUSAPI_BASE}/games/{CurrentGame.Name_API}/mods/{nexusUrl.ModId}/files/{nexusUrl.FileId}/download_link";
-                string API_ModInfoSource = $"{Defined.NEXUSAPI_BASE}/games/{CurrentGame.Name_API}/mods/{nexusUrl.ModId}";
-                string API_ModFileInfoSource = $"{Defined.NEXUSAPI_BASE}/games/{CurrentGame.Name_API}/mods/{nexusUrl.ModId}/files/{nexusUrl.FileId}";
-
-                httpClient.DefaultRequestHeaders.Add("APIKEY", _accountHandler.Token);
-                httpClient.DefaultRequestHeaders.Add("User-Agent", "Nexus Client v0.63.14");
-
-
-                string res1 = await (await httpClient.GetAsync(API_DownloadLinkSource)).Content.ReadAsStringAsync();
-                res1 = res1.Replace("[", string.Empty).Replace("]", string.Empty); //removing first and last '[' ']' cus i don't see any reason for it to be a list
-
-                string res2 = await (await httpClient.GetAsync(API_ModInfoSource)).Content.ReadAsStringAsync();
-                res2 = res2.Replace("[", string.Empty).Replace("]", string.Empty);
-
-                string res3 = await (await httpClient.GetAsync(API_ModFileInfoSource)).Content.ReadAsStringAsync();
-                res3 = res3.Replace("[", string.Empty).Replace("]", string.Empty);
-
-                var result_downloadInfo = JsonConvert.DeserializeObject<Api_ModDownloadInfo>(res1);
-                var result_modInfo = JsonConvert.DeserializeObject<Api_ModInfo>(res2);
-                var result_fileInfo = JsonConvert.DeserializeObject<Api_ModFileInfo>(res3);
+                var result_downloadInfo = await _nexusCommunicator.GetDownloadLinks(CurrentGame.Name_API, nexusUrl.ModId, nexusUrl.FileId);
+                var result_modInfo = await _nexusCommunicator.GetModInfo(CurrentGame.Name_API, nexusUrl.ModId);
+                var result_fileInfo = await _nexusCommunicator.GetModFileInfo(CurrentGame.Name_API, nexusUrl.ModId, nexusUrl.FileId);
 
                 string ModDownloadTo = $@"{CurrentGame.DownloadsDirectory }\{result_modInfo.name}";
                 if (!Directory.Exists(ModDownloadTo))

@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 
 using EeveexModManager.Controls;
+using EeveexModManager.Classes.DatabaseClasses;
 
 namespace EeveexModManager.Classes
 {

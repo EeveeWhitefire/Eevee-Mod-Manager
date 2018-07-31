@@ -102,7 +102,7 @@ namespace EeveexModManager
                 }
 
                 _db = new DatabaseContext_Main();// Strong Type Class
-                foreach (var game in _db.GetCollection<Db_Game>("games").FindAll())
+                foreach (var game in _db.GetCollection<Game>("games").FindAll())
                 {
                     if (!Directory.Exists(game.ModsDirectory))
                         Directory.CreateDirectory(game.ModsDirectory);
@@ -113,12 +113,12 @@ namespace EeveexModManager
                 }
                 _profilesManager = new ProfilesManager(_db);
 
-                foreach (var item in _db.GetCollection<Db_UserProfile>("profiles").FindAll())
+                foreach (var item in _db.GetCollection<Classes.DatabaseClasses.UserProfile>("profiles").FindAll())
                 {
                     _dbProfiles.Add(new DatabaseContext_Profile(item.ProfileDirectory, item.GameId));
                 }
 
-                if (Defined.Settings.State == StatesOfConfiguration.FirstTime || _db.GetCollection<Db_Game>("games").FindAll().Count() < 1)
+                if (Defined.Settings.State == StatesOfConfiguration.FirstTime || _db.GetCollection<Game>("games").FindAll().Count() < 1)
                 {
                     _db.FirstTimeSetup(_mutex, _jsonParser, _namedPipeManager, _dbProfiles, _profilesManager);
                     foreach (var item in _dbProfiles)
@@ -137,7 +137,7 @@ namespace EeveexModManager
                         mainWindow.WindowState = WindowState.Minimized;
                     }
                     mainWindow.Show();
-                    mainWindow.InitGUI();
+                    mainWindow.InitBindings();
                 }
             }
         }

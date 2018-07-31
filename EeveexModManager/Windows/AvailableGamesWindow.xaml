@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="Please choose the games you'd like to mod:" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
 
-    <Grid Name="mainGrid">
+    <Grid Name="mainGrid" Background="#FF373737">
         <Grid.Resources>
             <BitmapImage x:Key="GameAdditionButtonBMP" UriSource="pack://application:,,,/Resources/gamedetectionaddition_button.png" />
             <Style TargetType="Border" x:Key="GameDetectionBorderStyle">
@@ -18,15 +18,18 @@
                 <Setter Property="HorizontalAlignment" Value="Left"/>
                 <Setter Property="BorderThickness" Value="2"/>
                 <Setter Property="BorderBrush" Value="Gainsboro"/>
-                <Setter Property="Visibility" Value="Hidden"/>
-                <Setter Property="Width" Value="514"/>
+                <Setter Property="Visibility" Value="Visible"/>
+                <Setter Property="Width" Value="520"/>
+                <Setter Property="Height" Value="153"/>
+                <Setter Property="Margin" Value="0,0,0,8"/>
             </Style>
             <Style TargetType="Button" x:Key="GameAdditionButtonTemplate">
                 <Setter Property="BorderBrush" Value="Transparent"/>
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Foreground" Value="Transparent"/>
-                <Setter Property="HorizontalAlignment" Value="Left"/>
-                <Setter Property="VerticalAlignment" Value="Top"/>
+                <Setter Property="Margin" Value="6"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
                 <EventSetter Event="Click" Handler="AddGameDetectionButton_Click"/>
                 <Setter Property="Template">
                     <Setter.Value>
@@ -44,11 +47,13 @@
             </Style>
             <Style TargetType="StackPanel" x:Key="GameDetectorsStackPanelStyle">
                 <Setter Property="Orientation" Value="Vertical"/>
-                <Setter Property="Margin" Value="0,0,5,0"/>
+                <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="VerticalAlignment" Value="Top"/>
                 <Setter Property="HorizontalAlignment" Value="Left"/>
             </Style>
+            <BitmapImage x:Key="EMMThumbnailBMP" UriSource="pack://application:,,,/Resources/thumbnail.png" />
         </Grid.Resources>
+        <Image Name="thumbnail" Source="{StaticResource EMMThumbnailBMP}" Visibility="Hidden" VerticalAlignment="Bottom" HorizontalAlignment="Left"  Panel.ZIndex="-1" Height="160" Width="400" />
         <StackPanel Orientation="Horizontal" Margin="20,20,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">
             <StackPanel Orientation="Vertical" Margin="0,0,100,0">
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
@@ -59,11 +64,10 @@
                     <Button Content="Confirm" Name="Confirm_Button" Click="ConfirmGamesButton_Click" Style="{StaticResource ActionButtonStyle}"/>
                     <Button Content="Confirm All" Click="ConfirmAllGamesButton_Click"  Style="{StaticResource ActionButtonStyle}" Margin="0"/>
                 </StackPanel>
-                <Button Content="Back" Margin="0,0,0,10" Height="40" FontSize="25" Click="GetBackToMainWindow_Click" Visibility="Hidden" Name="BackToMain_Button"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Name="gameDetectorsParent">
                 <StackPanel Style="{StaticResource GameDetectorsStackPanelStyle}">
-                    <Border Style="{StaticResource GameDetectionBorderStyle}" Visibility="Visible">
+                    <Border Style="{StaticResource GameDetectionBorderStyle}">
                         <Button Style="{StaticResource GameAdditionButtonTemplate}"/>
                     </Border>
                 </StackPanel>

@@ -27,8 +27,8 @@ namespace EeveexModManager.Controls
 
         public GameDetector_Control(IGameDefault game) : base()
         {
-            HorizontalAlignment = HorizontalAlignment.Left;
-            VerticalAlignment = VerticalAlignment.Top;
+            HorizontalAlignment = HorizontalAlignment.Center;
+            VerticalAlignment = VerticalAlignment.Center;
             Orientation = Orientation.Horizontal;
             GameDefault = game;
 
@@ -50,7 +50,8 @@ namespace EeveexModManager.Controls
             {
                 Text = GameDefault.Name,
                 FontSize = 20,
-                Margin = new Thickness(0,0,0,10)
+                Margin = new Thickness(0,0,0,10),
+                Foreground = Brushes.LightGray
             });
 
             UpperPanel.Children.Add(new TextBox()
@@ -158,7 +159,7 @@ namespace EeveexModManager.Controls
             {
                 Text = "Game Confirmed!",
                 Margin = new Thickness(35, 0, 0, 0),
-                Foreground = Brushes.DarkGoldenrod,
+                Foreground = Brushes.Goldenrod,
                 FontSize = GameSearcher.GameStateTextSize,
                 VerticalAlignment = VerticalAlignment.Center,
             });

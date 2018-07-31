@@ -25,7 +25,7 @@ namespace EeveexModManager.Classes
             _db = db;
 
             if (IsUrlAssociated("nxm") != Defined.Settings.IsNxmHandled)
-                AssociationManagement(IsUrlAssociated("nxm"), IsAssociated_CheckBox, _db.GetCollection<Db_Game>("games").FindAll());
+                AssociationManagement(IsUrlAssociated("nxm"), IsAssociated_CheckBox, _db.GetCollection<Game>("games").FindAll());
         }
 
         void AssociateNxmFile(string Extension, string KeyName, string OpenWith, string FileDescription)
@@ -87,7 +87,7 @@ namespace EeveexModManager.Classes
         [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
 
-        public void AssociationManagement(bool isAssociated, CheckBox cbx, IEnumerable<Db_Game> games)
+        public void AssociationManagement(bool isAssociated, CheckBox cbx, IEnumerable<Game> games)
         {
             bool newState = !isAssociated;
             if (!isAssociated)

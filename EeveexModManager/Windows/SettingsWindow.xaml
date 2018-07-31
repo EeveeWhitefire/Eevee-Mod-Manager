@@ -6,7 +6,12 @@
         xmlns:local="clr-namespace:EeveexModManager.Windows"
         mc:Ignorable="d"
         Title="Settings" Height="300" Width="300" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
-    <Grid>
+    <Grid Background="#FF373737">
+        <Grid.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#FF373737"/>
+            </Style>
+        </Grid.Resources>
         <TabControl>
             <TabItem Header="Nexus">
                 <Border BorderBrush="DarkSeaGreen" BorderThickness="2">

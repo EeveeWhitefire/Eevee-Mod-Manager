@@ -43,7 +43,7 @@ namespace EeveexModManager.Windows
             {
                 if (Defined.Settings.IsNxmHandled != AssociationWithNXM_CheckBox.IsChecked)
                 {
-                    _nxmHandler.AssociationManagement(Defined.Settings.IsNxmHandled, AssociationWithNXM_CheckBox, _db.GetCollection<Db_Game>("games").FindAll());
+                    _nxmHandler.AssociationManagement(Defined.Settings.IsNxmHandled, AssociationWithNXM_CheckBox, _db.GetCollection<Game>("games").FindAll());
                 }
             }
             catch (Exception)
@@ -54,7 +54,7 @@ namespace EeveexModManager.Windows
 
         private void Association_Button_Click(object sender, RoutedEventArgs e)
         {
-            _nxmHandler.AssociationManagement(Defined.Settings.IsNxmHandled, AssociationWithNXM_CheckBox, _db.GetCollection<Db_Game>("games").FindAll());
+            _nxmHandler.AssociationManagement(Defined.Settings.IsNxmHandled, AssociationWithNXM_CheckBox, _db.GetCollection<Game>("games").FindAll());
         }
     }
 }

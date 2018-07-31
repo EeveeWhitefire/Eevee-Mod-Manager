@@ -11,7 +11,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+
 using EeveexModManager.Classes;
+using EeveexModManager.Classes.DatabaseClasses;
 
 namespace EeveexModManager.Controls
 {

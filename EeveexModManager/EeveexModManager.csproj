@@ -223,15 +223,14 @@
     <Compile Include="Classes\AccountHandler.cs" />
     <Compile Include="Classes\ApplicationSettings.cs" />
     <Compile Include="Classes\Cryptographer.cs" />
+    <Compile Include="Classes\DatabaseClasses\DatabaseContextBase.cs" />
     <Compile Include="Classes\DatabaseClasses\DatabaseContext_Profile.cs" />
-    <Compile Include="Classes\DatabaseClasses\Db_GameApplication.cs" />
-    <Compile Include="Classes\DatabaseClasses\Db_Mod.cs" />
-    <Compile Include="Classes\DatabaseClasses\Db_Game.cs" />
-    <Compile Include="Classes\DatabaseClasses\Db_UserProfile.cs" />
+    <Compile Include="Classes\DatabaseClasses\GameApplication.cs" />
+    <Compile Include="Classes\DatabaseClasses\Mod.cs" />
+    <Compile Include="Classes\DatabaseClasses\Game.cs" />
+    <Compile Include="Classes\DatabaseClasses\UserProfile.cs" />
     <Compile Include="Classes\Download.cs" />
     <Compile Include="Classes\DownloadManager.cs" />
-    <Compile Include="Classes\Game.cs" />
-    <Compile Include="Classes\GameApplication.cs" />
     <Compile Include="Classes\GameSearcher.cs" />
     <Compile Include="Classes\IconExtractor.cs" />
     <Compile Include="Classes\IconUtil.cs" />
@@ -240,7 +239,6 @@
     <Compile Include="Classes\NexusClasses\API\Api_ModFileInfo.cs" />
     <Compile Include="Classes\NexusClasses\API\Api_ModInfo.cs" />
     <Compile Include="Classes\NexusClasses\API\Api_UserInfo.cs" />
-    <Compile Include="Classes\Mod.cs" />
     <Compile Include="Classes\ModArchiveFile.cs" />
     <Compile Include="Classes\ModFile.cs" />
     <Compile Include="Classes\ModManager.cs" />
@@ -249,13 +247,11 @@
     <Compile Include="Classes\NexusCommunicationManager.cs" />
     <Compile Include="Classes\NxmHandler.cs" />
     <Compile Include="Classes\ProfilesManager.cs" />
-    <Compile Include="Classes\UserProfile.cs" />
     <Compile Include="Controls\ApplicationPicker_ComboBox.cs" />
     <Compile Include="Controls\ApplicationPicker_Control.cs" />
     <Compile Include="Controls\CircularButton.cs" />
     <Compile Include="Controls\ConfirmGame_Button.cs" />
     <Compile Include="Controls\GameDetector_Control.cs" />
-    <Compile Include="Controls\GamePicker_ComboBox.cs" />
     <Compile Include="Controls\GamePicker_Control.cs" />
     <Compile Include="Controls\ModDownload_Control.cs" />
     <Compile Include="Controls\Mod_Control.cs" />
@@ -397,6 +393,10 @@
     <Content Include="named-pipe-client.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\settings_btn.png" />
+    <Resource Include="Resources\icon - placeholder.png" />
+    <Resource Include="Resources\editgamesettings.png" />
+    <Resource Include="Resources\addgamebutton.png" />
     <Resource Include="Resources\application_icon.ico" />
     <Resource Include="Resources\gamedetectionaddition_button.png" />
     <Resource Include="Resources\Icon - Witcher3.png" />

@@ -22,20 +22,20 @@ namespace EeveexModManager.Classes
 
         public void DeleteProfile(ulong profileId)
         {
-            var profile = _mainDb.GetCollection<Db_UserProfile>("profiles").FindOne(x => x.ProfileId == profileId);
+            var profile = _mainDb.GetCollection<UserProfile>("profiles").FindOne(x => x.ProfileId == profileId);
             if(profile != null)
             {
                 
                 if (Directory.Exists(profile.ProfileDirectory))
                     Directory.Delete(profile.ProfileDirectory, true);
 
-                _mainDb.GetCollection<Db_UserProfile>("profiles").Delete(x => x.ProfileId == profileId);
+                _mainDb.GetCollection<UserProfile>("profiles").Delete(x => x.ProfileId == profileId);
             }
         }
 
         public void AddProfile(string name, Game g, bool privateSaves = false)
         {
-            var profile = _mainDb.GetCollection<Db_UserProfile>("profiles")
+            var profile = _mainDb.GetCollection<DatabaseClasses.UserProfile>("profiles")
                 .FindOne(x => x.GameId == g.Id && x.Name.ToLower() == name.ToLower());
             if (profile != null)
             {
@@ -51,7 +51,7 @@ namespace EeveexModManager.Classes
                 else
                 {
                     string profileDir = g.ProfilesDirectory + $"\\{name}";
-                    Db_UserProfile prof = new Db_UserProfile
+                    DatabaseClasses.UserProfile prof = new DatabaseClasses.UserProfile
                     {
                         ProfileDirectory = profileDir,
                         GameId = g.Id,
@@ -60,7 +60,7 @@ namespace EeveexModManager.Classes
                     };
                     if (!Directory.Exists(profileDir))
                         Directory.CreateDirectory(profileDir);
-                    _mainDb.GetCollection<Db_UserProfile>("profiles").Insert(prof);
+                    _mainDb.GetCollection<DatabaseClasses.UserProfile>("profiles").Insert(prof);
                 }
             }
         }

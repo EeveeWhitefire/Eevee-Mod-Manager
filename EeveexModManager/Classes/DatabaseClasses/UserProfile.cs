@@ -11,7 +11,7 @@ using EeveexModManager.Classes;
 
 namespace EeveexModManager.Classes.DatabaseClasses
 {
-    public class Db_UserProfile : IUserProfile
+    public class UserProfile : IUserProfile
     {
         [BsonId]
         public ulong ProfileId { get; set; }
@@ -21,9 +21,17 @@ namespace EeveexModManager.Classes.DatabaseClasses
         public bool PrivateSaves { get; set; } = false;
         public GameListEnum GameId { get; set; }
 
-        public UserProfile EncapsulateToSource()
+        #region Constructors
+        public UserProfile() { }
+
+        public UserProfile(string n, GameListEnum gameId, bool usesPrivateSaves, string dir, ulong id)
         {
-            return new UserProfile(Name, GameId, PrivateSaves, ProfileDirectory, ProfileId);
+            Name = n;
+            PrivateSaves = usesPrivateSaves;
+            GameId = gameId;
+            ProfileDirectory = dir;
+            ProfileId = id;
         }
+        #endregion
     }
 }

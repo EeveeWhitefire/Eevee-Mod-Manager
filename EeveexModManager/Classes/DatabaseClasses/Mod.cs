@@ -1,38 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 using EeveexModManager.Interfaces;
-using EeveexModManager.Classes.DatabaseClasses;
-using System.IO;
+using EeveexModManager.Classes;
+using LiteDB;
 
-namespace EeveexModManager.Classes
+namespace EeveexModManager.Classes.DatabaseClasses
 {
     public class Mod : IMod
     {
-        public string Name { get;}
-        public string ModFileName { get; }
-        public bool Active { get; protected set; }
-        public bool Installed { get;}
-        public string SourceArchive { get; }
-        public string ModDirectory { get;}
+        public string Name { get; set; }
+        public string ModFileName { get; set; }
+        public bool Active { get; set; }
+        public bool Installed { get; set; }
+        public string SourceArchive { get; set; }
+        public string ModDirectory { get; set; }
         public string DownloadDirectory { get; }
-        public string Version { get; }
-        public string Id { get; }
-        public bool IsOnline { get; protected set; } = false;
-        public string Author { get; protected set; } = "Unknown";
-        public string FullSourceUri { get; protected set; } = "Unknown";
+        public string Version { get; set; }
+        public string Id { get; set; }
+        public bool IsOnline { get; set; }
+        public string Author { get; set; }
+        public string FullSourceUri { get; set; }
         public int Priority { get; set; }
 
-        public GameListEnum GameId { get;}
-        public ModCategories ModCategory { get;}
+        public GameListEnum GameId { get; set; }
+        public ModCategories ModCategory { get; set; }
 
+        [BsonId]
         public string FileId { get; set; }
 
         public List<ModFile> FileTree;
+        #region Constructors
+        public Mod() { }
 
         public Mod(string n, string fileN, bool active, bool installed, string source, string modDir, string dlDir, GameListEnum gameId, ModCategories category, string fileId, int priority,
             string version = Defined.DEFAULTMODVERSION, string id = Defined.DEFAULTMODID, string author = Defined.DEFAULTMODAUTHOR, string srcUri = Defined.DEFAULTSOURCEURI,
@@ -58,11 +60,10 @@ namespace EeveexModManager.Classes
             FileTree = new List<ModFile>();
             Assistant.GetAllFilesInDir(ModDirectory).ForEach(x =>
             {
-               FileTree.Add(new ModFile(this, x));
+                FileTree.Add(new ModFile(this, x));
             });
         }
-
-
+        #endregion
 
         public void ToggleIsActive()
         {
@@ -71,27 +72,5 @@ namespace EeveexModManager.Classes
 
         public string GetUrl(string gameName)
             => $@"https://www.nexusmods.com/{gameName}/mods/{Id}";
-
-        public Db_Mod EncapsulateToDb()
-        {
-            return new Db_Mod()
-            {
-                Name = Name,
-                Active = Active,
-                Installed = Installed,
-                SourceArchive = SourceArchive,
-                ModDirectory = ModDirectory,
-                GameId = GameId,
-                ModCategory = ModCategory,
-                FileId = FileId,
-                Version = Version,
-                IsOnline = IsOnline,
-                ModFileName = ModFileName,
-                Id = Id,
-                Author = Author,
-                FullSourceUri = FullSourceUri,
-                Priority = Priority
-            };
-        }
     }
 }

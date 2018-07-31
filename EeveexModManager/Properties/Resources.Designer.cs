@@ -61,6 +61,16 @@ namespace EeveexModManager.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap addgamebutton {
+            get {
+                object obj = ResourceManager.GetObject("addgamebutton", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         public static System.Drawing.Icon application_icon {
@@ -126,6 +136,16 @@ namespace EeveexModManager.Properties {
         public static System.Drawing.Bitmap Button_RedX_Hover {
             get {
                 object obj = ResourceManager.GetObject("Button_RedX_Hover", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap editgamesettings {
+            get {
+                object obj = ResourceManager.GetObject("editgamesettings", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -213,6 +233,16 @@ namespace EeveexModManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap icon_placeholder {
+            get {
+                object obj = ResourceManager.GetObject("icon_placeholder", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap icon_skyrim {
             get {
                 object obj = ResourceManager.GetObject("icon_skyrim", resourceCulture);
@@ -276,6 +306,16 @@ namespace EeveexModManager.Properties {
         public static System.Drawing.Bitmap nexusmods_logo {
             get {
                 object obj = ResourceManager.GetObject("nexusmods_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap settings_btn {
+            get {
+                object obj = ResourceManager.GetObject("settings_btn", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

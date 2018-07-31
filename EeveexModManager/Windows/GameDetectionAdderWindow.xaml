@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:EeveexModManager.Windows"
         mc:Ignorable="d"
         Title="Please select a game:" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
-    <Grid>
+    <Grid Background="#FF373737">
         <StackPanel Orientation="Vertical" Width="300" Margin="10">
             <ComboBox Name="availableGames_ComboBox" Height="75" Margin="10"/>
             <Button Content="Confirm" Click="ConfirmGameButton_Click" Height="35" FontSize="20" Margin="10,10,10,10"/>

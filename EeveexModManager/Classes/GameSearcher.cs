@@ -14,6 +14,7 @@ using Microsoft.Win32;
 
 using EeveexModManager.Controls;
 using EeveexModManager.Interfaces;
+using EeveexModManager.Classes.DatabaseClasses;
 
 namespace EeveexModManager.Classes
 {
@@ -90,7 +91,7 @@ namespace EeveexModManager.Classes
                     Margin = new Thickness(30, 0, 0, 0),
                     FontSize = GameStateTextSize,
                     VerticalAlignment = VerticalAlignment.Center,
-                    Foreground = Brushes.Green
+                    Foreground = Brushes.LightGreen
                 });
             }
             StopSearch();

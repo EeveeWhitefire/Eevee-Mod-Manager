@@ -7,77 +7,21 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using EeveexModManager.Classes;
+
+using EeveexModManager.Classes.DatabaseClasses;
 
 namespace EeveexModManager.Controls
 {
-    public class GamePicker_Control : StackPanel
+    public class GamePicker_Control : TextBlock
     {
         public Game AssociatedGame { get; protected set; }
-
-        StackPanel stkPanel;
-        double TextSize;
-
-        public GamePicker_Control(Game game, double imageSize, double fontSize) : base()
+        
+        public GamePicker_Control(Game game) : base()
         {
-            HorizontalAlignment = HorizontalAlignment.Left;
-            VerticalAlignment = VerticalAlignment.Top;
-            Orientation = Orientation.Horizontal;
-
             AssociatedGame = game;
-            TextSize = fontSize;
-
-            Image icon = Assistant.LoadGameImage(game.Id.ToString(), imageSize);
-
-            stkPanel = new StackPanel()
-            {
-                VerticalAlignment = VerticalAlignment.Top,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Orientation = Orientation.Vertical
-            };
-
-
-            Children.Add(icon);
-
-            stkPanel.Children.Add(new TextBlock()
-            {
-                Text = AssociatedGame.Name,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-                FontSize = TextSize
-            });
-
-            if ( game.IsCurrent)
-            {
-                GameToCurrent();
-            }
-
-            Children.Add(stkPanel);
-        }
-
-        public void GameToCurrent(bool toCurr = true)
-        {
-            if (AssociatedGame.IsCurrent != toCurr)
-            {
-                AssociatedGame.ToggleIsCurrentGame();
-            }
-
-            if (toCurr)
-            {
-                stkPanel.Children.Add(new TextBlock()
-                {
-                    Text = "Current",
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Bottom,
-                    Foreground = Brushes.Green,
-                    FontSize = TextSize - 5
-                });
-            }
-            else
-            {
-                stkPanel.Children.RemoveAt(stkPanel.Children.Count - 1);
-            }
-
+            HorizontalAlignment = HorizontalAlignment.Left;
+            VerticalAlignment = VerticalAlignment.Center;
+            Text = AssociatedGame.Name;
         }
     }
 }

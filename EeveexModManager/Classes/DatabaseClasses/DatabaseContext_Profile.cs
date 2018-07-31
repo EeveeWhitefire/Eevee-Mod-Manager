@@ -11,7 +11,7 @@ using EeveexModManager.Interfaces;
 
 namespace EeveexModManager.Classes.DatabaseClasses
 {
-    public class DatabaseContext_Profile : LiteDatabase
+    public class DatabaseContext_Profile : DatabaseContextBase
     {
         public GameListEnum GameId { get; protected set; }
 
@@ -19,12 +19,12 @@ namespace EeveexModManager.Classes.DatabaseClasses
             base(profileDir + $@"\EMM.db4")
         {
             GameId = GameId;
-            GetCollection<Db_Mod>("mods").EnsureIndex(x => x.FileId);
+            GetCollection<Mod>("mods").EnsureIndex(x => x.FileId);
         }
 
         public void FirstTimeSetup()
         {
-            if (GetCollection<Db_Mod>("mods").Count() > 0)
+            if (GetCollection<Mod>("mods").Count() > 0)
                 DropCollection("mods");
         }
     }

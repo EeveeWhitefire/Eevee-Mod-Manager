@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using EeveexModManager.Classes.DatabaseClasses;
+
 namespace EeveexModManager.Classes
 {
     public class ModFile

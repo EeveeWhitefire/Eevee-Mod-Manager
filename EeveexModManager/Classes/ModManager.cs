@@ -50,24 +50,26 @@ namespace EeveexModManager.Classes
         {
             _db = db;
             _accountHandler = ah;
-            DownloadsManager = new DownloadManager(downloadsTreeView, AddModToGUI);
-            _nexusCommunicator = new NexusCommunicationManager(_accountHandler.Token);
-
-
             Downloads_View = downloadsTreeView;
             Mods_View = modsTreeView;
-            ModControls = new List<Mod_Control>();
-            Mods_View.ItemsSource = ModControls;
+            modsTreeView.Dispatcher.Invoke(() =>
+            {
+               DownloadsManager = new DownloadManager(downloadsTreeView, AddModToGUI);
+               _nexusCommunicator = new NexusCommunicationManager(_accountHandler.Token);
+                
+               ModControls = new List<Mod_Control>();
+               Mods_View.ItemsSource = ModControls;
+            });
         }
 
         public void UpdateMod(Mod m)
         {
-            _db.GetCollection<Db_Mod>("mods").Update(m.EncapsulateToDb());
+            _db.GetCollection<Mod>("mods").Update(m);
         }
 
         public void RemoveMod(string fileId, int index)
         {
-            _db.GetCollection<Db_Mod>("mods").Delete(x => x.FileId == fileId);
+            _db.GetCollection<Mod>("mods").Delete(x => x.FileId == fileId);
             ModControls.RemoveAt(index);
             Mods_View.Items.Refresh();
         }
@@ -76,15 +78,15 @@ namespace EeveexModManager.Classes
         {
             _db = db;
             ModControls.Clear();
-            _db.GetCollection<Db_Mod>("mods").FindAll().ToList().ForEach(x =>
+            _db.GetCollection<Mod>("mods").FindAll().ToList().ForEach(x =>
             {
-                ModControls.Add(new Mod_Control(x.EncapsulateToSource(), _db));
+                ModControls.Add(new Mod_Control(x, _db));
             });
         }
 
         public void AddModToGUI(Mod m)
         {
-            _db.GetCollection<Db_Mod>("mods").Insert(m.EncapsulateToDb());
+            _db.GetCollection<Mod>("mods").Insert(m);
             ModControls.Add(new Mod_Control(m, _db));
             Mods_View.Items.Refresh();
         }
@@ -95,7 +97,7 @@ namespace EeveexModManager.Classes
             {
                 Filter = "Archive Files|*.rar;*.zip;*.7z;"
             };
-            int modIndex = _db.GetCollection<Db_Mod>("mods").Count();
+            int modIndex = _db.GetCollection<Mod>("mods").Count();
             
             Mod newMod = new Mod($"Offline Mod #{modIndex}", archive.FileName, false, true, archive.FullNewPath, archive.ModDirectory, archive.DownloadDirectory,
                 CurrentGame.Id, ModCategories.Unknown, $"off-{modIndex}", ModControls.Count);
@@ -105,7 +107,7 @@ namespace EeveexModManager.Classes
         }
         public async Task CreateMod(Game CurrentGame, NexusUrl nexusUrl) //online
         {
-            if (!_db.GetCollection<Db_Mod>("mods").Exists(x => x.FileId == nexusUrl.FileId) && _accountHandler.IsLoggedIn)
+            if (!_db.GetCollection<Mod>("mods").Exists(x => x.FileId == nexusUrl.FileId) && _accountHandler.IsLoggedIn)
             {
                 var result_downloadInfo = await _nexusCommunicator.GetDownloadLinks(CurrentGame.Name_API, nexusUrl.ModId, nexusUrl.FileId);
                 var result_modInfo = await _nexusCommunicator.GetModInfo(CurrentGame.Name_API, nexusUrl.ModId);
@@ -134,7 +136,11 @@ namespace EeveexModManager.Classes
                     CurrentGame.Id, (ModCategories)result_modInfo.category_id, nexusUrl.FileId, ModControls.Count, result_modInfo.version, nexusUrl.ModId,
                     result_modInfo.author, nexusUrl.SourceUrl.ToString(), true);
 
-                await Task.Run(async () => await DownloadsManager.AddDownload(new Uri(result_downloadInfo.URI), DownloadAs, DownloadTo, InstallTo, result_modInfo.name, result_fileInfo.name, newMod));
+                await Task.Run(async () => 
+                {
+                    await DownloadsManager.AddDownload(new Uri(result_downloadInfo.URI), DownloadAs, 
+                        DownloadTo, InstallTo, result_modInfo.name, result_fileInfo.name, newMod);
+                });
             }
         }
 

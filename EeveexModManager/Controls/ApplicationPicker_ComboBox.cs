@@ -12,51 +12,24 @@ namespace EeveexModManager.Controls
 {
     public class ApplicationPicker_ComboBox : ComboBox
     {
-        Action Utility;
-        List<Db_GameApplication> Apps;
+        IEnumerable<GameApplication> Apps;
+        private List<ApplicationPicker_Control> _controls;
 
-        public ApplicationPicker_ComboBox(List<Db_GameApplication> apps, Action OnUtility) : base()
+        public ApplicationPicker_ComboBox(ComboBox info) : base()
         {
-            HorizontalAlignment = HorizontalAlignment.Right;
-            VerticalAlignment = VerticalAlignment.Bottom;
-            Height = 80;
-            Width = 430;
-            Init(apps);
-            Utility = OnUtility;
-
-            SelectionChanged += new SelectionChangedEventHandler(SelectionChanged_Event);
+            HorizontalAlignment = info.HorizontalAlignment;
+            VerticalAlignment = info.VerticalAlignment;
+            Height = info.Height;
+            Width = info.Width;
         }
 
-        public void Init(List<Db_GameApplication> apps)
+        public void Init(IEnumerable<GameApplication> apps)
         {
-            Items.Add(new TextBlock()
-            {
-                Text = "Add another application",
-                FontSize = 20,
-                Height = 50,
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Left
-            });
             Apps = apps;
-            foreach (var a in Apps.Select(x => x.EncapsulateToSource()))
-            {
-                Items.Add(new ApplicationPicker_Control(a));
-            }
-
-            SelectedIndex = 1;
-        }
-
-        void SelectionChanged_Event(object sender, SelectionChangedEventArgs e)
-        {
-            int index = (sender as ComboBox).SelectedIndex;
-            if (index == 0)
-            {
-                SelectedIndex = 1;
-                Utility();
-            }
-            else
-            {
-            }
+            _controls = Apps.Select(x => new ApplicationPicker_Control(x)).ToList();
+            ItemsSource = _controls;
+            Items.Refresh();
+            SelectedIndex = 0;
         }
     }
 }

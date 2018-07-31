@@ -11,9 +11,9 @@ namespace EeveexModManager.Controls
 {
     public class UserProfile_Control : ComboBoxItem
     {
-        public Db_UserProfile AssociatedProfile { get; protected set; }
+        public UserProfile AssociatedProfile { get; protected set; }
         public ProfilesManager ProfileManager { get; protected set; }
-        public UserProfile_Control(Db_UserProfile prof, ProfilesManager pm) : base()
+        public UserProfile_Control(Classes.DatabaseClasses.UserProfile prof, ProfilesManager pm) : base()
         {
             AssociatedProfile = prof;
             ProfileManager = pm;

@@ -20,7 +20,7 @@ using EeveexModManager.Classes.DatabaseClasses;
 using EeveexModManager.Controls;
 using EeveexModManager.Services;
 using EeveexModManager.Interfaces;
-using EeveexModManager.Classes.GameDefaults;
+using EeveexModManager.GameDefaults;
 
 
 namespace EeveexModManager.Windows
@@ -39,50 +39,41 @@ namespace EeveexModManager.Windows
         private NamedPipeManager _namedPipeManager;
         private Mutex _mutex;
         private IEnumerable<IGameDefault> _gameDefaults = GameDefaultValues.GetGamesDefault();
+        private ConfigurationPurpose _purpose;
+        private Action _uponConfigured = null;
 
         private int GamesConfigured = 0;
+        
+        public enum ConfigurationPurpose
+        {
+            FirstTime,
+            AddGames
+        }
 
-        private WindowsEnum GetBackTo = WindowsEnum.GameDetectionWindow;
+        public AvailableGamesWindow(DatabaseContext_Main db,  ConfigurationPurpose purpose = ConfigurationPurpose.AddGames, Action uponConfigured = null)
+        {
+            InitializeComponent();
+
+            _db = db;
+            _purpose = purpose;
+            _uponConfigured = uponConfigured;
+            var games = _db.GetAll<Game>("games").Select(x => x.Id);
+            _gameDefaults = _gameDefaults.Where(x => !games.Contains(x.Id)).ToList();
+
+            _gameSeachers = new List<GameSearcher>();
+            _games = new List<Game>();
+        }
 
         public AvailableGamesWindow(Mutex m, DatabaseContext_Main db, Service_JsonParser jsp,
-            NamedPipeManager npm, List<DatabaseContext_Profile> profiles, ProfilesManager profMng, 
-            bool getBackButton = false, WindowsEnum backTo = WindowsEnum.MainWindow)
+            NamedPipeManager npm, List<DatabaseContext_Profile> profiles, ProfilesManager profMng)
+            : this(db, ConfigurationPurpose.FirstTime)
         {
             _mutex = m;
-            _db = db;
             _jsonParser = jsp;
             _namedPipeManager = npm;
             _dbProfiles = profiles;
             _profilesManager = profMng;
-
-            _gameSeachers = new List<GameSearcher>();
-            _games = new List<Game>();
-
-            InitializeComponent();
-
-            if(getBackButton)
-            {
-                BackToMain_Button.Visibility = Visibility.Visible;
-                GetBackTo = backTo;
-            }
-
         }
-        
-
-        private void GetBackToMainWindow_Click(object sender, RoutedEventArgs e)
-        {
-            switch (GetBackTo)
-            {
-                case WindowsEnum.MainWindow:
-                    MainWindow mainWindow = new MainWindow(_mutex, _db, _jsonParser,
-                        _namedPipeManager, _dbProfiles, _profilesManager);
-                    mainWindow.Show();
-                    break;
-            }
-            Close();
-        }
-
-        const int GamesPerTab = 4;
 
         private void RestartScansButton_Click(object sender, RoutedEventArgs e)
         {
@@ -94,20 +85,19 @@ namespace EeveexModManager.Windows
             {
                 _gameSeachers.ForEach(x =>
                {
-                   Confirm_Button.Dispatcher.BeginInvoke((Action)(() => x.RestartSearch()), DispatcherPriority.Background);
+                   x.RestartSearch();
                });
             }
         }
 
+        [STAThread]
         void InitGames(List<Game> _games)
         {
-            _games.ForEach(x =>
-            {
-                GameConfigurationWindow win = new GameConfigurationWindow(x, ConfiguartionPart2);
-                win.Show();
-            });
+            GameConfigurationWindow win = new GameConfigurationWindow(_games, ConfigurationPart2);
+            win.Show();
         }
 
+        [STAThread]
         private void ConfirmGamesButton_Click(object sender, RoutedEventArgs e)
         {
             if (_gameSeachers.Where( x => x.Confirmed).Count() > 0)
@@ -119,34 +109,40 @@ namespace EeveexModManager.Windows
                 MessageBox.Show("Error! No games were found! Please click on the \"Restart Scans\" button to retry!");
             }
         }
-
-        private void ConfiguartionPart2()
+        
+        [STAThread]
+        private void ConfigurationPart2()
         {
-            GamesConfigured++;
-            if(GamesConfigured == _games.Count)
+            _db.GetCollection<Game>("games").Delete(x => true);
+            _db.GetCollection<GameApplication>("game_apps").Delete(x => true);
+            _db.GetCollection<UserProfile>("profiles").Delete(x => true);
+
+            _db.GetCollection<Game>("games").InsertBulk(_games);
+
+            var gameApps = _games.SelectMany(x => x.AutoDetectApplications());
+
+            _db.GetCollection<GameApplication>("game_apps").InsertBulk(gameApps);
+
+            foreach (var item in _games)
             {
-                _db.GetCollection<Db_Game>("games").Delete(x => true);
-                _db.GetCollection<Db_GameApplication>("game_apps").Delete(x => true);
-                _db.GetCollection<Db_UserProfile>("profiles").Delete(x => true);
+                _profilesManager.AddProfile("master", item);
+                _dbProfiles.Add(new DatabaseContext_Profile(item.ProfilesDirectory + "\\master", item.Id));
+            }
 
-                _db.GetCollection<Db_Game>("games").InsertBulk(_games.Select(x => x.EncapsulateToDb()));
+            Defined.Settings.State = StatesOfConfiguration.Ready;
 
-                var gameApps = _games.Select(x => x.AutoDetectApplications()).SelectMany(x => x).Select(y => y.EncapsulateToDb());
+            switch (_purpose)
+            {
+                case ConfigurationPurpose.FirstTime:
+                    MainWindow window = new MainWindow(_mutex, _db, _jsonParser, _namedPipeManager, _dbProfiles, _profilesManager);
+                    window.Show();
 
-                _db.GetCollection<Db_GameApplication>("game_apps").InsertBulk(gameApps);
+                    Close();
 
-                foreach (var item in _games)
-                {
-                    _profilesManager.AddProfile("master", item);
-                    _dbProfiles.Add(new DatabaseContext_Profile(item.ProfilesDirectory + "\\master", item.Id));
-                }
-
-                Defined.Settings.State = StatesOfConfiguration.Ready;
-
-                MainWindow window = new MainWindow(_mutex, _db, _jsonParser, _namedPipeManager, _dbProfiles, _profilesManager);
-                window.Show();
-
-                Close();
+                    break;
+                case ConfigurationPurpose.AddGames:
+                    _uponConfigured?.Invoke();
+                    break;
             }
         }
 
@@ -211,6 +207,9 @@ namespace EeveexModManager.Windows
                 currDetectorControl.Searcher = _gameSeachers.LastOrDefault();
                 currDetectorControl.Searcher.StartSearch();
                 border.Child = currDetectorControl;
+
+                if (_gameSeachers.Count == 1) thumbnail.Visibility = Visibility.Visible;
+
             }), DispatcherPriority.Background);
         }
     }

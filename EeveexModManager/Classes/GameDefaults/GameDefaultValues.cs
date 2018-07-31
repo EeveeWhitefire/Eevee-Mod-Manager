@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using EeveexModManager.Interfaces;
 
-namespace EeveexModManager.Classes.GameDefaults
+namespace EeveexModManager.GameDefaults
 {
     public class GameDefaultValues
     {

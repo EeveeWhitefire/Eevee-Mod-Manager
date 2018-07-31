@@ -58,7 +58,7 @@ namespace EeveexModManager.Windows
                 {
                     GameApplication application = new GameApplication(ApplicationName_TB.Text, ExecutablePath_TB.Text, currGame.Id);
 
-                    _db.GetCollection<Db_GameApplication>("game_apps").Insert(application.EncapsulateToDb());
+                    _db.GetCollection<GameApplication>("game_apps").Insert(application);
                     OnAppAdded(application);
                     Close();
                 }

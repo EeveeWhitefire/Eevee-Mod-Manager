@@ -23,10 +23,11 @@ namespace EeveexModManager
         public const string DEFAULTSOURCEURI = "Unknown";
         public const string NEXUSAPI_BASE = @"https://api.nexusmods.com/v1";
         public const string NAMED_PIPE_CLIENT_EXECUTABLE = "named-pipe-client.exe";
-        public const string NAMED_PIPE_NAME = "EeveexModManager";
-        public const string REGISTRY_KEY_NAME = "Eeveex";
+        public const string NAMED_PIPE_NAME = "EeveeModManager";
+        public const string REGISTRY_KEY_NAME = "Eevee";
         public const string DEFAULT_MODS_VIEW_SEARCHER_MESSAGE = "Enter mod name here...";
         public const int MAX_GAME_DETECTORS_IN_COLUMN = 4;
+        public const int GAME_OPTION_IMAGE_SIZE = 80;
         public static ApplicationSettings Settings = new ApplicationSettings();
     }
 
@@ -34,6 +35,9 @@ namespace EeveexModManager
     {
         public static bool IsEmpty(this string str)
             => str.Length == 0;
+
+        public static bool IsEmpty<T>(this IEnumerable<T> collec)
+            => collec.Count() == 0;
     }
 
     public class Assistant

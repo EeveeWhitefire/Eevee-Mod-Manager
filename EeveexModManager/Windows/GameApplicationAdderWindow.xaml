@@ -6,7 +6,12 @@
         xmlns:local="clr-namespace:EeveexModManager.Windows"
         mc:Ignorable="d"
         Title="Add Game Application" Height="250" Width="450" ResizeMode="NoResize">
-    <Grid>
+    <Grid  Background="#FF373737">
+        <Grid.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#FFE0E0E0"/>
+            </Style>
+        </Grid.Resources>
         <StackPanel Orientation="Vertical" Margin="10">
             <TextBlock Text="Select an Executable:" Margin="0,0,0,10"/>
             <StackPanel Orientation="Horizontal">

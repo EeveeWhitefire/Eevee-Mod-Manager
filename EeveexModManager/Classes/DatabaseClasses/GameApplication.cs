@@ -1,32 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
-using System.Windows;
 
+using EeveexModManager.Classes;
 using EeveexModManager.Interfaces;
-using EeveexModManager.Classes.DatabaseClasses;
-using System.Drawing;
+using LiteDB;
 
-namespace EeveexModManager.Classes
+namespace EeveexModManager.Classes.DatabaseClasses
 {
-
     public class GameApplication : IGameApplication
     {
-        public string Name { get; }
-        public string ExecutablePath { get;}
-        public GameListEnum AssociatedGameId { get; }
+        [BsonId]
+        public string Name { get; set; }
+        public string ExecutablePath { get; set; }
+        public GameListEnum AssociatedGameId { get; set; }
 
-        private List<BackupFile> _backups;
-        private List<string> _directoriesToDelete;
-        private List<string> _linksToDelete;
-        
-        public Process process;
+        #region Constructors
+
+        public GameApplication() { }
 
         public GameApplication(string n, string exe, GameListEnum game)
         {
@@ -37,18 +33,14 @@ namespace EeveexModManager.Classes
             _directoriesToDelete = new List<string>();
             _linksToDelete = new List<string>();
         }
+        #endregion
 
 
-        public Db_GameApplication EncapsulateToDb()
-        {
-            return new Db_GameApplication()
-            {
-                AssociatedGameId = AssociatedGameId,
-                ExecutablePath = ExecutablePath,
-                Name = Name
-            };
-        }
-
+        private List<BackupFile> _backups { get; set; }
+        private List<string> _directoriesToDelete { get; set; }
+        private List<string> _linksToDelete { get; set; }
+        private Process _process { get; set; }
+        
         class BackupFile
         {
             public string Source;
@@ -87,7 +79,7 @@ namespace EeveexModManager.Classes
 
             _backups.ForEach(x => x.Backup());
 
-            mods.SelectMany( x => x.FileTree).ToList().ForEach(x =>
+            mods.SelectMany(x => x.FileTree).ToList().ForEach(x =>
             {
                 string linkTo = game.DataPath + "\\" + x.RelativePath;
                 string linkFrom = x.FullPath;
@@ -104,7 +96,7 @@ namespace EeveexModManager.Classes
 
                 CreateHardLink(linkTo, linkFrom, IntPtr.Zero);
             });
-            
+
 
             using (Process process = Process.Start(new ProcessStartInfo(ExecutablePath)))
             {
@@ -112,19 +104,19 @@ namespace EeveexModManager.Classes
 
                 _linksToDelete.ForEach(x =>
                 {
-                   File.Delete(x);
+                    File.Delete(x);
                 });
                 _linksToDelete.Clear();
 
                 _directoriesToDelete.ForEach(x =>
                 {
-                   Directory.Delete(x);
+                    Directory.Delete(x);
                 });
                 _directoriesToDelete.Clear();
 
                 _backups.ForEach(x =>
                 {
-                   x.MoveBack();
+                    x.MoveBack();
                 });
                 _backups.Clear();
             }

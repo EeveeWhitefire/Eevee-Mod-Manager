@@ -29,7 +29,9 @@ namespace EeveexModManager.Windows
     /// </summary>
     public partial class GameConfigurationWindow : Window
     {
-        public Game AssociatedGame;
+        public List<Game> Games;
+        private IEnumerable<GamePicker_Control> _gameControls;
+        private Game _currGame;
         public string GameName { get; set; }
         private char DriveChar;
         private Action WhenFinishes;
@@ -42,28 +44,18 @@ namespace EeveexModManager.Windows
         [DllImport("user32.dll")]
         private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
-        public GameConfigurationWindow(Game g, Action whenFinishes)
+        public GameConfigurationWindow(List<Game> g, Action whenFinishes)
         {
-            AssociatedGame = g;
-            DriveChar = g.DataPath[0];
+            Games = g;
             WhenFinishes = whenFinishes;
-
-
             InitializeComponent();
-            Title = g.Name + " Directory Configuration";
-
-            var hwnd = new WindowInteropHelper(this).Handle;
-            SetWindowLong(hwnd, GWL_STYLE, GetWindowLong(hwnd, GWL_STYLE) & ~WS_SYSMENU); //no close button, bitch
-
-            GameImage.Source = Assistant.LoadImageFromResources("Icon - " + AssociatedGame.Id.ToString() + ".png");
-
-            ProfilesDirectory_TB.Text = g.ProfilesDirectory;
-            ModsDirectory_TB.Text = g.ModsDirectory;
-            DownloadsDirectory_TB.Text = g.DownloadsDirectory;
-            BackupsDirectory_TB.Text = g.BackupsDirectory;
+            _gameControls = Games.Select(x => new GamePicker_Control(x));
+            gamePicker.ItemsSource = _gameControls;
+            gamePicker.Items.Refresh();
+            gamePicker.SelectedIndex = 0;
         }
 
-        private void OkButton_Click(object sender, RoutedEventArgs e)
+        private bool VerifyPaths()
         {
             if (ProfilesDirectory_TB.Text.Length > 0 && ModsDirectory_TB.Text.Length > 0
                 && DownloadsDirectory_TB.Text.Length > 0)
@@ -72,19 +64,18 @@ namespace EeveexModManager.Windows
                 {
                     if (BackupsDirectory_TB.Text[0] == DriveChar)
                     {
-                        AssociatedGame.SetDirectories(ProfilesDirectory_TB.Text, ModsDirectory_TB.Text,
+                        (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.SetDirectories(ProfilesDirectory_TB.Text, ModsDirectory_TB.Text,
                             DownloadsDirectory_TB.Text, BackupsDirectory_TB.Text);
 
-                        if (!Directory.Exists(AssociatedGame.ModsDirectory))
-                            Directory.CreateDirectory(AssociatedGame.ModsDirectory);
-                        if (!Directory.Exists(AssociatedGame.DownloadsDirectory))
-                            Directory.CreateDirectory(AssociatedGame.DownloadsDirectory);
-                        if (!Directory.Exists(AssociatedGame.ProfilesDirectory))
-                            Directory.CreateDirectory(AssociatedGame.ProfilesDirectory);
-                        if (!Directory.Exists(AssociatedGame.BackupsDirectory))
-                            Directory.CreateDirectory(AssociatedGame.BackupsDirectory);
-                        WhenFinishes();
-                        Close();
+                        if (!Directory.Exists((gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.ModsDirectory))
+                            Directory.CreateDirectory((gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.ModsDirectory);
+                        if (!Directory.Exists((gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.DownloadsDirectory))
+                            Directory.CreateDirectory((gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.DownloadsDirectory);
+                        if (!Directory.Exists((gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.ProfilesDirectory))
+                            Directory.CreateDirectory((gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.ProfilesDirectory);
+                        if (!Directory.Exists((gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.BackupsDirectory))
+                            Directory.CreateDirectory((gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.BackupsDirectory);
+                        return true;
                     }
                     else
                         MessageBox.Show("Error! The Backups directory must be in the same drive as the game!");
@@ -94,6 +85,17 @@ namespace EeveexModManager.Windows
             }
             else
                 MessageBox.Show("Error! Some of the Text Boxes are empty!");
+            return false;
+        }
+
+        [STAThread]
+        private void OkButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(VerifyPaths())
+            {
+                WhenFinishes();
+                Close();
+            }
         }
 
         private void QuitButton_Click(object sender, RoutedEventArgs e)
@@ -109,7 +111,7 @@ namespace EeveexModManager.Windows
             if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 p = d.SelectedPath;
-                p = p.Length > 3 ? p : p + "EMM\\Downloads\\" + AssociatedGame.Id.ToString();
+                p = p.Length > 3 ? p : p + "EMM\\Downloads\\" + (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.Id.ToString();
                 ProfilesDirectory_TB.Text = p;
             }
         }
@@ -121,7 +123,7 @@ namespace EeveexModManager.Windows
             if(d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 p = d.SelectedPath;
-                p = p.Length > 3 ? p : p + "EMM\\Profiles\\" + AssociatedGame.Id.ToString();
+                p = p.Length > 3 ? p : p + "EMM\\Profiles\\" + (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.Id.ToString();
                 ProfilesDirectory_TB.Text = p;
             }
         }
@@ -136,7 +138,7 @@ namespace EeveexModManager.Windows
             if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 p = d.SelectedPath;
-                p = p.Length > 3 ? p : p + "EMM\\Mods\\" + AssociatedGame.Id.ToString();
+                p = p.Length > 3 ? p : p + "EMM\\Mods\\" + (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.Id.ToString();
             }
 
             while(p[0] != DriveChar)
@@ -145,7 +147,7 @@ namespace EeveexModManager.Windows
                 if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     p = d.SelectedPath;
-                    p = p.Length > 3 ? p : p + "EMM\\Mods\\" + AssociatedGame.Id.ToString();
+                    p = p.Length > 3 ? p : p + "EMM\\Mods\\" + (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.Id.ToString();
                 }
             }
             ProfilesDirectory_TB.Text = p;
@@ -161,7 +163,7 @@ namespace EeveexModManager.Windows
             if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 p = d.SelectedPath;
-                p = p.Length > 3 ? p : p + "EMM\\Backups\\" + AssociatedGame.Id.ToString();
+                p = p.Length > 3 ? p : p + "EMM\\Backups\\" + (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.Id.ToString();
             }
 
             while (p[0] != DriveChar)
@@ -170,10 +172,34 @@ namespace EeveexModManager.Windows
                 if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     p = d.SelectedPath;
-                    p = p.Length > 3 ? p : p + "EMM\\Backups\\" + AssociatedGame.Id.ToString();
+                    p = p.Length > 3 ? p : p + "EMM\\Backups\\" + (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.Id.ToString();
                 }
             }
             ProfilesDirectory_TB.Text = p;
+        }
+
+        private void gamePicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_currGame == null || VerifyPaths())
+            {
+                _currGame = (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame;
+                DriveChar = (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.DataPath[0];
+                Title = (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.Name + " Directory Configuration";
+
+                var hwnd = new WindowInteropHelper(this).Handle;
+                SetWindowLong(hwnd, GWL_STYLE, GetWindowLong(hwnd, GWL_STYLE) & ~WS_SYSMENU); //no close button, bitch
+
+                GameImage.Source = Assistant.LoadImageFromResources("Icon - " + (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.Id.ToString() + ".png");
+
+                ProfilesDirectory_TB.Text = (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.ProfilesDirectory;
+                ModsDirectory_TB.Text = (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.ModsDirectory;
+                DownloadsDirectory_TB.Text = (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.DownloadsDirectory;
+                BackupsDirectory_TB.Text = (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame.BackupsDirectory;
+            }
+            else
+            {
+                gamePicker.SelectedIndex = Games.IndexOf(_currGame);
+            }
         }
     }
 }

@@ -67,18 +67,19 @@
                 <Setter Property="Foreground" Value="Transparent"/>
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="CurrentDesign" Value="{Binding MouseNotOverDesign, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type customcontrols:HoverDesignButton}">
-                            <Border Name="border" BorderThickness="0" Background="{TemplateBinding Background}">
-                                <ContentPresenter Content="{Binding CurrentDesign, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Border BorderThickness="0">
+                                <ContentPresenter Content="{Binding CurrentDesign, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="CurrentDesign" Value="{Binding MouseOverDesign, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                    <Setter Property="CurrentDesign" Value="{Binding MouseOverDesign, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"/>
                                 </Trigger>
                                 <Trigger Property="IsMouseOver" Value="False">
-                                    <Setter Property="CurrentDesign" Value="{Binding MouseNotOverDesign, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                    <Setter Property="CurrentDesign" Value="{Binding MouseNotOverDesign, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>

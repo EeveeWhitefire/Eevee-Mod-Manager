@@ -155,11 +155,6 @@ namespace EeveexModManager
             appPicker.ItemsSource = apps.Select(x => new ApplicationPicker_Control(x));
             appPicker.Items.Refresh();
             appPicker.SelectedIndex = 0;
-            /*
-            if (!(appPicker is ApplicationPicker_ComboBox))
-                appPicker = new ApplicationPicker_ComboBox(appPicker);
-
-            (appPicker as ApplicationPicker_ComboBox).Init(apps);*/
 
             var profiles = _db.GetWhere<UserProfile>("profiles", (x => x.GameId == _currGame.Id));
 

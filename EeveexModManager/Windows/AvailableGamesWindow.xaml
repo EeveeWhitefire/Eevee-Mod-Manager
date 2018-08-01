@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EeveexModManager.Windows"
-        xmlns:controls="clr-namespace:EeveexModManager.Controls"
+        xmlns:customcontrols="clr-namespace:EeveexModManager.Controls"
         mc:Ignorable="d"
         Title="Please choose the games you'd like to mod:" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
 
@@ -50,6 +50,29 @@
                 <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="VerticalAlignment" Value="Top"/>
                 <Setter Property="HorizontalAlignment" Value="Left"/>
+            </Style>
+            <Style TargetType="{x:Type customcontrols:HoverDesignButton}">
+                <Setter Property="OverridesDefaultStyle" Value="True"/>
+                <Setter Property="Foreground" Value="Transparent"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type customcontrols:HoverDesignButton}">
+                            <Border BorderThickness="0">
+                                <ContentPresenter Content="{Binding CurrentDesign, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="CurrentDesign" Value="{Binding MouseOverDesign, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="False">
+                                    <Setter Property="CurrentDesign" Value="{Binding MouseNotOverDesign, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
             <BitmapImage x:Key="EMMThumbnailBMP" UriSource="pack://application:,,,/Resources/thumbnail.png" />
         </Grid.Resources>

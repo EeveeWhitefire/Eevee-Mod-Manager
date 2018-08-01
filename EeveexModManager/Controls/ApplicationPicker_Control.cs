@@ -57,7 +57,7 @@ namespace EeveexModManager.Controls
 
             Children.Add(new TextBlock()
             {
-                Text = app.Name,
+                Text = app.Name + ".exe",
                 VerticalAlignment = VerticalAlignment.Center,
                 FontSize = 25
             });

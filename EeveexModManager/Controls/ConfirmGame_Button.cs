@@ -12,15 +12,19 @@ using EeveexModManager.Interfaces;
 
 namespace EeveexModManager.Controls
 {
-    public class ConfirmGame_Button : SquareButton
+    public class ConfirmGame_Button : HoverDesignButton
     {
         public string AssociatedGame { get; protected set; }
 
-        public ConfirmGame_Button(string game, double radX, double radY) : base(radX, radY, "Button_GreenCheckMark" )
+        public ConfirmGame_Button(string game, double width, double height) : base()
         {
+            Width = width;
+            Height = height;
             AssociatedGame = game;
             VerticalAlignment = VerticalAlignment.Bottom;
             Margin = new Thickness(10, 0, 20, 10);
+            MouseOverDesign = Assistant.LoadImageFromResources("Button_GreenCheckMark_Hover");
+            MouseNotOverDesign = Assistant.LoadImageFromResources("Button_GreenCheckMark");
         }
     }
 }

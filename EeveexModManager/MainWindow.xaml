@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EeveexModManager"
+        xmlns:customcontrols="clr-namespace:EeveexModManager.Controls"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="EeveexModManager.MainWindow"
         mc:Ignorable="d"
         Title="Eevee Mod Manager" Height="730" Width="1478" ResizeMode="CanResizeWithGrip" MinWidth="1380" MinHeight="730" x:Name="window">
@@ -21,11 +22,12 @@
             <BitmapImage x:Key="LoginButtonBMP" UriSource="pack://application:,,,/Resources/loginbutton_false.png" />
             <BitmapImage x:Key="LogoutButtonBMP" UriSource="pack://application:,,,/Resources/loginbutton_true.png" />
             <BitmapImage x:Key="AddGameButtonBMP" UriSource="pack://application:,,,/Resources/addgamebutton.png" />
-            <BitmapImage x:Key="SettingsButtonBMP" UriSource="pack://application:,,,/Resources/settings_btn.png" />
+            <BitmapImage x:Key="SettingsButtonIdleBMP" UriSource="pack://application:,,,/Resources/settings_btn_idle.png" />
+            <BitmapImage x:Key="SettingsButtonSelectedBMP" UriSource="pack://application:,,,/Resources/settings_btn_selected.png"  />
             <BitmapImage x:Key="EditGameSettingsButtonBMP" UriSource="pack://application:,,,/Resources/editgamesettings.png" />
             <Style TargetType="TabItem">
                 <Setter Property="Foreground" Value="Silver"/>
-                <Setter Property="Width" Value="80"/>
+                <Setter Property="Width" Value="90"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="TabItem">
@@ -60,6 +62,29 @@
                 <Setter Property="Background" Value="#FF515151"/>
                 <Setter Property="Foreground" Value="Silver"/>
             </Style>
+            <Style TargetType="{x:Type customcontrols:HoverDesignButton}">
+                <Setter Property="OverridesDefaultStyle" Value="True"/>
+                <Setter Property="Foreground" Value="Transparent"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type customcontrols:HoverDesignButton}">
+                            <Border Name="border" BorderThickness="0" Background="{TemplateBinding Background}">
+                                <ContentPresenter Content="{Binding CurrentDesign, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="CurrentDesign" Value="{Binding MouseOverDesign, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="False">
+                                    <Setter Property="CurrentDesign" Value="{Binding MouseNotOverDesign, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
@@ -76,7 +101,7 @@
             <TabItem Header="Downloads">
                 <Grid Name="DownloadsGrid">
                     <StackPanel Orientation="Vertical">
-                        <ListView x:Name="Downloads_View" Width="{Binding ActualWidth, ElementName=DownloadsGrid}" HorizontalAlignment="Right" 
+                        <ListView x:Name="Downloads_View" Width="{Binding ActualWidth, ElementName=ModList_View}" HorizontalAlignment="Right" 
                                       MouseDoubleClick="Downloads_View_MouseDoubleClick" ContextMenuOpening="Downloads_View_ContextMenuOpening" BorderBrush="LightGray" 
                                       BorderThickness="3" VerticalAlignment="Bottom" Height="{Binding ActualHeight, ElementName=ModList_View}">
                             <ListView.ContextMenu>
@@ -88,12 +113,12 @@
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Header="Name" Width="{Binding Width, ConverterParameter=0.2, Converter={StaticResource mulConverter}, ElementName=Downloads_View}" DisplayMemberBinding="{Binding DownloadName}"/>
-                                    <GridViewColumn Header="Downloaded" Width="{Binding Width, ConverterParameter=0.125, Converter={StaticResource mulConverter}, ElementName=Downloads_View}" DisplayMemberBinding="{Binding CurrentNumberOfBytes}"/>
-                                    <GridViewColumn Header="Out of" Width="{Binding Width, ConverterParameter=0.125, Converter={StaticResource mulConverter}, ElementName=Downloads_View}" DisplayMemberBinding="{Binding NumberOfBytesInTotal}"/>
+                                    <GridViewColumn Header="Downloaded" Width="{Binding Width, ConverterParameter=0.14, Converter={StaticResource mulConverter}, ElementName=Downloads_View}" DisplayMemberBinding="{Binding CurrentNumberOfBytes}"/>
+                                    <GridViewColumn Header="Out of" Width="{Binding Width, ConverterParameter=0.14, Converter={StaticResource mulConverter}, ElementName=Downloads_View}" DisplayMemberBinding="{Binding NumberOfBytesInTotal}"/>
                                     <GridViewColumn Header="Percentage" Width="{Binding Width, ConverterParameter=0.15, Converter={StaticResource mulConverter}, ElementName=Downloads_View}" DisplayMemberBinding="{Binding DownloadedPercentage}"/>
-                                    <GridViewColumn Header="Download Speed" Width="{Binding Width, ConverterParameter=0.15, Converter={StaticResource mulConverter}, ElementName=Downloads_View}" DisplayMemberBinding="{Binding Speed}"/>
-                                    <GridViewColumn Header="Average Speed" Width="{Binding Width, ConverterParameter=0.15, Converter={StaticResource mulConverter}, ElementName=Downloads_View}" DisplayMemberBinding="{Binding AverageSpeed}"/>
-                                    <GridViewColumn Header="State" Width="{Binding Width, ConverterParameter=0.1, Converter={StaticResource mulConverter}, ElementName=Downloads_View}" DisplayMemberBinding="{Binding State}" />
+                                    <GridViewColumn Header="Speed" Width="{Binding Width, ConverterParameter=0.15, Converter={StaticResource mulConverter}, ElementName=Downloads_View}" DisplayMemberBinding="{Binding Speed}"/>
+                                    <!--<GridViewColumn Header="Average Speed" Width="{Binding Width, ConverterParameter=0.15, Converter={StaticResource mulConverter}, ElementName=Downloads_View}" DisplayMemberBinding="{Binding AverageSpeed}"/>-->
+                                    <GridViewColumn Header="State" Width="auto" DisplayMemberBinding="{Binding State}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>
@@ -136,27 +161,23 @@
             </TabItem>
         </TabControl>
         <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top">
-            <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Vertical" Margin="0,0,20,0">
                 <TextBlock Text="Game:" Foreground="Silver" Margin="0,0,0,5" FontSize="15"/>
-                <ComboBox Name="gamePicker" Width="180" Height="20" Margin="0,0,30,0" SelectionChanged="gamePicker_SelectionChanged"/>
-            </StackPanel>
-            <StackPanel Orientation="Vertical">
+                <ComboBox Name="gamePicker" Width="180" Height="20" Margin="0,0,0,10" SelectionChanged="gamePicker_SelectionChanged"/>
                 <TextBlock Text="Profile:" Foreground="Silver" Margin="0,0,0,5" FontSize="15"/>
-                <ComboBox Name="profilePicker" Margin="0,0,10,0" Width="180" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top">
+                <ComboBox Name="profilePicker" Margin="0,0,0,0" Width="180" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top">
                     <TextBlock Text="&lt;Manage Profiles&gt;"/>
                 </ComboBox>
             </StackPanel>
-            <Button Click="SettingsButton_Click" Height="50" VerticalAlignment="Top" Background="Transparent" BorderBrush="Transparent" Foreground="Transparent">
-                <Image Source="{StaticResource SettingsButtonBMP}"/>
-            </Button>
+            <customcontrols:HoverDesignButton MouseOverDesign="{StaticResource SettingsButtonSelectedBMP}" 
+                                              MouseNotOverDesign="{StaticResource SettingsButtonIdleBMP}" Click="SettingsButton_Click" 
+                                              Height="70" ToolTip="Settings" Width="70"/>
         </StackPanel>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,10,0" Name="RightStack" Grid.ColumnSpan="2">
             <Button Name="ApplicationLaunch_Button" Foreground="Transparent" Background="Transparent" BorderBrush="Transparent" Click="LaunchApplicationButton_Click" Margin="0,0,0,10">
                 <Image Source="{StaticResource LaunchButtonBMP}" Width="430" Height="80"/>
             </Button>
-            <ComboBox Height="{Binding ActualHeight, ElementName=ApplicationLaunch_Button}" Width="430" Name="appPicker">
-
-            </ComboBox>
+            <ComboBox Height="{Binding ActualHeight, ElementName=ApplicationLaunch_Button}" Width="430" Name="appPicker" ToolTip="Application to launch"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,0,10" Grid.Column="0" Grid.Row="2">
             <Image Source="{StaticResource NexusModsLogoBMP}" Width="50" Height="50" Margin="0,0,10,0"/>

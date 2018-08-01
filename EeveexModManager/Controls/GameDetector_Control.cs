@@ -20,7 +20,7 @@ namespace EeveexModManager.Controls
         public GameSearcher Searcher { get; set; }
 
         public ConfirmGame_Button AuthorizeButton { get; protected set; }
-        public ShapedButton<Rectangle> CancelButton { get; protected set; }
+        public HoverDesignButton CancelButton { get; protected set; }
 
         public StackPanel UpperPanel { get; protected set; }
         public StackPanel ButtonsPanel { get; protected set; }
@@ -70,14 +70,17 @@ namespace EeveexModManager.Controls
             };
 
             AuthorizeButton = new ConfirmGame_Button(GameDefault.Name, Defined.MODPICKINGBUTTON_SIZE, Defined.MODPICKINGBUTTON_SIZE);
-
             AuthorizeButton.Click += new RoutedEventHandler(ConfirmGameButton_Click);
 
-            CancelButton = new SquareButton(Defined.MODPICKINGBUTTON_SIZE, Defined.MODPICKINGBUTTON_SIZE, "Button_RedX")
+            CancelButton = new HoverDesignButton()
             {
                 VerticalAlignment = VerticalAlignment.Bottom,
                 HorizontalAlignment = HorizontalAlignment.Left,
-                Margin = new Thickness(0,0,0,10)
+                Margin = new Thickness(0,0,0,10),
+                Width = Defined.MODPICKINGBUTTON_SIZE,
+                Height = Defined.MODPICKINGBUTTON_SIZE,
+                MouseNotOverDesign = Assistant.LoadImageFromResources("Button_RedX"),
+                MouseOverDesign = Assistant.LoadImageFromResources("Button_RedX_Hover")
             };
             CancelButton.Click += new RoutedEventHandler(IgnoreModButton_Click);
 
@@ -112,8 +115,8 @@ namespace EeveexModManager.Controls
             {
                 Searcher.Search = false;
 
-                CancelButton.State_ToDisabled();
-                AuthorizeButton.State_ToDisabled();
+                CancelButton.ChangeState(false);
+                AuthorizeButton.ChangeState(false);
                 if (ButtonsPanel.Children[ButtonsPanel.Children.Count - 1].GetType() == typeof(TextBlock))
                 {
                     ButtonsPanel.Children.RemoveAt(ButtonsPanel.Children.Count - 1);
@@ -136,20 +139,20 @@ namespace EeveexModManager.Controls
                 ButtonsPanel.Children.RemoveAt(ButtonsPanel.Children.Count - 1);
             }
 
-            AuthorizeButton.State_ToDisabled();
-            CancelButton.State_ToEnabled();
+            AuthorizeButton.ChangeState(false);
+            CancelButton.ChangeState(true);
             AuthorizeButton.Visibility = Visibility.Hidden;
         }
 
         public void FoundGame()
         {
-            AuthorizeButton.State_ToEnabled();
+            AuthorizeButton.ChangeState(true);
         }
 
         public void ConfirmGame()
         {
-            CancelButton.State_ToDisabled();
-            AuthorizeButton.State_ToDisabled();
+            CancelButton.ChangeState(false);
+            AuthorizeButton.ChangeState(false);
             if (ButtonsPanel.Children[ButtonsPanel.Children.Count - 1].GetType() == typeof(TextBlock))
             {
                 ButtonsPanel.Children.RemoveAt(ButtonsPanel.Children.Count - 1);

@@ -313,9 +313,19 @@ namespace EeveexModManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap settings_btn {
+        public static System.Drawing.Bitmap settings_btn_idle {
             get {
-                object obj = ResourceManager.GetObject("settings_btn", resourceCulture);
+                object obj = ResourceManager.GetObject("settings_btn_idle", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap settings_btn_selected {
+            get {
+                object obj = ResourceManager.GetObject("settings_btn_selected", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

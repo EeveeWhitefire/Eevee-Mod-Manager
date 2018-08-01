@@ -196,7 +196,10 @@
   <data name="icon_placeholder" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon - placeholder.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="settings_btn" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\settings_btn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="settings_btn_idle" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\settings_btn_idle.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="settings_btn_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\settings_btn_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

@@ -451,7 +451,7 @@ namespace EeveexModManager
             else
             {
                 textbox.Foreground = Brushes.Black;
-                ModList_View.BorderBrush = Brushes.LightSkyBlue;
+                ModList_View.BorderBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FF218FEE")); ;
                 _modManager.ModControls.ForEach(x =>
                 {
                     if (x.FileName.ToLower().Contains(textbox.Text.ToLower()) || x.ModName.ToLower().Contains(textbox.Text.ToLower()))

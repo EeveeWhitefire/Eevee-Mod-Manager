@@ -41,8 +41,6 @@ namespace EeveexModManager.Windows
         private IEnumerable<IGameDefault> _gameDefaults = GameDefaultValues.GetGamesDefault();
         private ConfigurationPurpose _purpose;
         private Action _uponConfigured = null;
-
-        private int GamesConfigured = 0;
         
         public enum ConfigurationPurpose
         {

@@ -58,7 +58,7 @@ namespace EeveexModManager.Classes
             Search = false;
             if (!Exists)
             {
-                GuiControl.CancelButton.State_ToDisabled();
+                GuiControl.CancelButton.ChangeState(false);
                 GuiControl.ButtonsPanel.Children.Add(new TextBlock()
                 {
                     Text = "Game Wasn't Found!",
@@ -80,7 +80,7 @@ namespace EeveexModManager.Classes
 
         public void StartSearch()
         {
-            GuiControl.CancelButton.State_ToEnabled();
+            GuiControl.CancelButton.ChangeState(true);
             if (GameIsInstalled())
             {
                 Exists = true;

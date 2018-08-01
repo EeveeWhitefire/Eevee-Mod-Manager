@@ -247,16 +247,13 @@
     <Compile Include="Classes\NexusCommunicationManager.cs" />
     <Compile Include="Classes\NxmHandler.cs" />
     <Compile Include="Classes\ProfilesManager.cs" />
-    <Compile Include="Controls\ApplicationPicker_ComboBox.cs" />
     <Compile Include="Controls\ApplicationPicker_Control.cs" />
-    <Compile Include="Controls\CircularButton.cs" />
     <Compile Include="Controls\ConfirmGame_Button.cs" />
     <Compile Include="Controls\GameDetector_Control.cs" />
     <Compile Include="Controls\GamePicker_Control.cs" />
+    <Compile Include="Controls\HoverDesignButton.cs" />
     <Compile Include="Controls\ModDownload_Control.cs" />
     <Compile Include="Controls\Mod_Control.cs" />
-    <Compile Include="Controls\ShapedButton.cs" />
-    <Compile Include="Controls\SquareButton.cs" />
     <Compile Include="Controls\UserProfile_Control.cs" />
     <Compile Include="Defined.cs" />
     <Compile Include="Classes\GameDefaults\GameDefaultValues.cs" />
@@ -393,7 +390,8 @@
     <Content Include="named-pipe-client.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\settings_btn.png" />
+    <Resource Include="Resources\settings_btn_selected.png" />
+    <Resource Include="Resources\settings_btn_idle.png" />
     <Resource Include="Resources\icon - placeholder.png" />
     <Resource Include="Resources\editgamesettings.png" />
     <Resource Include="Resources\addgamebutton.png" />

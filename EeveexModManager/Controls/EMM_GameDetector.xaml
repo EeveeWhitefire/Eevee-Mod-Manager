@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="EeveexModManager.Controls.EMM_GameDetector"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EeveexModManager.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="143" Width="510">
+    <Grid Background="#FF7C7C7C">
+        <Grid.Resources>
+            <BitmapImage x:Key="GameIconPlaceholderBMP" UriSource="pack://application:,,,/Resources/icon - placeholder.png" />
+            <BitmapImage x:Key="IgnoreGameButtonBMP" UriSource="pack://application:,,,/Resources/ignoregame_btn.png" />
+            <BitmapImage x:Key="ConfirmGameButtonBMP" UriSource="pack://application:,,,/Resources/confirmgame_btn.png" />
+        </Grid.Resources>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <Image Source="{StaticResource GameIconPlaceholderBMP}" Width="140" Margin="0,0,10,0" VerticalAlignment="Top"/>
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,10,0" Width="350">
+                <TextBlock Text="Game's name" Foreground="#FF373737" FontSize="20" Margin="0,0,0,10"/>
+                <TextBox IsEnabled="False" IsReadOnly="True" Background="#FF616161" Height="25" Margin="0,0,0,10"/>
+                <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                    <local:EMM_ImageButton MouseNotOverDesign="#FFFF0000" MouseOverDesign="#FFFFD800" x:Name="ignoreGame_Btn"
+                                      Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                      Click="ignoreGame_Btn_Click" Source="{StaticResource IgnoreGameButtonBMP}"/>
+                    <local:EMM_ImageButton MouseNotOverDesign="#FF00FF21" MouseOverDesign="#FFFFD800" x:Name="confirmGame_Btn"
+                                      Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsEnabled="False"
+                                      Margin="10,0,20,0" Click="confirmGame_Btn_Click" Source="{StaticResource ConfirmGameButtonBMP}"/>
+                    <TextBlock Name="status" Text="Status" Margin="25,0,0,0" FontSize="20" VerticalAlignment="Center" 
+                               Foreground="Goldenrod"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

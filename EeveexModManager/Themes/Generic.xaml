@@ -1,0 +1,68 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:EeveexModManager"
+    xmlns:customcontrols="clr-namespace:EeveexModManager.Controls">
+
+    <Style TargetType="{x:Type customcontrols:EMM_TextButton}" BasedOn = "{StaticResource {x:Type Button}}">
+        <Setter Property="BorderThickness" Value="4"/>
+        <Setter Property="BorderBrush" Value="#FF555555"/>
+        <Setter Property="Foreground" Value="Silver"/>
+        <Setter Property="MouseOverDesign" Value="#FF218FEE"/>
+        <Setter Property="MouseNotOverDesign" Value="#FF155D99"/>
+        <Setter Property="FontFamily" Value="Stencil"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type customcontrols:EMM_TextButton}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <TextBlock Text="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}" FontSize="{TemplateBinding FontSize}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{Binding MouseOverDesign, RelativeSource={RelativeSource Self}}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="False">
+                            <Setter Property="Background" Value="{Binding MouseNotOverDesign, RelativeSource={RelativeSource Self}}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="#FF808080"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type customcontrols:EMM_ImageButton}" BasedOn = "{StaticResource {x:Type Button}}">
+        <Setter Property="BorderThickness" Value="4"/>
+        <Setter Property="BorderBrush" Value="#FF555555"/>
+        <Setter Property="Foreground" Value="Silver"/>
+        <Setter Property="MouseOverDesign" Value="#FF218FEE"/>
+        <Setter Property="MouseNotOverDesign" Value="#FF155D99"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type customcontrols:EMM_ImageButton}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <Image Source="{TemplateBinding Source}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{Binding MouseOverDesign, RelativeSource={RelativeSource Self}}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="False">
+                            <Setter Property="Background" Value="{Binding MouseNotOverDesign, RelativeSource={RelativeSource Self}}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="#FF808080"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

@@ -29,7 +29,6 @@ namespace EeveexModManager.Classes
         public long DownloadedSize { get; protected set; } = 0;
         public float ProgressPercentage { get; protected set; } = 0;
         public long DownloadSpeed;
-        public long AverageDownloadSpeed;
         public DownloadStates DownloadState { get; protected set; } = DownloadStates.PreStart;
 
 
@@ -52,8 +51,7 @@ namespace EeveexModManager.Classes
             DownloadTo = As;
             DownloadAt = At;
             InstallAt = installAt;
-
-            _downloadSpeeds = new List<int>(); //for average speed calculation
+            
             _downloadBytes = new List<int>(); //for speed calculation
 
             _start = DateTime.UtcNow;
@@ -247,7 +245,6 @@ namespace EeveexModManager.Classes
                     int speed = sum / bytesThisSecond.Count;
                     _downloadSpeeds.Add(speed);
                     DownloadSpeed = speed / 1000; //KB
-                    AverageDownloadSpeed = (_downloadSpeeds.Sum() / _downloadSpeeds.Count) / 1000;
                 }
                 else
                     DownloadSpeed = 0;

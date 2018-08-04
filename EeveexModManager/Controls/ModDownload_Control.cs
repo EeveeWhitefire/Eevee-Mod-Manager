@@ -58,7 +58,6 @@ namespace EeveexModManager.Controls
             NumberOfBytesInTotal = $"{AssociatedDownload.FileSize / 1000} KB";
             DownloadedPercentage = $"{AssociatedDownload.ProgressPercentage} %";
             Speed = $"{AssociatedDownload.DownloadSpeed} KB\\s";
-            AverageSpeed = $"{AssociatedDownload.AverageDownloadSpeed} KB\\s";
             switch (AssociatedDownload.DownloadState)
             {
                 case Interfaces.DownloadStates.PreStart:

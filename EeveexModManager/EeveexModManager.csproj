@@ -248,10 +248,12 @@
     <Compile Include="Classes\NxmHandler.cs" />
     <Compile Include="Classes\ProfilesManager.cs" />
     <Compile Include="Controls\ApplicationPicker_Control.cs" />
-    <Compile Include="Controls\ConfirmGame_Button.cs" />
-    <Compile Include="Controls\GameDetector_Control.cs" />
+    <Compile Include="Controls\EMM_ImageButton.cs" />
+    <Compile Include="Controls\EMM_TextButton.cs" />
+    <Compile Include="Controls\EMM_GameDetector.xaml.cs">
+      <DependentUpon>EMM_GameDetector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\GamePicker_Control.cs" />
-    <Compile Include="Controls\HoverDesignButton.cs" />
     <Compile Include="Controls\ModDownload_Control.cs" />
     <Compile Include="Controls\Mod_Control.cs" />
     <Compile Include="Controls\UserProfile_Control.cs" />
@@ -283,6 +285,10 @@
     <Compile Include="Windows\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controls\EMM_GameDetector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -296,6 +302,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Windows\AvailableGamesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -354,12 +364,6 @@
     <Resource Include="icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Button_GreenCheckMark.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Button_RedX.png" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.1">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.7.1 %28x86 and x64%29</ProductName>
@@ -372,26 +376,15 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Button_GreenCheckMark_Hover.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Button_RedX_Hover.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Button_GreenCheckMark_Disabled.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Button_RedX_Disabled.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="7z.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="named-pipe-client.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\settings_btn_selected.png" />
-    <Resource Include="Resources\settings_btn_idle.png" />
+    <Resource Include="Resources\settings_btn.png" />
+    <Resource Include="Resources\ignoregame_btn.png" />
+    <Resource Include="Resources\confirmgame_btn.png" />
     <Resource Include="Resources\icon - placeholder.png" />
     <Resource Include="Resources\editgamesettings.png" />
     <Resource Include="Resources\addgamebutton.png" />
@@ -406,10 +399,7 @@
     <Resource Include="Resources\Icon - Fallout3.png" />
     <Resource Include="Resources\Icon - DragonAgeOrigins.png" />
     <Resource Include="Resources\Icon - DragonAge2.png" />
-    <Resource Include="Resources\loginbutton_true.png" />
-    <Resource Include="Resources\loginbutton_false.png" />
     <Resource Include="Resources\nexusmods_logo.png" />
-    <Resource Include="Resources\launchbutton.png" />
     <Resource Include="Resources\thumbnail.png" />
     <Resource Include="Resources\icon.png" />
   </ItemGroup>

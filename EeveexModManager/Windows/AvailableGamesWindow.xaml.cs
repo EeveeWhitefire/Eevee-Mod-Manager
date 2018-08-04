@@ -199,7 +199,7 @@ namespace EeveexModManager.Windows
                         gameDetectorsParent.Children.Add(newStkPanel);
                     }
                 }
-                GameDetector_Control currDetectorControl = new GameDetector_Control(g);
+                EMM_GameDetector currDetectorControl = new EMM_GameDetector(g);
 
                 _gameSeachers.Add(new GameSearcher(g, currDetectorControl, _games));
                 currDetectorControl.Searcher = _gameSeachers.LastOrDefault();

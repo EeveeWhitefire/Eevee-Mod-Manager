@@ -13,12 +13,59 @@ namespace EeveexModManager.Controls
 {
     public class Mod_Control : Control
     {
-        public string ModState { get; set; }
-        public string ModName { get; set; }
-        public string FileName { get; set; }
-        public string ModAuthor { get; set; }
-        public string ModVersion { get; set; }
-        public string ModId { get; set; }
+        public bool ModState
+        {
+            get { return AssociatedMod.Active; }
+            set {
+                AssociatedMod.Active = value;
+                Update();
+            }
+        }
+        public string ModName
+        {
+            get { return AssociatedMod.Name; }
+            set
+            {
+                AssociatedMod.Name = value;
+                Update();
+            }
+        }
+        public string FileName
+        {
+            get { return AssociatedMod.ModFileName; }
+            set
+            {
+                AssociatedMod.ModFileName = value;
+                Update();
+            }
+        }
+        public string ModAuthor
+        {
+            get { return AssociatedMod.Author; }
+            set
+            {
+                AssociatedMod.Author = value;
+                Update();
+            }
+        }
+        public string ModVersion
+        {
+            get { return AssociatedMod.Version; }
+            set
+            {
+                AssociatedMod.Version = value;
+                Update();
+            }
+        }
+        public string ModId
+        {
+            get { return AssociatedMod.Id; }
+            set
+            {
+                AssociatedMod.Id = value;
+                Update();
+            }
+        }
 
         private DatabaseContext_Profile _db;
         public Mod AssociatedMod { get; set; }
@@ -27,17 +74,11 @@ namespace EeveexModManager.Controls
         {
             AssociatedMod = m;
             _db = db;
-            UpdateProperties();
         }
-
-        public void UpdateProperties()
+        
+        public void Update()
         {
-            ModName = AssociatedMod.Name;
-            FileName = AssociatedMod.ModFileName;
-            ModAuthor = AssociatedMod.Author;
-            ModVersion = AssociatedMod.Version;
-            ModId = AssociatedMod.Id;
-            ModState = AssociatedMod.Active ? "✔" : "🗙";
+            _db.GetCollection<Mod>("mods").Update(AssociatedMod);
         }
     }
 }

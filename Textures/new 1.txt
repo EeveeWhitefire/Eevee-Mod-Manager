@@ -1,0 +1,10 @@
+green - #FF00FF21
+grey - #FF808080
+yellow - #FFFFD800
+red - #FFFF0000
+bg - #FF373737
+border - #FF555555
+
+light blu - #FF218FEE
+dark blue - #FF155D997
+silver - #FFC0C0C0

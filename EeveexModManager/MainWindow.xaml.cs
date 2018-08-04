@@ -21,6 +21,8 @@ using EeveexModManager.Classes.DatabaseClasses;
 using EeveexModManager.Controls;
 using EeveexModManager.Windows;
 using EeveexModManager.Interfaces;
+using System.Windows.Shapes;
+using System.Windows.Controls.Primitives;
 
 namespace EeveexModManager
 {
@@ -182,7 +184,7 @@ namespace EeveexModManager
         {
             ModList_View.Dispatcher.Invoke(() =>
             {
-               (LogInButton.Content as Image).Source = Assistant.LoadImageFromResources($"loginbutton_{_accountHandler.IsLoggedIn}.png");
+                LogInButton.Content = "Logout";
                LoginState_TextBox.Text = $"Logged in! Welcome {username}!";
                LoginState_TextBox.Foreground = Brushes.LightGreen;
             });
@@ -292,19 +294,6 @@ namespace EeveexModManager
         }
 
         #region Mod List View Event Handlers
-
-        private void ModList_View_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            if (ModList_View.SelectedItems.Count == 1) //double clicked on only one download
-            {
-                var mControl = ModList_View.SelectedItem as Mod_Control;
-                mControl.AssociatedMod.ToggleIsActive();
-                mControl.UpdateProperties();
-                ModList_View.Items.Refresh();
-                _modManager.UpdateMod(mControl.AssociatedMod);
-            }
-        }
-
         #region Mod Right Click Menu Events
 
         private void ModList_View_ContextMenuOpening(object sender, ContextMenuEventArgs e)
@@ -513,6 +502,72 @@ namespace EeveexModManager
             {
                 _db.UpdateCurrentGame((gamePicker.SelectedItem as GamePicker_Control).AssociatedGame, SetGame);
             }
+        }
+
+        private void dirOpener_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int index = (sender as ComboBox).SelectedIndex;
+            string dir = null;
+            switch (index)
+            {
+                case 0: //"Open Game Directory"
+                    dir = _currGame.InstallationPath;
+                    break;
+                case 1: //"Open Profile Directory"
+                    dir = _currProfile.ProfileDirectory;
+                    break;
+                case 2: //"Open EMM Directory"
+                    dir = Defined.Settings.InstallationPath;
+                    break;
+                case 3: //"Open Mods Directory"
+                    dir = _currGame.ModsDirectory;
+                    break;
+                case 4: //"Open Downloads Directory"
+                    dir = _currGame.DownloadsDirectory;
+                    break;
+                case 5: //"Open EMM APPDATA Directory"
+                    dir = Defined.Settings.ApplicationDataPath;
+                    break;
+                default:
+                    break;
+            }
+            Process.Start(dir);
+        }
+
+        private void GridViewColumnHeader_Loaded(object sender, RoutedEventArgs e)
+        {
+            GridViewColumnHeader columnHeader = sender as GridViewColumnHeader;
+            if (columnHeader.Template.FindName("HeaderBorder", columnHeader) is Border HeaderBorder)
+            {
+                HeaderBorder.Background = HeaderBorder.Background;
+            }
+            if (columnHeader.Template.FindName("HeaderHoverBorder", columnHeader) is Border HeaderHoverBorder)
+            {
+                HeaderHoverBorder.BorderBrush = HeaderHoverBorder.BorderBrush;
+            }
+            if (columnHeader.Template.FindName("UpperHighlight", columnHeader) is Rectangle UpperHighlight)
+            {
+                UpperHighlight.Visibility = UpperHighlight.Visibility;
+            }
+            if (columnHeader.Template.FindName("PART_HeaderGripper", columnHeader) is Thumb PART_HeaderGripper)
+            {
+                PART_HeaderGripper.Background = Defined.Colors.LightBlue;
+            }
+        }
+
+        private void PluginsView_FilterTxt_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void pluginPromote_Btn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void pluginDemote_Btn_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

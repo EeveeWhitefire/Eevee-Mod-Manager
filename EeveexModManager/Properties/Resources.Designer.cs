@@ -83,59 +83,9 @@ namespace EeveexModManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap Button_GreenCheckMark {
+        public static System.Drawing.Bitmap confirmgame_btn {
             get {
-                object obj = ResourceManager.GetObject("Button_GreenCheckMark", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Button_GreenCheckMark_Disabled {
-            get {
-                object obj = ResourceManager.GetObject("Button_GreenCheckMark_Disabled", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Button_GreenCheckMark_Hover {
-            get {
-                object obj = ResourceManager.GetObject("Button_GreenCheckMark_Hover", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Button_RedX {
-            get {
-                object obj = ResourceManager.GetObject("Button_RedX", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Button_RedX_Disabled {
-            get {
-                object obj = ResourceManager.GetObject("Button_RedX_Disabled", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Button_RedX_Hover {
-            get {
-                object obj = ResourceManager.GetObject("Button_RedX_Hover", resourceCulture);
+                object obj = ResourceManager.GetObject("confirmgame_btn", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -273,29 +223,9 @@ namespace EeveexModManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap launchbutton {
+        public static System.Drawing.Bitmap ignoregame_btn {
             get {
-                object obj = ResourceManager.GetObject("launchbutton", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap loginbutton_false {
-            get {
-                object obj = ResourceManager.GetObject("loginbutton_false", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap loginbutton_true {
-            get {
-                object obj = ResourceManager.GetObject("loginbutton_true", resourceCulture);
+                object obj = ResourceManager.GetObject("ignoregame_btn", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -313,19 +243,9 @@ namespace EeveexModManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap settings_btn_idle {
+        public static System.Drawing.Bitmap settings_btn {
             get {
-                object obj = ResourceManager.GetObject("settings_btn_idle", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap settings_btn_selected {
-            get {
-                object obj = ResourceManager.GetObject("settings_btn_selected", resourceCulture);
+                object obj = ResourceManager.GetObject("settings_btn", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

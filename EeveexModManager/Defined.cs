@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows;
 
 using ApplicationSettings = EeveexModManager.Classes.ApplicationSettings;
+using System.Windows.Media;
 
 namespace EeveexModManager
 {
@@ -29,6 +30,24 @@ namespace EeveexModManager
         public const int MAX_GAME_DETECTORS_IN_COLUMN = 4;
         public const int GAME_OPTION_IMAGE_SIZE = 80;
         public static ApplicationSettings Settings = new ApplicationSettings();
+
+        public class Colors
+        {
+            private const string _lightBlue = "#FF218FEE";
+            private const string _darkBlue = "#FF155D99";
+            private const string _green = "#FF00FF21";
+            private const string _red = "#FFFF0000";
+            private const string _yellow = "#FFFFD800";
+            private const string _background = "#FF373737";
+            private const string _disabled = "#FF808080";
+
+            public static Brush LightBlue = (Brush)(new BrushConverter().ConvertFrom(_lightBlue));
+            public static Brush DarkBlue = (Brush)(new BrushConverter().ConvertFrom(_darkBlue));
+            public static Brush DisabledGrey = (Brush)(new BrushConverter().ConvertFrom(_disabled));
+            public static Brush Green = (Brush)(new BrushConverter().ConvertFrom(_green));
+            public static Brush Yellow = (Brush)(new BrushConverter().ConvertFrom(_yellow));
+            public static Brush Red = (Brush)(new BrushConverter().ConvertFrom(_red));
+        }
     }
 
     public static class ExtensionMethods
@@ -91,22 +110,6 @@ namespace EeveexModManager
             throw new NotImplementedException();
         }
     }
-    public class INeedANameMathConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            double v = (double)value;
-            double percentage = System.Convert.ToDouble(parameter);
-            int res = (int)((double)percentage * v);
-            return res;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class AdditionMathConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

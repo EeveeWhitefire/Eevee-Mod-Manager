@@ -7,7 +7,7 @@
         xmlns:customcontrols="clr-namespace:EeveexModManager.Controls"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="EeveexModManager.MainWindow"
         mc:Ignorable="d"
-        Title="Eevee Mod Manager" Height="730" Width="1478" ResizeMode="CanResizeWithGrip" MinWidth="1380" MinHeight="730" x:Name="window">
+        Title="Eevee Mod Manager" Height="730" Width="1478" ResizeMode="CanResizeWithGrip" MinWidth="1460" MinHeight="720" x:Name="window">
 
     <Window.Resources>
         <local:AdditionMathConverter x:Key="addConverter"/>
@@ -17,16 +17,12 @@
     <Grid Name="mainGrid" Background="#FF373737">
         <Grid.Resources>
             <BitmapImage x:Key="EMMThumbnailBMP" UriSource="pack://application:,,,/Resources/thumbnail.png" />
-            <BitmapImage x:Key="LaunchButtonBMP" UriSource="pack://application:,,,/Resources/launchbutton.png" />
             <BitmapImage x:Key="NexusModsLogoBMP" UriSource="pack://application:,,,/Resources/nexusmods_logo.png" />
-            <BitmapImage x:Key="LoginButtonBMP" UriSource="pack://application:,,,/Resources/loginbutton_false.png" />
-            <BitmapImage x:Key="LogoutButtonBMP" UriSource="pack://application:,,,/Resources/loginbutton_true.png" />
             <BitmapImage x:Key="AddGameButtonBMP" UriSource="pack://application:,,,/Resources/addgamebutton.png" />
-            <BitmapImage x:Key="SettingsButtonIdleBMP" UriSource="pack://application:,,,/Resources/settings_btn_idle.png" />
-            <BitmapImage x:Key="SettingsButtonSelectedBMP" UriSource="pack://application:,,,/Resources/settings_btn_selected.png"  />
+            <BitmapImage x:Key="SettingsButtonBMP" UriSource="pack://application:,,,/Resources/settings_btn.png" />
             <BitmapImage x:Key="EditGameSettingsButtonBMP" UriSource="pack://application:,,,/Resources/editgamesettings.png" />
             <Style TargetType="TabItem">
-                <Setter Property="Foreground" Value="Silver"/>
+                <Setter Property="Foreground" Value="#FFE6E6E6"/>
                 <Setter Property="Width" Value="90"/>
                 <Setter Property="Template">
                     <Setter.Value>
@@ -59,32 +55,14 @@
             <Style TargetType="GridViewColumnHeader">
                 <Setter Property="MinWidth" Value="80" />
                 <Setter Property="MaxWidth" Value="{Binding ActualWidth, ConverterParameter=0.4, Converter={StaticResource mulConverter}, ElementName=ModList_View}"/>
-                <Setter Property="Background" Value="#FF515151"/>
+                <Setter Property="Background" Value="#FF404040"/>
                 <Setter Property="Foreground" Value="Silver"/>
-            </Style>
-            <Style TargetType="{x:Type customcontrols:HoverDesignButton}">
-                <Setter Property="OverridesDefaultStyle" Value="True"/>
-                <Setter Property="Foreground" Value="Transparent"/>
-                <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="BorderBrush" Value="Transparent"/>
-                <Setter Property="CurrentDesign" Value="{Binding MouseNotOverDesign, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type customcontrols:HoverDesignButton}">
-                            <Border BorderThickness="0">
-                                <ContentPresenter Content="{Binding CurrentDesign, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="CurrentDesign" Value="{Binding MouseOverDesign, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"/>
-                                </Trigger>
-                                <Trigger Property="IsMouseOver" Value="False">
-                                    <Setter Property="CurrentDesign" Value="{Binding MouseNotOverDesign, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
+                <EventSetter Event="Loaded" Handler="GridViewColumnHeader_Loaded"/>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="#FF515151"/>
+                    </Trigger>
+                </Style.Triggers>
             </Style>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
@@ -123,7 +101,33 @@
                                 </GridView>
                             </ListView.View>
                         </ListView>
-                        <TextBox TextChanged="DownloadsView_FilterTxt_TextChanged" Foreground="Gray" MouseUp="DownloadsView_FilterTxt_MouseUp" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                        <TextBox TextChanged="DownloadsView_FilterTxt_TextChanged" Foreground="Gray" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Plugins">
+                <Grid>
+                    <StackPanel Orientation="Vertical">
+                        <ListView Name="PluginList_View" BorderBrush="LightGray" BorderThickness="3" Height="383">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="State" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.13, ElementName=PluginList_View}">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding PluginState}" Tag="{Binding PluginName}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Index" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.15, ElementName=PluginList_View}" DisplayMemberBinding="{Binding Priority}"/>
+                                    <GridViewColumn Header="Name" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.7, ElementName=PluginList_View}" DisplayMemberBinding="{Binding PluginName}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox TextChanged="PluginsView_FilterTxt_TextChanged" Foreground="Gray" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="640"/>
+                            <customcontrols:EMM_TextButton Content="🠝" x:Name="pluginPromote_Btn" Click="pluginPromote_Btn_Click" Width="30" BorderThickness="2"/>
+                            <customcontrols:EMM_TextButton Content="🠟" x:Name="pluginDemote_Btn" Click="pluginDemote_Btn_Click" Width="30" BorderThickness="2"/>
+                        </StackPanel>
                     </StackPanel>
                 </Grid>
             </TabItem>
@@ -132,8 +136,7 @@
             <TabItem Header="Mods">
                 <Grid>
                     <StackPanel Orientation="Vertical">
-                        <ListView Name="ModList_View" MouseDoubleClick="ModList_View_MouseDoubleClick" 
-                                          ContextMenuOpening="ModList_View_ContextMenuOpening"
+                        <ListView Name="ModList_View" ContextMenuOpening="ModList_View_ContextMenuOpening"
                                       BorderBrush="LightGray" BorderThickness="3" Height="383">
                             <ListView.ContextMenu>
                                 <ContextMenu>
@@ -144,7 +147,13 @@
                             </ListView.ContextMenu>
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn Header="State" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.13, ElementName=ModList_View}" DisplayMemberBinding="{Binding ModState}"/>
+                                    <GridViewColumn Header="State" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.13, ElementName=ModList_View}">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding ModState}" Tag="{Binding ModId}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
                                     <GridViewColumn Header="Name" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.24, ElementName=ModList_View}" DisplayMemberBinding="{Binding FileName}"/>
                                     <GridViewColumn Header="Origin" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.24, ElementName=ModList_View}" DisplayMemberBinding="{Binding ModName}"/>
                                     <GridViewColumn Header="Mod ID" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.13, ElementName=ModList_View}" DisplayMemberBinding="{Binding ModId}"/>
@@ -153,7 +162,7 @@
                                 </GridView>
                             </ListView.View>
                         </ListView>
-                        <TextBox TextChanged="ModsView_FilterTxt_TextChanged" Foreground="Gray" MouseUp="ModsView_FilterTxt_MouseDown"/>
+                        <TextBox TextChanged="ModsView_FilterTxt_TextChanged" Foreground="Gray" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
@@ -164,28 +173,36 @@
         <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top">
             <StackPanel Orientation="Vertical" Margin="0,0,20,0">
                 <TextBlock Text="Game:" Foreground="Silver" Margin="0,0,0,5" FontSize="15"/>
-                <ComboBox Name="gamePicker" Width="180" Height="20" Margin="0,0,0,10" SelectionChanged="gamePicker_SelectionChanged"/>
+                <ComboBox Name="gamePicker" Width="180" Height="25" Margin="0,0,0,10" SelectionChanged="gamePicker_SelectionChanged"/>
                 <TextBlock Text="Profile:" Foreground="Silver" Margin="0,0,0,5" FontSize="15"/>
-                <ComboBox Name="profilePicker" Margin="0,0,0,0" Width="180" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top">
+                <ComboBox Name="profilePicker" Margin="0,0,0,0" Width="180" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top">
                     <TextBlock Text="&lt;Manage Profiles&gt;"/>
                 </ComboBox>
+                <TextBlock Text="Open Directory:" Foreground="Silver" Margin="0,0,0,5" FontSize="15"/>
+                <ComboBox Name="dirOpener" Margin="0,0,0,0" Width="180" HorizontalAlignment="Left" Height="25" 
+                          VerticalAlignment="Top" SelectionChanged="dirOpener_SelectionChanged">
+                    <TextBlock Text="Open Game Directory"/>
+                    <TextBlock Text="Open Profile Directory"/>
+                    <TextBlock Text="Open EMM Directory"/>
+                    <TextBlock Text="Open Mods Directory"/>
+                    <TextBlock Text="Open Downloads Directory"/>
+                    <TextBlock Text="Open EMM APPDATA Directory"/>
+                </ComboBox>
             </StackPanel>
-            <customcontrols:HoverDesignButton MouseOverDesign="{StaticResource SettingsButtonSelectedBMP}" 
-                                              MouseNotOverDesign="{StaticResource SettingsButtonIdleBMP}" Click="SettingsButton_Click" 
-                                              Height="70" ToolTip="Settings" Width="70"/>
+            <customcontrols:EMM_ImageButton Click="SettingsButton_Click" Height="70" ToolTip="Settings" Width="70" VerticalAlignment="Top" 
+                                            Source="{StaticResource SettingsButtonBMP}"/>
         </StackPanel>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,10,0" Name="RightStack" Grid.ColumnSpan="2">
-            <Button Name="ApplicationLaunch_Button" Foreground="Transparent" Background="Transparent" BorderBrush="Transparent" Click="LaunchApplicationButton_Click" Margin="0,0,0,10">
-                <Image Source="{StaticResource LaunchButtonBMP}" Width="430" Height="80"/>
-            </Button>
+            <customcontrols:EMM_TextButton Width="430" Height="80" x:Name="ApplicationLaunch_Button" Click="LaunchApplicationButton_Click" Margin="0,0,0,10" Content="Launch" FontSize="50"/>
             <ComboBox Height="{Binding ActualHeight, ElementName=ApplicationLaunch_Button}" Width="430" Name="appPicker" ToolTip="Application to launch"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,0,10" Grid.Column="0" Grid.Row="2">
-            <Image Source="{StaticResource NexusModsLogoBMP}" Width="50" Height="50" Margin="0,0,10,0"/>
-            <Button FontSize="30" Margin="0,0,20,0" Click="LogInButton_Click" Foreground="Transparent" BorderBrush="Transparent" Background="Transparent" Name="LogInButton" >
-                <Image Source="{StaticResource LoginButtonBMP}" Width="160" Height="45"/>
-            </Button>
-            <TextBlock Text="Not logged in." FontSize="25" Foreground="OrangeRed" VerticalAlignment="Center" Name="LoginState_TextBox"/>
-        </StackPanel>
+        <Grid Background="#FF7C7C7C" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Column="0" Grid.Row="2" Width="480" Height="58">
+            <StackPanel Orientation="Horizontal"  Margin="20,0,0,00" >
+                <Image Source="{StaticResource NexusModsLogoBMP}" Width="50" Height="50" Margin="0,0,10,0"/>
+                <customcontrols:EMM_TextButton FontSize="30" Width="160" Height="45" Margin="0,0,20,0" Click="LogInButton_Click" 
+                                       x:Name="LogInButton" Content="Login"/>
+                <TextBlock Text="Not logged in." FontSize="25" Foreground="OrangeRed" VerticalAlignment="Center" Name="LoginState_TextBox"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

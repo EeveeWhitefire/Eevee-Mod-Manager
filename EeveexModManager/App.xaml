@@ -6,6 +6,11 @@
              Startup="App_Startup"
              Exit="ApplicationExit">
     <Application.Resources>
-        <properties:Settings x:Key="Settings" />
+        <ResourceDictionary>
+            <properties:Settings x:Key="Settings" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/EeveexModManager;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

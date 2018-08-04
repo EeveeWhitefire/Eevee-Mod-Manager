@@ -33,16 +33,14 @@ namespace EeveexModManager.Classes
         public bool Confirmed { get; protected set; } = false;
         public bool Search { get; set; } = true;
 
-        public GameDetector_Control GuiControl { get; protected set; }
+        public EMM_GameDetector GuiControl { get; protected set; }
 
-        public GameSearcher(IGameDefault def, GameDetector_Control control, List<Game> games)
+        public GameSearcher(IGameDefault def, EMM_GameDetector control, List<Game> games)
         {
             GameDefault = def;
             GuiControl = control;
             ConfirmedGames = games;
         }
-
-        public const int GameStateTextSize = 20;
 
         public void RestartSearch()
         {
@@ -50,7 +48,7 @@ namespace EeveexModManager.Classes
             Search = true;
             Exists = false;
             Confirmed = false;
-            StartSearch();
+            GuiControl.ignoreGame_Btn.IsEnabled = false;
         }
 
         public void StopSearch()
@@ -58,17 +56,10 @@ namespace EeveexModManager.Classes
             Search = false;
             if (!Exists)
             {
-                GuiControl.CancelButton.ChangeState(false);
-                GuiControl.ButtonsPanel.Children.Add(new TextBlock()
-                {
-                    Text = "Game Wasn't Found!",
-                    FontSize = GameStateTextSize,
-                    Margin = new Thickness(10, 0, 0, 0),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Foreground = Brushes.Red
-                });
+                GuiControl.ignoreGame_Btn.IsEnabled = false;
+                GuiControl.status.Text = "Game Wasn't Found!";
+                GuiControl.status.Foreground = Brushes.Red;
             }
-
         }
 
         public void ConfirmGame()
@@ -80,19 +71,12 @@ namespace EeveexModManager.Classes
 
         public void StartSearch()
         {
-            GuiControl.CancelButton.ChangeState(true);
+            GuiControl.ignoreGame_Btn.IsEnabled = false;
             if (GameIsInstalled())
             {
                 Exists = true;
-                GuiControl.FoundGame();
-                GuiControl.ButtonsPanel.Children.Add(new TextBlock()
-                {
-                    Text = "Game Was Found!",
-                    Margin = new Thickness(30, 0, 0, 0),
-                    FontSize = GameStateTextSize,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Foreground = Brushes.LightGreen
-                });
+                GuiControl.status.Text = "Game Was Found!";
+                GuiControl.status.Foreground = Brushes.LightGreen;
             }
             StopSearch();
         }
@@ -123,7 +107,5 @@ namespace EeveexModManager.Classes
             }
             return false;
         }
-        
-
     }
 }

@@ -7,7 +7,7 @@
         xmlns:customcontrols="clr-namespace:EeveexModManager.Controls"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="EeveexModManager.MainWindow"
         mc:Ignorable="d"
-        Title="Eevee Mod Manager" Height="730" Width="1478" ResizeMode="CanResizeWithGrip" MinWidth="1460" MinHeight="720" x:Name="window">
+        Title="Eevee Mod Manager v0.0.0" Height="730" Width="1478" ResizeMode="CanResizeWithGrip" MinWidth="1460" MinHeight="720" x:Name="window">
 
     <Window.Resources>
         <local:AdditionMathConverter x:Key="addConverter"/>
@@ -119,14 +119,14 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
                                     <GridViewColumn Header="Index" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.15, ElementName=PluginList_View}" DisplayMemberBinding="{Binding Priority}"/>
-                                    <GridViewColumn Header="Name" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.7, ElementName=PluginList_View}" DisplayMemberBinding="{Binding PluginName}"/>
+                                    <GridViewColumn Header="Name" Width="{Binding ActualWidth, Converter={StaticResource mulConverter}, ConverterParameter=0.6, ElementName=PluginList_View}" DisplayMemberBinding="{Binding PluginName}"/>
                                 </GridView>
                             </ListView.View>
                         </ListView>
                         <StackPanel Orientation="Horizontal">
-                            <TextBox TextChanged="PluginsView_FilterTxt_TextChanged" Foreground="Gray" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="640"/>
                             <customcontrols:EMM_TextButton Content="🠝" x:Name="pluginPromote_Btn" Click="pluginPromote_Btn_Click" Width="30" BorderThickness="2"/>
                             <customcontrols:EMM_TextButton Content="🠟" x:Name="pluginDemote_Btn" Click="pluginDemote_Btn_Click" Width="30" BorderThickness="2"/>
+                            <TextBox TextChanged="PluginsView_FilterTxt_TextChanged" Foreground="Gray" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="639"/>
                         </StackPanel>
                     </StackPanel>
                 </Grid>
@@ -189,20 +189,22 @@
                     <TextBlock Text="Open EMM APPDATA Directory"/>
                 </ComboBox>
             </StackPanel>
-            <customcontrols:EMM_ImageButton Click="SettingsButton_Click" Height="70" ToolTip="Settings" Width="70" VerticalAlignment="Top" 
-                                            Source="{StaticResource SettingsButtonBMP}"/>
+            <customcontrols:EMM_TextButton Click="SettingsButton_Click" Height="70" ToolTip="Settings" Width="70" VerticalAlignment="Top" 
+                                            Content="⚙" FontSize="40"/>
         </StackPanel>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,10,0" Name="RightStack" Grid.ColumnSpan="2">
             <customcontrols:EMM_TextButton Width="430" Height="80" x:Name="ApplicationLaunch_Button" Click="LaunchApplicationButton_Click" Margin="0,0,0,10" Content="Launch" FontSize="50"/>
             <ComboBox Height="{Binding ActualHeight, ElementName=ApplicationLaunch_Button}" Width="430" Name="appPicker" ToolTip="Application to launch"/>
         </StackPanel>
-        <Grid Background="#FF7C7C7C" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Column="0" Grid.Row="2" Width="480" Height="58">
-            <StackPanel Orientation="Horizontal"  Margin="20,0,0,00" >
-                <Image Source="{StaticResource NexusModsLogoBMP}" Width="50" Height="50" Margin="0,0,10,0"/>
-                <customcontrols:EMM_TextButton FontSize="30" Width="160" Height="45" Margin="0,0,20,0" Click="LogInButton_Click" 
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Column="0" Grid.Row="2" Height="58">
+            <Grid Background="#FF7C7C7C"  Width="680" >
+                <StackPanel Orientation="Horizontal"  Margin="20,0,0,00" >
+                    <Image Source="{StaticResource NexusModsLogoBMP}" Width="50" Height="50" Margin="0,0,10,0"/>
+                    <customcontrols:EMM_TextButton FontSize="30" Width="160" Height="45" Margin="0,0,20,0" Click="LogInButton_Click" 
                                        x:Name="LogInButton" Content="Login"/>
-                <TextBlock Text="Not logged in." FontSize="25" Foreground="OrangeRed" VerticalAlignment="Center" Name="LoginState_TextBox"/>
-            </StackPanel>
-        </Grid>
+                    <TextBlock Text="Not logged in." FontSize="25" Foreground="OrangeRed" VerticalAlignment="Center" Name="LoginState_TextBox"/>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
     </Grid>
 </Window>

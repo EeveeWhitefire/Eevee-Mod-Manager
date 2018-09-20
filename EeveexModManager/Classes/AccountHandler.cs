@@ -19,14 +19,14 @@ namespace EeveexModManager.Classes
 {
     public class AccountHandler
     {
-        private Action<string> WhenLogsIn = null;
+        private Action<string> Callback = null;
         public string Token { get; protected set; }
         public string Username { get; protected set; }
         public bool IsLoggedIn { get; protected set; }
 
-        public AccountHandler(Action<string> action)
+        public AccountHandler(Action<string> callback)
         {
-            WhenLogsIn = action;
+            Callback = callback;
         }
         public void Init()
         {
@@ -43,7 +43,7 @@ namespace EeveexModManager.Classes
                     if (ValidateKey(key))
                     {
                         Token = key;
-                        WhenLogsIn(Username);
+                        Callback(Username);
                     }
                     else
                     {
@@ -141,7 +141,7 @@ namespace EeveexModManager.Classes
                                 {
                                     await w.WriteAsync(key);
                                 }
-                                WhenLogsIn(Username);
+                                Callback(Username);
                             }
                         }
                     }

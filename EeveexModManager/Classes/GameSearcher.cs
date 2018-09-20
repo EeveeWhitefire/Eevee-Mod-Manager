@@ -48,7 +48,6 @@ namespace EeveexModManager.Classes
             Search = true;
             Exists = false;
             Confirmed = false;
-            GuiControl.ignoreGame_Btn.IsEnabled = false;
         }
 
         public void StopSearch()
@@ -56,6 +55,7 @@ namespace EeveexModManager.Classes
             Search = false;
             if (!Exists)
             {
+                GuiControl.status.Visibility = Visibility.Visible;
                 GuiControl.ignoreGame_Btn.IsEnabled = false;
                 GuiControl.status.Text = "Game Wasn't Found!";
                 GuiControl.status.Foreground = Brushes.Red;
@@ -71,12 +71,14 @@ namespace EeveexModManager.Classes
 
         public void StartSearch()
         {
-            GuiControl.ignoreGame_Btn.IsEnabled = false;
             if (GameIsInstalled())
             {
                 Exists = true;
+                GuiControl.status.Visibility = Visibility.Visible;
                 GuiControl.status.Text = "Game Was Found!";
                 GuiControl.status.Foreground = Brushes.LightGreen;
+                GuiControl.ignoreGame_Btn.IsEnabled = true;
+                GuiControl.confirmGame_Btn.IsEnabled = true;
             }
             StopSearch();
         }

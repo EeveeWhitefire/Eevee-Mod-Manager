@@ -205,6 +205,7 @@ namespace EeveexModManager.Windows
                 currDetectorControl.Searcher = _gameSeachers.LastOrDefault();
                 currDetectorControl.Searcher.StartSearch();
                 border.Child = currDetectorControl;
+                border.Background = Defined.Colors.AlternateBackground;
 
                 if (_gameSeachers.Count == 1) thumbnail.Visibility = Visibility.Visible;
 

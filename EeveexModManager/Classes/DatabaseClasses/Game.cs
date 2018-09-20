@@ -30,11 +30,12 @@ namespace EeveexModManager.Classes.DatabaseClasses
         public string DownloadsDirectory { get; set; }
         public string ProfilesDirectory { get; set; }
         public string BackupsDirectory { get; set; }
-        public Dictionary<string, string> KnownExecutables { get; set; }
+        public IDictionary<string, string> KnownExecutables { get; set; }
 
         public GameListEnum Id { get; set; }
 
         public bool IsCurrent { get; set; }
+        public string PluginFileExtension { get; set; }
         #endregion
         #region Static Methods
 
@@ -102,7 +103,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
         /// <param name="nReg">Display name of the game in the registry (under Uninstall)</param>
         /// <param name="id">Nexus Mods' generated ID for the game</param>
         public Game(string iPath, string dPath, string ePath, string n,
-            string nApi, string nNxm, string nReg, GameListEnum id, Dictionary<string, string> exes)
+            string nApi, string nNxm, string nReg, GameListEnum id, IDictionary<string, string> exes, string pluginExt)
         {
             Name = n;
             InstallationPath = iPath;
@@ -113,6 +114,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
             Id = id;
             Name_Registry = nReg;
             KnownExecutables = exes;
+            PluginFileExtension = pluginExt;
 
             string idAsString = Id.ToString();
 
@@ -130,7 +132,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
         /// <param name="regN">Registry name of the game</param>
         public Game(string iPath, IGameDefault def, string regN) :
             this(iPath, $"{iPath}{def.RelativeDataPath}", GetExecutablePath(def.ExecutableName, iPath),
-                def.Name, def.Name_API, def.Name_Nexus, regN, def.Id, def.KnownExecutables)
+                def.Name, def.Name_API, def.Name_Nexus, regN, def.Id, def.KnownExecutables, def.PluginFileExtension)
         { }
         /// <summary>
         /// Full Constructor
@@ -145,7 +147,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
         /// <param name="isCurr">Whether this game is the current one</param>
         public Game(string iPath, string dPath, string exePath,
             IGameDefault def, string nReg, bool isCurr) :
-            this(iPath, dPath, exePath, def.Name, def.Name_API, def.Name_Nexus, nReg, def.Id, def.KnownExecutables)
+            this(iPath, dPath, exePath, def.Name, def.Name_API, def.Name_Nexus, nReg, def.Id, def.KnownExecutables, def.PluginFileExtension)
         {
             IsCurrent = isCurr;
         }

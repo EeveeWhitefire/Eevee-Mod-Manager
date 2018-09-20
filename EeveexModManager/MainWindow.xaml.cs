@@ -51,7 +51,11 @@ namespace EeveexModManager
         private AdditionMathConverter _addConverter;
 
         #region Current State Variables
-        private Game _currGame { get { return _db.GetCurrentGame(); } }
+        private Game _currGame
+        {
+            get { return _db.GetCurrentGame(); }
+            set { _db.UpdateCurrentGame(value, SetGame); }
+        }
         private UserProfile _currProfile;
         private DatabaseContext_Profile _currProfileDb;
         #endregion
@@ -166,6 +170,7 @@ namespace EeveexModManager
             }
             if (!profiles.IsEmpty())
                 profilePicker.SelectedIndex = 1;
+            Title = $"{Defined.TITLE} | {_currGame.Name}";
         }
 
         #region Login
@@ -434,8 +439,8 @@ namespace EeveexModManager
             }
             else
             {
-                textbox.Foreground = Brushes.Black;
-                ModList_View.BorderBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FF218FEE")); ;
+                textbox.Foreground = Defined.Colors.DarkBlue;
+                ModList_View.BorderBrush = Defined.Colors.LightBlue;
                 _modManager.ModControls.ForEach(x =>
                 {
                     if (x.FileName.ToLower().Contains(textbox.Text.ToLower()) || x.ModName.ToLower().Contains(textbox.Text.ToLower()))
@@ -465,8 +470,8 @@ namespace EeveexModManager
             }
             else
             {
-                textbox.Foreground = Brushes.Black;
-                Downloads_View.BorderBrush = Brushes.LightSkyBlue;
+                textbox.Foreground = Defined.Colors.DarkBlue;
+                Downloads_View.BorderBrush = Defined.Colors.LightBlue;
                 _modManager.DownloadsManager.DownloadControls.ForEach(x =>
                 {
                     if (x.DownloadName.ToLower().Contains(textbox.Text.ToLower()))
@@ -500,7 +505,7 @@ namespace EeveexModManager
             }
             else if((sender as ComboBox).SelectedIndex != currGameIndex)
             {
-                _db.UpdateCurrentGame((gamePicker.SelectedItem as GamePicker_Control).AssociatedGame, SetGame);
+                _currGame = (gamePicker.SelectedItem as GamePicker_Control).AssociatedGame;
             }
         }
 
@@ -531,7 +536,11 @@ namespace EeveexModManager
                 default:
                     break;
             }
-            Process.Start(dir);
+            if (index != -1)
+            {
+                Process.Start(dir);
+                (sender as ComboBox).SelectedIndex = -1;
+            }
         }
 
         private void GridViewColumnHeader_Loaded(object sender, RoutedEventArgs e)
@@ -557,7 +566,19 @@ namespace EeveexModManager
 
         private void PluginsView_FilterTxt_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            var textbox = sender as TextBox;
+            if (textbox.Text.IsEmpty())
+            {
+                textbox.Foreground = Defined.Colors.DarkBlue;
+                PluginList_View.BorderBrush = Brushes.LightGray;
+                _modManager.DownloadsManager.DownloadControls.ForEach(x => x.Visibility = Visibility.Visible);
+            }
+            else
+            {
+                textbox.Foreground = Brushes.Black;
+                PluginList_View.BorderBrush = Defined.Colors.LightBlue;
+            }
+            PluginList_View.Items.Refresh();
         }
 
         private void pluginPromote_Btn_Click(object sender, RoutedEventArgs e)

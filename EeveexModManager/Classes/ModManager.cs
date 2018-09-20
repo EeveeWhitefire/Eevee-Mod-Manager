@@ -78,7 +78,7 @@ namespace EeveexModManager.Classes
         {
             _db = db;
             ModControls.Clear();
-            _db.GetCollection<Mod>("mods").FindAll().ToList().ForEach(x =>
+            _db.GetAll<Mod>("mods").ToList().ForEach(x =>
             {
                 ModControls.Add(new Mod_Control(x, _db));
             });

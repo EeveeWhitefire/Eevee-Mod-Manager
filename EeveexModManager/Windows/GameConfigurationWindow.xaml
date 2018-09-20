@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EeveexModManager.Windows"
+        xmlns:customcontrols="clr-namespace:EeveexModManager.Controls"
         mc:Ignorable="d"
         Title="Please Configure Your Games" Height="350" Width="650" ResizeMode="NoResize">
     <Grid Background="#FF373737">
@@ -15,7 +16,7 @@
         </Grid.Resources>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
             <TextBlock Text="Game:" Margin="0,0,0,10"/>
-            <ComboBox Name="gamePicker" Width="200" Height="20" SelectionChanged="gamePicker_SelectionChanged"/>
+            <ComboBox Name="gamePicker" Width="200" Height="25" SelectionChanged="gamePicker_SelectionChanged"/>
         </StackPanel>
         <StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Right" VerticalAlignment="Top">
             <TextBlock Text="Mods Directory:" Margin="0,0,0,10"/>
@@ -41,8 +42,8 @@
         </StackPanel>
         <Image Name="GameImage" Width="140" Height="140" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10" Source="{StaticResource GameIconPlaceholder}"/>
         <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,10,10" Width="156">
-            <Button Name="OkButton" Content="OK" Click="OkButton_Click" FontSize="30" Margin="0,0,0,10"/>
-            <Button Name="QuitButton" Content="Quit EMM" Click="QuitButton_Click" FontSize="30"/>
+            <customcontrols:EMM_TextButton x:Name="OkButton" Content="OK" Click="OkButton_Click" FontSize="30" Margin="0,0,0,10"/>
+            <customcontrols:EMM_TextButton x:Name="QuitButton" Content="Quit EMM" Click="QuitButton_Click" FontSize="30"/>
         </StackPanel>
     </Grid>
 </Window>

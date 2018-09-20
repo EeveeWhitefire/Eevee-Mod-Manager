@@ -15,6 +15,7 @@ namespace EeveexModManager.Interfaces
         string RelativeDataPath { get; }
         string[] Registry_Names { get; }
         string ExecutableName { get; }
-        Dictionary<string, string> KnownExecutables { get; }
+        IDictionary<string, string> KnownExecutables { get; }
+        string PluginFileExtension { get; }
     }
 }

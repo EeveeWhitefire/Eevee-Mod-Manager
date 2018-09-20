@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using EeveexModManager.Interfaces;
 using EeveexModManager.Classes;
 using LiteDB;
+using System.IO;
 
 namespace EeveexModManager.Classes.DatabaseClasses
 {
@@ -32,7 +33,11 @@ namespace EeveexModManager.Classes.DatabaseClasses
         [BsonId]
         public string FileId { get; set; }
 
-        public List<ModFile> FileTree;
+        public BinaryNode<string> FileTree;
+        public IEnumerable<string> Plugins
+        {
+            get { return FileTree.Children.Where(x => x.IsStandalone && x.Value.ToLower().EndsWith(".esp")).Select(x => x.Value); }
+        }
         #region Constructors
         public Mod() { }
 
@@ -57,11 +62,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
             FullSourceUri = srcUri;
             Priority = priority;
 
-            FileTree = new List<ModFile>();
-            Assistant.GetAllFilesInDir(ModDirectory).ForEach(x =>
-            {
-                FileTree.Add(new ModFile(this, x));
-            });
+            FileTree = BinaryNode.GetDirectoryTree(ModDirectory);
         }
         #endregion
 

@@ -29,7 +29,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
             return GetCollection<Game>("games").FindOne(x => x.IsCurrent);
         }
 
-        public void UpdateCurrentGame(Game newCurr, Action afterSetGame)
+        public void UpdateCurrentGame(Game newCurr, Action callback)
         {
             Game curr = GetCurrentGame();
             if (newCurr.Id != curr.Id)
@@ -39,7 +39,7 @@ namespace EeveexModManager.Classes.DatabaseClasses
                 GetCollection<Game>("games").Update(curr);
                 GetCollection<Game>("games").Update(newCurr);
             }
-            afterSetGame();
+            callback();
         }
 
 

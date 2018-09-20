@@ -6,21 +6,21 @@
              xmlns:local="clr-namespace:EeveexModManager.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="143" Width="510">
-    <Grid Background="#FF7C7C7C">
+    <Grid>
         <Grid.Resources>
             <BitmapImage x:Key="GameIconPlaceholderBMP" UriSource="pack://application:,,,/Resources/icon - placeholder.png" />
             <BitmapImage x:Key="IgnoreGameButtonBMP" UriSource="pack://application:,,,/Resources/ignoregame_btn.png" />
             <BitmapImage x:Key="ConfirmGameButtonBMP" UriSource="pack://application:,,,/Resources/confirmgame_btn.png" />
         </Grid.Resources>
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left">
-            <Image Source="{StaticResource GameIconPlaceholderBMP}" Width="140" Margin="0,0,10,0" VerticalAlignment="Top"/>
+            <Image Source="{StaticResource GameIconPlaceholderBMP}" Width="140" Margin="0,0,10,0" VerticalAlignment="Top" Name="gameIcon"/>
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,10,0" Width="350">
-                <TextBlock Text="Game's name" Foreground="#FF373737" FontSize="20" Margin="0,0,0,10"/>
+                <TextBlock Name="gameName" Text="Game's name" Foreground="#FF373737" FontSize="20" Margin="0,5,0,10"/>
                 <TextBox IsEnabled="False" IsReadOnly="True" Background="#FF616161" Height="25" Margin="0,0,0,10"/>
                 <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
-                    <local:EMM_ImageButton MouseNotOverDesign="#FFFF0000" MouseOverDesign="#FFFFD800" x:Name="ignoreGame_Btn"
-                                      Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                                      Click="ignoreGame_Btn_Click" Source="{StaticResource IgnoreGameButtonBMP}"/>
+                    <local:EMM_ImageButton MouseNotOverDesign="#FFFF0000" MouseOverDesign="#FFFFD800" IsEnabled="False"
+                                           x:Name="ignoreGame_Btn" Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                           Click="ignoreGame_Btn_Click" Source="{StaticResource IgnoreGameButtonBMP}"/>
                     <local:EMM_ImageButton MouseNotOverDesign="#FF00FF21" MouseOverDesign="#FFFFD800" x:Name="confirmGame_Btn"
                                       Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsEnabled="False"
                                       Margin="10,0,20,0" Click="confirmGame_Btn_Click" Source="{StaticResource ConfirmGameButtonBMP}"/>

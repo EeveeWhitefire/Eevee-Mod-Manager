@@ -30,6 +30,12 @@ namespace EeveexModManager.Controls
         public EMM_GameDetector(IGameDefault game)
         {
             InitializeComponent();
+            HorizontalAlignment = HorizontalAlignment.Stretch;
+            VerticalAlignment = VerticalAlignment.Stretch;
+            ResetGUI();
+            GameDefault = game;
+            gameIcon.Source = Assistant.LoadGameImage(GameDefault.Id.ToString());
+            gameName.Text = GameDefault.Name;
         }
 
         public void ResetGUI()
@@ -37,7 +43,7 @@ namespace EeveexModManager.Controls
             status.Visibility = Visibility.Hidden;
 
             confirmGame_Btn.IsEnabled = false;
-            ignoreGame_Btn.IsEnabled = true;
+            ignoreGame_Btn.IsEnabled = false;
         }
 
         public void FoundGame()

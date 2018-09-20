@@ -25,15 +25,15 @@ namespace EeveexModManager.Windows
     {
         private IEnumerable<IGameDefault> _gameDefaults;
         private Border _border;
-        private Action<IGameDefault, Border> _onConfirmGame;
+        private Action<IGameDefault, Border> _callback;
 
         public GameDetectionAdderWindow(IEnumerable<IGameDefault> availableGames, 
-            Border border, Action<IGameDefault, Border> action)
+            Border border, Action<IGameDefault, Border> callback)
         {
             InitializeComponent();
 
             _gameDefaults = availableGames;
-            _onConfirmGame = action;
+            _callback = callback;
             _border = border;
 
             foreach (var g in availableGames)
@@ -46,7 +46,7 @@ namespace EeveexModManager.Windows
 
         private void ConfirmGameButton_Click(object sender, RoutedEventArgs e)
         {
-            _onConfirmGame((availableGames_ComboBox.SelectedItem as A).GameDefault, _border);
+            _callback((availableGames_ComboBox.SelectedItem as A).GameDefault, _border);
             Close();
         }
 
@@ -62,7 +62,14 @@ namespace EeveexModManager.Windows
             public A(IGameDefault g)
             {
                 Orientation = Orientation.Horizontal;
-                Children.Add(Assistant.LoadGameImage(g.Id.ToString(), 75));
+                Children.Add(new Image()
+                {
+                    Source = Assistant.LoadGameImage(g.Id.ToString()),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Height = 75,
+                    Width = 75,
+                    Margin = new Thickness(0,0,10,0)
+                });
                 Children.Add(new TextBlock()
                 {
                     Text = g.Id.ToString(),
